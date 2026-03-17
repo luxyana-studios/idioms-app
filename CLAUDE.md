@@ -235,6 +235,119 @@ Auth and database features won't work until `.env` is configured.
 - Translations: flat JSON in `src/core/i18n/`
 - Tests: `__tests__/*.test.ts(x)` colocated in feature directories
 
+## Common Tasks
+
+### Adding a new feature module
+
+1. Create `src/features/<name>/` with `stores/`, `hooks/`, `components/` subdirs
+2. Create the Zustand store (`<name>.store.ts`) exporting `use<Name>Store`
+3. Create the wrapper hook (`hooks/use<Name>.ts`)
+4. Create a test in `stores/__tests__/` with native module mocks
+5. Run `npx tsc --noEmit` to verify
+
+Or use: `/new-feature <name>`
+
+### Adding a new screen to an existing tab
+
+1. Create the screen file in `src/app/(main)/(<group>)/<screen>.tsx` with default export
+2. Register it in the group's `_layout.tsx` as a `<Stack.Screen>`
+3. Add translation keys (`<group>.<screen>`) to both `en.json` and `es.json`
+
+Or use: `/new-screen <group> <screenName>`
+
+### Adding a new tab
+
+1. Create `src/app/(main)/(<tab>)/` with `_layout.tsx` (Stack) and `index.tsx`
+2. Add `<Tabs.Screen name="(<tab>)">` in `src/app/(main)/_layout.tsx` with icon and title
+3. Add translation key (`<tab>.title`) to both language files
+
+Or use: `/new-tab <name> [icon]`
+
+### Adding a new Supabase table
+
+1. Create the table in Supabase dashboard or via migration
+2. Run `npx supabase gen types typescript` to regenerate `src/types/supabase.ts`
+3. Create a query hook in the relevant feature using React Query (`useQuery`/`useMutation`)
+4. Remember to set up RLS policies on the table
+
+Or use: `/add-supabase-table <name>`
+
+### Adding a new language
+
+1. Create `src/core/i18n/<lang>.json` with all keys from `en.json`
+2. Add it to `resources` in `src/core/i18n/index.ts`
+3. Add a picker entry in the settings screen language list
+
+### Adding a native dependency
+
+1. `npm install <package>`
+2. Stop Metro if running
+3. `npx expo run:android` or `npx expo run:ios` to rebuild with native code
+4. Metro restarts automatically after the build
+
+### Changing theme colors
+
+Edit `src/core/theme/themes.ts` — both `lightColors` and `darkColors` objects.
+Do NOT edit `unistyles.ts` unless you're adding a completely new theme name.
+
+### Changing spacing, radius, or typography scale
+
+Edit `src/core/theme/tokens.ts`. These tokens are consumed everywhere via `theme.spacing.*`,
+`theme.radius.*`, and `theme.typography.*`.
+
+## For New Contributors
+
+### Where does my code go?
+
+| I'm building... | It goes in... |
+|---|---|
+| A new screen | `src/app/(main)/(<group>)/<screen>.tsx` |
+| Business logic / state | `src/features/<name>/stores/<name>.store.ts` |
+| A reusable UI component | `src/shared/components/<Name>.tsx` |
+| A feature-specific component | `src/features/<name>/components/<Name>.tsx` |
+| An API/data hook | `src/features/<name>/hooks/use<Name>.ts` |
+| Core infrastructure | `src/core/` — but ask first, this area has footguns |
+
+### What should I NOT touch without understanding why?
+
+- **`src/entry.ts`** — controls module load order. Unistyles must configure before any route loads. Getting this wrong crashes the app on startup.
+- **`babel.config.js` plugin order** — Reanimated plugin must be last. Unistyles plugin must come before it.
+- **`metro.config.js` condition names** — forces CJS resolution. Removing this breaks Zustand imports.
+- **`src/core/theme/unistyles.ts`** — registers themes/breakpoints. Only touch to add a new theme name.
+
+### Why can't I use Expo Go?
+
+This project uses Nitro Modules (Unistyles v3, MMKV v4) which compile native C++ code.
+Expo Go is a pre-built app that can't load custom native modules. You must use development
+builds: `npx expo run:android` or `npx expo run:ios`.
+
+### How does auth work?
+
+1. App starts → `entry.ts` runs → Expo Router loads routes
+2. Root `_layout.tsx` calls `useAuthStore().initialize()` which checks Supabase for an existing session
+3. `AuthGate` watches session state and redirects: no session → `/(auth)/login`, has session → `/(main)/(home)`
+4. Supabase persists the session token in MMKV storage (not the Zustand store)
+5. Splash screen stays up until auth is initialized AND fonts are loaded
+
+### How does styling work?
+
+Everything uses Unistyles v3. The key rule: import `StyleSheet` from `react-native-unistyles`,
+**never** from `react-native`. Styles are defined as functions that receive the theme:
+
+```tsx
+const styles = StyleSheet.create((theme) => ({
+  container: { padding: theme.spacing.md },
+}));
+```
+
+Use `theme.colors.*` for colors, `theme.spacing.*` for spacing, `theme.typography.*` for font
+sizes/weights. No magic numbers — always use tokens.
+
+### How do I get a custom slash command?
+
+This project has slash commands in `.claude/commands/`. Type `/` in Claude Code to see them.
+Available: `/new-feature`, `/new-screen`, `/new-tab`, `/review`, `/review-pr`, `/incorporate-pr-review`, `/add-translation`, `/add-supabase-table`.
+
 ## Environment
 
 - `android/` and `ios/` directories are gitignored — generated by `expo run:*`
