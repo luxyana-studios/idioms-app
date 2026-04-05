@@ -33,6 +33,7 @@ export function DrawerContent({
   return (
     <DrawerContentScrollView
       {...props}
+      style={{ flex: 1, backgroundColor: theme.colors.surface }}
       contentContainerStyle={styles.container}
     >
       <View style={styles.profile}>
@@ -78,7 +79,7 @@ export function DrawerContent({
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: theme.spacing.lg,
     paddingBottom: theme.spacing.xl,
   },
