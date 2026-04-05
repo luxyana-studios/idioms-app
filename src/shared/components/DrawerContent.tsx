@@ -1,10 +1,10 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
-import { DrawerContentScrollView } from "@react-navigation/drawer";
 import Constants from "expo-constants";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
@@ -17,6 +17,7 @@ export function DrawerContent({
 }: DrawerContentComponentProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const { signOut } = useAuth();
@@ -31,10 +32,15 @@ export function DrawerContent({
   }
 
   return (
-    <DrawerContentScrollView
-      {...props}
-      style={{ flex: 1, backgroundColor: theme.colors.surface }}
-      contentContainerStyle={styles.container}
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.colors.surface,
+          paddingTop: insets.top,
+          paddingBottom: Math.max(insets.bottom, theme.spacing.xl),
+        },
+      ]}
     >
       <View style={styles.profile}>
         <View
@@ -80,8 +86,6 @@ export function DrawerContent({
         <Typography variant="body">{t("settings.title")}</Typography>
       </Pressable>
 
-      <View style={styles.spacer} />
-
       <View style={styles.footer}>
         <Typography variant="caption">
           {t("drawer.appVersion", { version })}
@@ -92,15 +96,15 @@ export function DrawerContent({
           onPress={signOut}
         />
       </View>
-    </DrawerContentScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    flexGrow: 1,
+    flex: 1,
+    justifyContent: "space-between" as const,
     paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.xl,
   },
   profile: {
     paddingVertical: theme.spacing.xl,
@@ -126,9 +130,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.sm,
     borderRadius: theme.radius.md,
-  },
-  spacer: {
-    flex: 1,
   },
   footer: {
     gap: theme.spacing.md,
