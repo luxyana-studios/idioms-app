@@ -25,9 +25,9 @@ export function DrawerContent({
   const initial = email.charAt(0).toUpperCase() || "?";
   const version = Constants.expoConfig?.version ?? "1.0.0";
 
-  function handleSettings() {
+  function navigate(href: Parameters<typeof router.navigate>[0]) {
     navigation.closeDrawer();
-    router.navigate("/(main)/(settings)");
+    router.navigate(href);
   }
 
   return (
@@ -56,7 +56,26 @@ export function DrawerContent({
 
       <View style={styles.divider} />
 
-      <Pressable style={styles.navItem} onPress={handleSettings}>
+      <Pressable
+        style={styles.navItem}
+        onPress={() => navigate("/(main)/(tabs)/(home)")}
+      >
+        <Ionicons name="home-outline" size={20} color={theme.colors.text} />
+        <Typography variant="body">{t("home.title")}</Typography>
+      </Pressable>
+
+      <Pressable
+        style={styles.navItem}
+        onPress={() => navigate("/(main)/(tabs)/(explore)")}
+      >
+        <Ionicons name="search-outline" size={20} color={theme.colors.text} />
+        <Typography variant="body">{t("explore.title")}</Typography>
+      </Pressable>
+
+      <Pressable
+        style={styles.navItem}
+        onPress={() => navigate("/(main)/(settings)")}
+      >
         <Ionicons name="settings-outline" size={20} color={theme.colors.text} />
         <Typography variant="body">{t("settings.title")}</Typography>
       </Pressable>
