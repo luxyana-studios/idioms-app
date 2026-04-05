@@ -1,51 +1,14 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Tabs } from "expo-router";
-import { useTranslation } from "react-i18next";
-import { useUnistyles } from "react-native-unistyles";
+import { Drawer } from "expo-router/drawer";
+import { DrawerContent } from "@/shared/components/DrawerContent";
 
 export default function MainLayout() {
-  const { theme } = useUnistyles();
-  const { t } = useTranslation();
-
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.tabBarInactive,
-        tabBarStyle: {
-          backgroundColor: theme.colors.tabBar,
-          borderTopColor: theme.colors.border,
-        },
-      }}
+    <Drawer
+      drawerContent={(props) => <DrawerContent {...props} />}
+      screenOptions={{ headerShown: false, swipeEnabled: false }}
     >
-      <Tabs.Screen
-        name="(home)"
-        options={{
-          title: t("home.title"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="(explore)"
-        options={{
-          title: t("explore.title"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="search-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="(settings)"
-        options={{
-          title: t("settings.title"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" size={size} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+      <Drawer.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Drawer.Screen name="(settings)" options={{ headerShown: false }} />
+    </Drawer>
   );
 }

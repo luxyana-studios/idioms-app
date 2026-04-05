@@ -1,3 +1,4 @@
+import { DrawerToggleButton } from "@react-navigation/drawer";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useUnistyles } from "react-native-unistyles";
@@ -17,7 +18,15 @@ export default function HomeLayout() {
         headerTintColor: theme.colors.text,
       }}
     >
-      <Stack.Screen name="index" options={{ title: t("home.title") }} />
+      <Stack.Screen
+        name="index"
+        options={{
+          title: t("home.title"),
+          headerLeft: () => (
+            <DrawerToggleButton tintColor={theme.colors.text} />
+          ),
+        }}
+      />
       <Stack.Screen name="[id]" options={{ title: "" }} />
     </Stack>
   );
