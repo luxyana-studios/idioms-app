@@ -20,7 +20,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     if (!session && !inAuth) {
       router.replace("/(auth)/login");
     } else if (session && inAuth) {
-      router.replace("/(main)/(home)");
+      router.replace("/(main)/(tabs)/(home)");
     }
   }, [session, initialized, segments, router.replace]);
 

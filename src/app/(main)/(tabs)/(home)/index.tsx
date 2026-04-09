@@ -20,7 +20,7 @@ export default function HomeScreen() {
         </Typography>
         <Button
           title={t("home.viewDetail")}
-          onPress={() => router.push("/(main)/(home)/123")}
+          onPress={() => router.push("/(main)/(tabs)/(home)/123")}
           variant="outline"
         />
       </View>

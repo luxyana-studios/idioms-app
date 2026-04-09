@@ -23,5 +23,6 @@
   "settings.themeDark": "Oscuro",
   "settings.language": "Idioma",
   "settings.languageEn": "English",
-  "settings.languageEs": "Español"
+  "settings.languageEs": "Español",
+  "drawer.appVersion": "Versión {{version}}"
 }
