@@ -1,7 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Pressable, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
@@ -11,8 +17,13 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const router = useRouter();
+  const { width: screenWidth } = useWindowDimensions();
   const { idioms, currentIndex, savedIds, saveIdiom, unsaveIdiom, nextIdiom } =
     useIdiomsStore();
+
+  // Card dimensions: fill screen minus horizontal padding, cap at 340
+  const CARD_WIDTH = Math.min(screenWidth - theme.spacing.lg * 2, 340);
+  const CARD_HEIGHT = Math.round(CARD_WIDTH * (4 / 3));
 
   const current = idioms[currentIndex];
   const isSaved = savedIds.includes(current.id);
@@ -78,21 +89,44 @@ export default function HomeScreen() {
         </View>
 
         {/* Card Stack */}
-        <View style={styles.stackContainer}>
+        <View
+          style={[
+            styles.stackWrapper,
+            { width: CARD_WIDTH + 32, height: CARD_HEIGHT + 72 },
+          ]}
+        >
           {/* Back card 2 */}
           <View
             style={[
               styles.card,
-              styles.cardBack2,
-              { backgroundColor: theme.colors.surfaceContainerLow },
+              {
+                width: CARD_WIDTH,
+                height: CARD_HEIGHT,
+                backgroundColor: theme.colors.surfaceContainerLow,
+                transform: [
+                  { translateX: 16 },
+                  { translateY: 16 },
+                  { rotate: "2deg" },
+                ],
+                opacity: 0.4,
+              },
             ]}
           />
           {/* Back card 1 */}
           <View
             style={[
               styles.card,
-              styles.cardBack1,
-              { backgroundColor: theme.colors.surfaceContainer },
+              {
+                width: CARD_WIDTH,
+                height: CARD_HEIGHT,
+                backgroundColor: theme.colors.surfaceContainer,
+                transform: [
+                  { translateX: 8 },
+                  { translateY: 8 },
+                  { rotate: "1deg" },
+                ],
+                opacity: 0.7,
+              },
             ]}
           />
 
@@ -101,14 +135,18 @@ export default function HomeScreen() {
             style={[
               styles.card,
               styles.cardFront,
-              { backgroundColor: theme.colors.surfaceContainerHigh },
+              {
+                width: CARD_WIDTH,
+                height: CARD_HEIGHT,
+                backgroundColor: theme.colors.surfaceContainerHigh,
+              },
             ]}
             onPress={openDetail}
           >
             {/* Ambient glow */}
             <View style={styles.cardGlow} pointerEvents="none" />
 
-            {/* Top row: category + audio */}
+            {/* Top row: category chip + audio button */}
             <View style={styles.cardTop}>
               <View
                 style={[
@@ -200,7 +238,7 @@ export default function HomeScreen() {
           </Pressable>
 
           {/* Skip / Save hints */}
-          <View style={styles.hints}>
+          <View style={[styles.hints, { top: CARD_HEIGHT + 12 }]}>
             <TouchableOpacity style={styles.hintBtn} onPress={handleSkip}>
               <Ionicons
                 name="close"
@@ -320,9 +358,6 @@ export default function HomeScreen() {
   );
 }
 
-const CARD_WIDTH = 320;
-const CARD_HEIGHT = 440;
-
 const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
@@ -349,8 +384,8 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 32,
     alignItems: "center",
+    paddingBottom: theme.spacing.xl,
   },
   sectionHeader: {
     alignItems: "center",
@@ -368,26 +403,16 @@ const styles = StyleSheet.create((theme) => ({
     textAlign: "center",
     letterSpacing: -0.5,
   },
-  stackContainer: {
-    width: CARD_WIDTH + 32,
-    height: CARD_HEIGHT + 80,
-    alignItems: "center",
+  // Stack wrapper: sized dynamically in JSX via inline style
+  stackWrapper: {
+    position: "relative",
   },
+  // Card base: positioned absolute, sized dynamically
   card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    borderRadius: theme.radius["2xl"],
     position: "absolute",
     top: 0,
     left: 16,
-  },
-  cardBack2: {
-    transform: [{ translateX: 16 }, { translateY: 16 }, { rotate: "2deg" }],
-    opacity: 0.4,
-  },
-  cardBack1: {
-    transform: [{ translateX: 8 }, { translateY: 8 }, { rotate: "1deg" }],
-    opacity: 0.7,
+    borderRadius: theme.radius["2xl"],
   },
   cardFront: {
     padding: theme.spacing.lg,
@@ -402,10 +427,10 @@ const styles = StyleSheet.create((theme) => ({
     position: "absolute",
     top: 0,
     right: 0,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: `${theme.colors.primary}20`,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: `${theme.colors.primary}18`,
   },
   cardTop: {
     flexDirection: "row",
@@ -432,18 +457,16 @@ const styles = StyleSheet.create((theme) => ({
   cardContent: {
     flex: 1,
     justifyContent: "center",
-    marginTop: theme.spacing.lg,
+    marginTop: theme.spacing.md,
   },
   phrase: {
-    color: theme.colors.primary,
     marginBottom: theme.spacing.md,
-    lineHeight: 44,
   },
   definition: {
-    lineHeight: 26,
+    lineHeight: 24,
   },
   cardFooter: {
-    marginTop: theme.spacing.lg,
+    marginTop: theme.spacing.md,
     gap: theme.spacing.sm,
   },
   progressTrack: {
@@ -466,17 +489,16 @@ const styles = StyleSheet.create((theme) => ({
   },
   hints: {
     position: "absolute",
-    bottom: 0,
     left: 0,
     right: 0,
     flexDirection: "row",
     justifyContent: "center",
     gap: 48,
-    opacity: 0.7,
+    opacity: 0.75,
   },
   hintBtn: {
     alignItems: "center",
-    gap: theme.spacing.xs,
+    gap: 4,
   },
   hintLabel: {
     textTransform: "uppercase",
@@ -488,7 +510,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.lg,
     marginTop: theme.spacing.xl,
     gap: theme.spacing.md,
-    paddingBottom: theme.spacing.lg,
   },
   recCard: {
     flexDirection: "row",
@@ -501,16 +522,16 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
   },
   recIconBox: {
-    width: 56,
-    height: 56,
+    width: 52,
+    height: 52,
     borderRadius: theme.radius.xl,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
   },
   recIconRound: {
-    width: 48,
-    height: 48,
+    width: 44,
+    height: 44,
     borderRadius: theme.radius.full,
     alignItems: "center",
     justifyContent: "center",

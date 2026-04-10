@@ -1,6 +1,7 @@
 import { Slot, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { Platform, View } from "react-native";
 import { AppProviders } from "@/core/providers/AppProviders";
 import { useLoadFonts } from "@/core/theme/fonts";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
@@ -27,6 +28,16 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// On web: constrain to a phone-width column centered on screen
+function WebFrame({ children }: { children: React.ReactNode }) {
+  if (Platform.OS !== "web") return <>{children}</>;
+  return (
+    <View style={{ flex: 1, alignItems: "center", backgroundColor: "#16130e" }}>
+      <View style={{ flex: 1, width: "100%", maxWidth: 430 }}>{children}</View>
+    </View>
+  );
+}
+
 export default function RootLayout() {
   const initialize = useAuthStore((s) => s.initialize);
   const initialized = useAuthStore((s) => s.initialized);
@@ -44,9 +55,11 @@ export default function RootLayout() {
 
   return (
     <AppProviders>
-      <AuthGate>
-        <Slot />
-      </AuthGate>
+      <WebFrame>
+        <AuthGate>
+          <Slot />
+        </AuthGate>
+      </WebFrame>
     </AppProviders>
   );
 }
