@@ -1,37 +1,55 @@
-# Luxyana Template
+# IdiomDeck
 
-Production-ready React Native app template for Luxyana. Universal (iOS, Android, Web).
+Learn the art of language through beautifully crafted idiom cards. IdiomDeck is a mobile app for discovering, learning, and mastering idiomatic expressions through a swipe-based card deck experience.
+
+## Features
+
+- **Daily card deck** — swipeable idiom cards with skip/save actions
+- **Explore** — browse categories and search the full idiom library
+- **Saved** — personal collection of bookmarked idioms
+- **Library** — curated decks and collections by category
+- **Quiz mode** — test your knowledge with multiple-choice challenges
+- **Card detail** — etymology, global equivalents, usage examples
+- **Dark/light themes** — Terra Ethos (dark) and Futurist Serenity (light)
+- **i18n** — English and Spanish
 
 ## Tech Stack
 
-- **Framework**: Expo SDK 54 (Expo Router, file-based routing)
-- **Styling**: Unistyles v3 (dark/light/system themes)
-- **Client state**: Zustand + MMKV persistence
-- **Server state**: TanStack React Query
-- **Backend**: Supabase (auth + database)
-- **i18n**: i18next + react-i18next (EN/ES)
-- **Lists**: FlashList
-- **Animations**: Reanimated
-- **Linting**: Biome
+| Area | Library |
+|---|---|
+| Framework | Expo SDK 54, Expo Router 6 (file-based routing) |
+| Styling | Unistyles v3 (dark/light/system themes, Manrope font) |
+| Client state | Zustand v5 + MMKV persistence |
+| Server state | TanStack React Query v5 |
+| Backend | Supabase (auth + database) |
+| i18n | i18next + react-i18next (EN/ES) |
+| Lists | FlashList v2 |
+| Animations | Reanimated v4 |
+| Linting | Biome v2 |
+
+## Design System
+
+IdiomDeck uses two Material Design 3-based color palettes:
+
+- **Terra Ethos** (dark) — deep earthy tones, `#16130e` background, `#ecbe8e` primary (warm tan), `#bfcab1` secondary (sage)
+- **Futurist Serenity** (light) — cream base, `#fcf9f4` background, `#914731` primary (terracotta), `#596244` secondary (sage)
+
+Typography is set exclusively in **Manrope** (300–800 weights).
 
 ## Prerequisites
 
 - Node.js (LTS)
 - Android SDK (for Android builds)
 - JDK 17
-- A physical device or emulator with USB debugging enabled
 
 ### Android SDK Setup
 
 ```bash
-# Install JDK 17
 sudo apt-get install openjdk-17-jdk
-
-# Install Android command-line tools, then:
 sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 ```
 
-Add to your `~/.zshrc` (or `~/.bashrc`):
+Add to `~/.zshrc`:
 
 ```bash
 export ANDROID_HOME=$HOME/Android/Sdk
@@ -42,117 +60,98 @@ export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:
 ## Getting Started
 
 ```bash
-# Install dependencies
 npm install
+cp .env.example .env     # add your Supabase credentials
 
-# Copy env file and add your Supabase credentials
-cp .env.example .env
-
-# Build and install on Android device (first time only)
-npx expo run:android
-
-# Build and install on iOS device (first time only)
-npx expo run:ios
+npx expo run:android     # first build (Android)
+npx expo run:ios         # first build (iOS)
 ```
 
 ## Daily Development
 
 ```bash
-# Start Metro bundler — the app on your device connects automatically
-npx expo start
+npx expo start           # start Metro, app hot-reloads on device
+npx expo start --clear   # fresh cache (use after config changes)
 ```
 
-Code changes hot-reload instantly. No rebuild needed.
+Rebuild with `npx expo run:android` when adding native dependencies, changing `app.config.ts`, or modifying `babel.config.js` / `metro.config.js`.
 
-### When to Rebuild
-
-Run `npx expo run:android` (or `run:ios`) again when:
-
-- Adding or upgrading a library with native code
-- Changing `app.config.ts` native settings (package name, permissions, etc.)
-- Changing `babel.config.js` or `metro.config.js`
-
-### Useful Commands
+### Quality Commands
 
 ```bash
-npx expo start --clear        # start with fresh Metro cache
 npx biome check src/          # lint
 npx biome check --write src/  # lint + auto-fix
 npx tsc --noEmit              # type check
+npm test                      # unit tests
 ```
 
 ## Environment Variables
-
-Copy `.env.example` to `.env` and set:
 
 ```
 EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-The app runs without these (placeholder mode with a console warning), but auth and database features won't work.
+The app runs without these in placeholder mode (auth and database features disabled).
 
 ## Project Structure
 
 ```
 src/
-├── app/                    # Expo Router file-based routes
-│   ├── _layout.tsx         # Root layout (providers, auth gate)
-│   ├── index.tsx           # Entry redirect
-│   ├── (auth)/             # Login & signup screens
-│   └── (main)/             # Authenticated tabs
-│       ├── (home)/         # Home + detail screens
-│       ├── (explore)/      # FlashList + React Query demo
-│       └── (settings)/     # Theme, language, logout
-├── core/                   # Shared infrastructure
-│   ├── supabase/           # Supabase client
-│   ├── storage/            # MMKV instance + adapters
-│   ├── theme/              # Unistyles themes, tokens, breakpoints
-│   ├── i18n/               # i18next config + translations
-│   ├── query/              # React Query client
-│   └── providers/          # Provider composition
-├── features/               # Feature modules
-│   ├── auth/               # Auth store, hooks, components
-│   └── settings/           # Settings store + hooks
-├── shared/                 # Shared UI components
-│   └── components/         # Button, TextInput, Typography, ScreenContainer
-└── types/                  # TypeScript type definitions
+├── app/                        # Expo Router file-based routes
+│   ├── _layout.tsx             # Root layout (providers, auth gate)
+│   ├── index.tsx               # Entry redirect
+│   ├── (auth)/                 # Login & signup screens
+│   └── (main)/
+│       ├── (tabs)/
+│       │   ├── (home)/         # Card deck (Daily Selection)
+│       │   ├── (explore)/      # Search + bento category grid
+│       │   ├── (saved)/        # Saved idioms collection
+│       │   └── (library)/      # Curated decks & collections
+│       └── (settings)/         # Theme, language, logout
+├── core/                       # Shared infrastructure
+│   ├── supabase/               # Supabase client
+│   ├── storage/                # MMKV instance + adapters
+│   ├── theme/                  # Unistyles themes, tokens, Manrope fonts
+│   ├── i18n/                   # i18next config + translations (en/es)
+│   ├── query/                  # React Query client
+│   └── providers/              # Provider composition
+├── features/                   # Feature modules
+│   ├── auth/                   # Auth store, hooks, components
+│   ├── idioms/                 # Idiom types, mock data, Zustand store
+│   └── settings/               # Settings store + hooks
+├── shared/                     # Shared UI components
+│   └── components/             # Button, TextInput, Typography, ScreenContainer
+└── types/                      # TypeScript type definitions
 ```
 
 ## Connecting a Device
 
 ### USB
 
-1. Enable **Developer options** on your phone (tap Build number 7 times)
-2. Enable **USB debugging** in Developer options
-3. Connect via USB and accept the debugging prompt
+1. Enable **Developer options** (tap Build number 7 times)
+2. Enable **USB debugging**
+3. Connect via USB → accept the debugging prompt
 4. Verify: `adb devices`
 
 ### Wireless (Android 11+)
 
 1. Enable **Wireless debugging** in Developer options
 2. Tap **Pair device with pairing code**
-3. Run `adb pair <ip>:<pairing-port>` and enter the code
-4. Run `adb connect <ip>:<port>` (use the port shown under Wireless debugging)
+3. `adb pair <ip>:<pairing-port>` → enter the code
+4. `adb connect <ip>:<port>`
 
-#### Troubleshooting: mDNS device not recognized by Expo
+#### Troubleshooting: mDNS not recognized
 
-If `adb devices` shows an mDNS entry (e.g. `adb-SERIAL._adb-tls-connect._tcp`) and `npx expo run:android` fails with "device not found", Expo can't resolve the mDNS device ID. Fix by connecting via IP directly:
+If `npx expo run:android` fails with "device not found" on an mDNS entry:
 
-1. Get the device IP from the mDNS connection:
-   ```bash
-   adb -s "adb-SERIAL._adb-tls-connect._tcp" shell ip -f inet addr show wlan0
-   ```
-2. Find the port on your device under **Settings > Developer Options > Wireless Debugging**.
-3. Connect using the IP:
-   ```bash
-   adb connect <IP>:<PORT>
-   ```
-4. Verify with `adb devices` — you should see `<IP>:<PORT> device`.
-5. Run `npx expo run:android` again.
+```bash
+adb -s "adb-SERIAL._adb-tls-connect._tcp" shell ip -f inet addr show wlan0
+adb connect <IP>:<PORT>
+```
 
-## Important Notes
+## Notes
 
-- This template uses **development builds**, not Expo Go. Libraries like Unistyles v3 and MMKV v4 use Nitro Modules which require custom native code.
-- The `android/` and `ios/` directories are generated by `npx expo run:android/ios`. They are gitignored.
-- The custom entry point (`src/entry.ts`) ensures Unistyles configuration runs before Expo Router discovers routes.
+- Uses **development builds**, not Expo Go — Unistyles v3 and MMKV v4 require Nitro Modules (custom native code)
+- `android/` and `ios/` are gitignored — generated by `expo run:*`
+- `src/entry.ts` controls module load order: Unistyles must configure before Expo Router discovers routes

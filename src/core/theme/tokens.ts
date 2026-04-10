@@ -12,15 +12,19 @@ export const radius = {
   md: 8,
   lg: 12,
   xl: 16,
+  "2xl": 24,
+  "3xl": 32,
   full: 9999,
 } as const;
 
 export const typography = {
   fonts: {
-    sans: "DMSans_400Regular",
-    sansMedium: "DMSans_500Medium",
-    sansSemibold: "DMSans_600SemiBold",
-    sansBold: "DMSans_700Bold",
+    sans: "Manrope_400Regular",
+    sansLight: "Manrope_300Light",
+    sansMedium: "Manrope_500Medium",
+    sansSemibold: "Manrope_600SemiBold",
+    sansBold: "Manrope_700Bold",
+    sansExtraBold: "Manrope_800ExtraBold",
   },
   sizes: {
     xs: 12,

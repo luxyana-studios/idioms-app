@@ -15,7 +15,7 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
-    "@expo-google-fonts/dm-sans": "^0.4.2",
+    "@expo-google-fonts/manrope": "^0.4.2",
     "@expo/vector-icons": "^15.0.2",
     "@react-navigation/drawer": "^7.9.8",
     "@shopify/flash-list": "2.0.2",
