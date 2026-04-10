@@ -320,11 +320,16 @@ export default function HomeScreen() {
         <View style={styles.recommendations}>
           {/* Origin Stories */}
           <TouchableOpacity activeOpacity={0.75}>
-            <GlassView intensity={20} style={styles.recCard}>
+            <View
+              style={[
+                styles.recCard,
+                { backgroundColor: theme.colors.surfaceContainerLow },
+              ]}
+            >
               <View
                 style={[
                   styles.recIconBox,
-                  { backgroundColor: "rgba(255,255,255,0.06)" },
+                  { backgroundColor: theme.colors.surfaceContainerHighest },
                 ]}
               >
                 <Ionicons
@@ -353,7 +358,7 @@ export default function HomeScreen() {
                 size={16}
                 color={theme.colors.outline}
               />
-            </GlassView>
+            </View>
           </TouchableOpacity>
 
           {/* Quick Quiz — gradient accent */}
