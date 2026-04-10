@@ -1,4 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import type { DrawerNavigationProp } from "@react-navigation/drawer";
+import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -8,10 +10,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { Typography } from "@/shared/components/Typography";
@@ -20,6 +19,8 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const router = useRouter();
+  const navigation =
+    useNavigation<DrawerNavigationProp<Record<string, undefined>>>();
   const { width: screenWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   // Tab bar = 60px + paddingBottom (see tabs _layout) + extra breathing room
@@ -54,10 +55,14 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <View style={[styles.safeArea, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.headerBtn} hitSlop={8}>
+        <TouchableOpacity
+          style={styles.headerBtn}
+          hitSlop={8}
+          onPress={() => navigation.openDrawer()}
+        >
           <Ionicons name="menu" size={24} color={theme.colors.primary} />
         </TouchableOpacity>
         <Typography
@@ -364,7 +369,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
