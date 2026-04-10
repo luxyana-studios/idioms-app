@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -18,6 +19,7 @@ export default function HomeScreen() {
   const { theme } = useUnistyles();
   const router = useRouter();
   const { width: screenWidth } = useWindowDimensions();
+  const tabBarHeight = useBottomTabBarHeight();
   const { idioms, currentIndex, savedIds, saveIdiom, unsaveIdiom, nextIdiom } =
     useIdiomsStore();
 
@@ -67,7 +69,10 @@ export default function HomeScreen() {
 
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: tabBarHeight + theme.spacing.lg },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Section header */}
