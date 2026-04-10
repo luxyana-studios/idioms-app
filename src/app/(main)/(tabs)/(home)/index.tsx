@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -13,6 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
+import { GlassView } from "@/shared/components/GlassView";
 import { Typography } from "@/shared/components/Typography";
 
 export default function HomeScreen() {
@@ -23,13 +25,11 @@ export default function HomeScreen() {
     useNavigation<DrawerNavigationProp<Record<string, undefined>>>();
   const { width: screenWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  // Tab bar = 60px + paddingBottom (see tabs _layout) + extra breathing room
   const scrollPaddingBottom =
     60 + Math.max(insets.bottom, 8) + theme.spacing.xl;
   const { idioms, currentIndex, savedIds, saveIdiom, unsaveIdiom, nextIdiom } =
     useIdiomsStore();
 
-  // Card dimensions: fill screen minus horizontal padding, cap at 340
   const CARD_WIDTH = Math.min(screenWidth - theme.spacing.lg * 2, 340);
   const CARD_HEIGHT = Math.round(CARD_WIDTH * (4 / 3));
 
@@ -38,45 +38,57 @@ export default function HomeScreen() {
   const progress = (currentIndex + 1) / idioms.length;
 
   const handleSave = () => {
-    if (isSaved) {
-      unsaveIdiom(current.id);
-    } else {
-      saveIdiom(current.id);
-    }
+    if (isSaved) unsaveIdiom(current.id);
+    else saveIdiom(current.id);
     nextIdiom();
-  };
-
-  const handleSkip = () => {
-    nextIdiom();
-  };
-
-  const openDetail = () => {
-    router.push(`/(main)/(tabs)/(home)/${current.id}`);
   };
 
   return (
-    <View style={[styles.safeArea, { paddingTop: insets.top }]}>
-      {/* Header */}
+    <View style={[styles.root, { paddingTop: insets.top }]}>
+      {/* ── Ambient glow blobs ── */}
+      <View style={styles.blobsContainer} pointerEvents="none">
+        <View
+          style={[
+            styles.blob,
+            styles.blobTopRight,
+            { backgroundColor: `${theme.colors.primary}22` },
+          ]}
+        />
+        <View
+          style={[
+            styles.blob,
+            styles.blobBottomLeft,
+            { backgroundColor: `${theme.colors.secondary}18` },
+          ]}
+        />
+      </View>
+
+      {/* ── Header ── */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.headerBtn}
-          hitSlop={8}
           onPress={() => navigation.openDrawer()}
+          hitSlop={10}
         >
-          <Ionicons name="menu" size={24} color={theme.colors.primary} />
+          <Ionicons name="menu" size={22} color={theme.colors.primary} />
         </TouchableOpacity>
+
         <Typography
           variant="heading"
           weight="extraBold"
-          style={styles.headerTitle}
+          style={[styles.logo, { color: theme.colors.primary }]}
         >
           IdiomDeck
         </Typography>
-        <TouchableOpacity style={styles.headerBtn} hitSlop={8}>
-          <Ionicons name="search" size={24} color={theme.colors.primary} />
+
+        <TouchableOpacity style={styles.headerBtn} hitSlop={10}>
+          <GlassView intensity={30} style={styles.searchBtn}>
+            <Ionicons name="search" size={18} color={theme.colors.primary} />
+          </GlassView>
         </TouchableOpacity>
       </View>
 
+      {/* ── Scroll content ── */}
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={[
@@ -90,24 +102,24 @@ export default function HomeScreen() {
           <Typography
             variant="caption"
             weight="extraBold"
-            style={styles.sectionLabel}
+            style={[styles.sectionLabel, { color: theme.colors.secondary }]}
           >
             {t("home.dailySelection")}
           </Typography>
           <Typography
             variant="title"
             weight="extraBold"
-            style={styles.sectionTitle}
+            style={[styles.sectionTitle, { color: theme.colors.text }]}
           >
             {t("home.expandLexicon")}
           </Typography>
         </View>
 
-        {/* Card Stack */}
+        {/* ── Card Stack ── */}
         <View
           style={[
             styles.stackWrapper,
-            { width: CARD_WIDTH + 32, height: CARD_HEIGHT + 72 },
+            { width: CARD_WIDTH + 32, height: CARD_HEIGHT + 80 },
           ]}
         >
           {/* Back card 2 */}
@@ -118,12 +130,13 @@ export default function HomeScreen() {
                 width: CARD_WIDTH,
                 height: CARD_HEIGHT,
                 backgroundColor: theme.colors.surfaceContainerLow,
+                borderColor: "rgba(255,255,255,0.04)",
                 transform: [
                   { translateX: 16 },
                   { translateY: 16 },
                   { rotate: "2deg" },
                 ],
-                opacity: 0.4,
+                opacity: 0.45,
               },
             ]}
           />
@@ -135,6 +148,7 @@ export default function HomeScreen() {
                 width: CARD_WIDTH,
                 height: CARD_HEIGHT,
                 backgroundColor: theme.colors.surfaceContainer,
+                borderColor: "rgba(255,255,255,0.06)",
                 transform: [
                   { translateX: 8 },
                   { translateY: 8 },
@@ -145,7 +159,7 @@ export default function HomeScreen() {
             ]}
           />
 
-          {/* Front card */}
+          {/* ── Front card ── */}
           <Pressable
             style={[
               styles.card,
@@ -156,17 +170,23 @@ export default function HomeScreen() {
                 backgroundColor: theme.colors.surfaceContainerHigh,
               },
             ]}
-            onPress={openDetail}
+            onPress={() => router.push(`/(main)/(tabs)/(home)/${current.id}`)}
           >
-            {/* Ambient glow */}
+            {/* Top-edge light shimmer */}
+            <LinearGradient
+              colors={["rgba(255,255,255,0.06)", "transparent"]}
+              style={styles.cardShimmer}
+              pointerEvents="none"
+            />
+            {/* Warm glow blob */}
             <View style={styles.cardGlow} pointerEvents="none" />
 
-            {/* Top row: category chip + audio button */}
+            {/* Category chip + audio */}
             <View style={styles.cardTop}>
               <View
                 style={[
                   styles.chip,
-                  { backgroundColor: theme.colors.surfaceContainerHighest },
+                  { backgroundColor: "rgba(255,255,255,0.07)" },
                 ]}
               >
                 <Typography
@@ -183,19 +203,19 @@ export default function HomeScreen() {
               <TouchableOpacity
                 style={[
                   styles.audioBtn,
-                  { backgroundColor: theme.colors.surfaceContainerHighest },
+                  { backgroundColor: "rgba(255,255,255,0.07)" },
                 ]}
                 hitSlop={8}
               >
                 <Ionicons
                   name="volume-medium"
-                  size={20}
+                  size={18}
                   color={theme.colors.primary}
                 />
               </TouchableOpacity>
             </View>
 
-            {/* Idiom phrase + definition */}
+            {/* Phrase + definition */}
             <View style={styles.cardContent}>
               <Typography
                 variant="display"
@@ -220,17 +240,14 @@ export default function HomeScreen() {
               <View
                 style={[
                   styles.progressTrack,
-                  { backgroundColor: theme.colors.surfaceContainerLowest },
+                  { backgroundColor: "rgba(255,255,255,0.06)" },
                 ]}
               >
-                <View
-                  style={[
-                    styles.progressFill,
-                    {
-                      backgroundColor: theme.colors.secondary,
-                      width: `${progress * 100}%`,
-                    },
-                  ]}
+                <LinearGradient
+                  colors={[theme.colors.secondary, theme.colors.primary]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[styles.progressFill, { width: `${progress * 100}%` }]}
                 />
               </View>
               <View style={styles.stats}>
@@ -252,12 +269,19 @@ export default function HomeScreen() {
             </View>
           </Pressable>
 
-          {/* Skip / Save hints */}
-          <View style={[styles.hints, { top: CARD_HEIGHT + 12 }]}>
-            <TouchableOpacity style={styles.hintBtn} onPress={handleSkip}>
+          {/* ── Skip / Save hints ── */}
+          <GlassView
+            intensity={50}
+            style={[styles.hintsGlass, { top: CARD_HEIGHT + 12 }]}
+          >
+            <TouchableOpacity
+              style={styles.hintBtn}
+              onPress={nextIdiom}
+              hitSlop={8}
+            >
               <Ionicons
-                name="close"
-                size={24}
+                name="close-circle-outline"
+                size={22}
                 color={theme.colors.textSecondary}
               />
               <Typography
@@ -271,10 +295,22 @@ export default function HomeScreen() {
                 {t("home.skip")}
               </Typography>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.hintBtn} onPress={handleSave}>
+
+            <View
+              style={[
+                styles.hintDivider,
+                { backgroundColor: "rgba(255,255,255,0.1)" },
+              ]}
+            />
+
+            <TouchableOpacity
+              style={styles.hintBtn}
+              onPress={handleSave}
+              hitSlop={8}
+            >
               <Ionicons
                 name={isSaved ? "heart" : "heart-outline"}
-                size={24}
+                size={22}
                 color={theme.colors.primary}
               />
               <Typography
@@ -285,86 +321,100 @@ export default function HomeScreen() {
                 {t("home.saved")}
               </Typography>
             </TouchableOpacity>
-          </View>
+          </GlassView>
         </View>
 
-        {/* Secondary recommendations */}
+        {/* ── Recommendations ── */}
         <View style={styles.recommendations}>
           {/* Origin Stories */}
-          <TouchableOpacity
-            style={[
-              styles.recCard,
-              { backgroundColor: theme.colors.surfaceContainerLow },
-            ]}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.recIconBox,
-                { backgroundColor: theme.colors.surfaceContainerHigh },
-              ]}
-            >
+          <TouchableOpacity activeOpacity={0.75}>
+            <GlassView intensity={20} style={styles.recCard}>
+              <View
+                style={[
+                  styles.recIconBox,
+                  { backgroundColor: "rgba(255,255,255,0.06)" },
+                ]}
+              >
+                <Ionicons
+                  name="book"
+                  size={22}
+                  color={theme.colors.textSecondary}
+                />
+              </View>
+              <View style={styles.recText}>
+                <Typography
+                  variant="label"
+                  weight="bold"
+                  style={{ color: theme.colors.text }}
+                >
+                  {t("home.originStories")}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  style={{ color: theme.colors.textSecondary }}
+                >
+                  {t("home.originStoriesSubtitle")}
+                </Typography>
+              </View>
               <Ionicons
-                name="book"
-                size={24}
-                color={theme.colors.textSecondary}
+                name="chevron-forward"
+                size={16}
+                color={theme.colors.outline}
               />
-            </View>
-            <View style={styles.recText}>
-              <Typography
-                variant="label"
-                weight="bold"
-                style={{ color: theme.colors.text }}
-              >
-                {t("home.originStories")}
-              </Typography>
-              <Typography
-                variant="caption"
-                style={{ color: theme.colors.textSecondary }}
-              >
-                {t("home.originStoriesSubtitle")}
-              </Typography>
-            </View>
+            </GlassView>
           </TouchableOpacity>
 
-          {/* Quick Quiz */}
-          <TouchableOpacity
-            style={[
-              styles.recCard,
-              styles.recCardAccent,
-              {
-                backgroundColor: `${theme.colors.primary}14`,
-                borderColor: `${theme.colors.primary}20`,
-              },
-            ]}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.recIconRound,
-                { backgroundColor: theme.colors.primary },
-              ]}
-            >
-              <Ionicons
-                name="flash"
-                size={20}
-                color={theme.colors.primaryText}
+          {/* Quick Quiz — gradient accent */}
+          <TouchableOpacity activeOpacity={0.75}>
+            <View style={styles.recCardQuiz}>
+              <LinearGradient
+                colors={[
+                  `${theme.colors.primary}22`,
+                  `${theme.colors.primaryContainer}15`,
+                ]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[
+                  StyleSheet.absoluteFillObject,
+                  {
+                    borderRadius: theme.radius.xl,
+                    borderWidth: 1,
+                    borderColor: `${theme.colors.primary}25`,
+                  },
+                ]}
               />
-            </View>
-            <View style={styles.recText}>
-              <Typography
-                variant="label"
-                weight="bold"
-                style={{ color: theme.colors.primary }}
+              <View
+                style={[
+                  styles.recIconRound,
+                  { backgroundColor: theme.colors.primary },
+                ]}
               >
-                {t("home.quickQuiz")}
-              </Typography>
-              <Typography
-                variant="caption"
-                style={{ color: theme.colors.onPrimaryContainer }}
-              >
-                {t("home.quickQuizSubtitle")}
-              </Typography>
+                <Ionicons
+                  name="flash"
+                  size={18}
+                  color={theme.colors.primaryText}
+                />
+              </View>
+              <View style={styles.recText}>
+                <Typography
+                  variant="label"
+                  weight="bold"
+                  style={{ color: theme.colors.primary }}
+                >
+                  {t("home.quickQuiz")}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  style={{ color: theme.colors.onPrimaryContainer }}
+                >
+                  {t("home.quickQuizSubtitle")}
+                </Typography>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={theme.colors.primary}
+              />
             </View>
           </TouchableOpacity>
         </View>
@@ -374,10 +424,33 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create((theme) => ({
-  safeArea: {
+  root: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+  // Ambient blobs
+  blobsContainer: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
+  },
+  blob: {
+    position: "absolute",
+    borderRadius: 999,
+  },
+  blobTopRight: {
+    width: 280,
+    height: 280,
+    top: -80,
+    right: -80,
+    // Blur simulated via opacity + size
+  },
+  blobBottomLeft: {
+    width: 240,
+    height: 240,
+    bottom: 100,
+    left: -80,
+  },
+  // Header
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -391,61 +464,78 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-  headerTitle: {
-    color: theme.colors.primary,
+  searchBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: theme.radius.full,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  logo: {
     letterSpacing: -0.5,
   },
+  // Scroll
   scroll: {
     flex: 1,
   },
   scrollContent: {
     alignItems: "center",
-    paddingBottom: theme.spacing.xl,
   },
+  // Section header
   sectionHeader: {
     alignItems: "center",
     marginBottom: theme.spacing.xl,
     paddingHorizontal: theme.spacing.lg,
   },
   sectionLabel: {
-    color: theme.colors.secondary,
     textTransform: "uppercase",
-    letterSpacing: 2,
-    marginBottom: theme.spacing.xs,
+    letterSpacing: 2.5,
+    marginBottom: 6,
+    fontSize: 10,
   },
   sectionTitle: {
-    color: theme.colors.text,
     textAlign: "center",
     letterSpacing: -0.5,
   },
-  // Stack wrapper: sized dynamically in JSX via inline style
+  // Card stack
   stackWrapper: {
     position: "relative",
   },
-  // Card base: positioned absolute, sized dynamically
   card: {
     position: "absolute",
     top: 0,
     left: 16,
     borderRadius: theme.radius["2xl"],
+    borderWidth: 1,
   },
   cardFront: {
     padding: theme.spacing.lg,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 16 },
-    shadowOpacity: 0.3,
-    shadowRadius: 32,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.4,
+    shadowRadius: 40,
+    elevation: 12,
     overflow: "hidden",
+    borderColor: "rgba(255,255,255,0.09)",
+  },
+  cardShimmer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 80,
+    borderTopLeftRadius: theme.radius["2xl"],
+    borderTopRightRadius: theme.radius["2xl"],
   },
   cardGlow: {
     position: "absolute",
-    top: 0,
-    right: 0,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: `${theme.colors.primary}18`,
+    top: -40,
+    right: -40,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: `${theme.colors.primary}15`,
   },
   cardTop: {
     flexDirection: "row",
@@ -453,9 +543,11 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
   },
   chip: {
-    paddingHorizontal: theme.spacing.md,
+    paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: theme.radius.full,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
   },
   chipText: {
     textTransform: "uppercase",
@@ -463,11 +555,13 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: 10,
   },
   audioBtn: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     borderRadius: theme.radius.full,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
   },
   cardContent: {
     flex: 1,
@@ -476,6 +570,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   phrase: {
     marginBottom: theme.spacing.md,
+    lineHeight: 44,
   },
   definition: {
     lineHeight: 24,
@@ -485,7 +580,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.sm,
   },
   progressTrack: {
-    height: 4,
+    height: 3,
     borderRadius: theme.radius.full,
     overflow: "hidden",
   },
@@ -502,24 +597,35 @@ const styles = StyleSheet.create((theme) => ({
     letterSpacing: 1,
     fontSize: 10,
   },
-  hints: {
+  // Hints glass pill
+  hintsGlass: {
     position: "absolute",
-    left: 0,
+    left: 16,
     right: 0,
+    width: "auto",
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "center",
-    gap: 48,
-    opacity: 0.75,
+    borderRadius: theme.radius.full,
+    paddingVertical: 10,
+    paddingHorizontal: theme.spacing.xl,
+    gap: theme.spacing.xl,
+    overflow: "hidden",
   },
   hintBtn: {
     alignItems: "center",
     gap: 4,
   },
+  hintDivider: {
+    width: 1,
+    height: 28,
+  },
   hintLabel: {
     textTransform: "uppercase",
     letterSpacing: 1.5,
-    fontSize: 10,
+    fontSize: 9,
   },
+  // Recommendations
   recommendations: {
     width: "100%",
     paddingHorizontal: theme.spacing.lg,
@@ -532,17 +638,25 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.md,
     padding: theme.spacing.md,
     borderRadius: theme.radius.xl,
+    overflow: "hidden",
   },
-  recCardAccent: {
-    borderWidth: 1,
+  recCardQuiz: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.md,
+    padding: theme.spacing.md,
+    borderRadius: theme.radius.xl,
+    overflow: "hidden",
   },
   recIconBox: {
-    width: 52,
-    height: 52,
-    borderRadius: theme.radius.xl,
+    width: 48,
+    height: 48,
+    borderRadius: theme.radius.lg,
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.07)",
   },
   recIconRound: {
     width: 44,

@@ -1,14 +1,16 @@
+import { LinearGradient } from "expo-linear-gradient";
 import {
   ActivityIndicator,
   Pressable,
   type PressableProps,
+  View,
 } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Typography } from "./Typography";
 
 interface ButtonProps extends Omit<PressableProps, "children"> {
   title: string;
-  variant?: "primary" | "outline";
+  variant?: "primary" | "outline" | "ghost";
   loading?: boolean;
 }
 
@@ -20,13 +22,14 @@ export function Button({
   style,
   ...props
 }: ButtonProps) {
+  const { theme } = useUnistyles();
   const isPrimary = variant === "primary";
+  const isOutline = variant === "outline";
 
   return (
     <Pressable
       style={({ pressed }) => [
         styles.base,
-        isPrimary ? styles.primary : styles.outline,
         (disabled || loading) && styles.disabled,
         pressed && styles.pressed,
         typeof style === "function"
@@ -36,19 +39,44 @@ export function Button({
       disabled={disabled || loading}
       {...props}
     >
-      {loading ? (
-        <ActivityIndicator
-          color={
-            isPrimary ? styles.primaryText.color : styles.outlineText.color
-          }
-        />
-      ) : (
-        <Typography
-          variant="label"
-          style={isPrimary ? styles.primaryText : styles.outlineText}
-        >
-          {title}
-        </Typography>
+      {({ pressed }) => (
+        <>
+          {isPrimary && (
+            <LinearGradient
+              colors={[theme.colors.primary, theme.colors.primaryContainer]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.gradient, pressed && styles.pressed]}
+            />
+          )}
+          {isOutline && (
+            <View
+              style={[
+                styles.outlineBg,
+                { borderColor: `${theme.colors.primary}40` },
+              ]}
+            />
+          )}
+          {loading ? (
+            <ActivityIndicator
+              color={
+                isPrimary ? theme.colors.primaryText : theme.colors.primary
+              }
+            />
+          ) : (
+            <Typography
+              variant="label"
+              weight="bold"
+              style={
+                isPrimary
+                  ? { color: theme.colors.primaryText, letterSpacing: 0.5 }
+                  : { color: theme.colors.primary }
+              }
+            >
+              {title}
+            </Typography>
+          )}
+        </>
       )}
     </Pressable>
   );
@@ -56,29 +84,26 @@ export function Button({
 
 const styles = StyleSheet.create((theme) => ({
   base: {
-    height: 48,
-    borderRadius: theme.radius.md,
+    height: 52,
+    borderRadius: theme.radius.full,
     alignItems: "center" as const,
     justifyContent: "center" as const,
+    overflow: "hidden" as const,
   },
-  primary: {
-    backgroundColor: theme.colors.primary,
+  gradient: {
+    ...StyleSheet.absoluteFillObject,
   },
-  outline: {
+  outlineBg: {
+    ...StyleSheet.absoluteFillObject,
     borderWidth: 1,
-    borderColor: theme.colors.border,
-    backgroundColor: "transparent",
-  },
-  primaryText: {
-    color: theme.colors.primaryText,
-  },
-  outlineText: {
-    color: theme.colors.text,
+    borderRadius: theme.radius.full,
+    backgroundColor: `${theme.colors.primary}0a`,
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.45,
   },
   pressed: {
-    opacity: 0.8,
+    opacity: 0.82,
+    transform: [{ scale: 0.98 }],
   },
 }));
