@@ -1,9 +1,11 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
+import { BlurView } from "expo-blur";
 import Constants from "expo-constants";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Pressable, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -28,28 +30,68 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
     router.navigate(href);
   }
 
+  const GlassBackground =
+    Platform.OS === "android" ? (
+      <View
+        style={[
+          StyleSheet.absoluteFillObject,
+          { backgroundColor: "rgba(22, 19, 14, 0.96)" },
+        ]}
+      />
+    ) : (
+      <BlurView
+        intensity={80}
+        tint="dark"
+        style={StyleSheet.absoluteFillObject}
+      />
+    );
+
   return (
     <View
       style={[
         styles.container,
         {
-          backgroundColor: theme.colors.surface,
-          paddingTop: insets.top,
+          paddingTop: insets.top + theme.spacing.md,
           paddingBottom: Math.max(insets.bottom, theme.spacing.xl),
         },
       ]}
     >
+      {/* Glass background */}
+      {GlassBackground}
+
+      {/* Subtle top-edge shimmer */}
+      <LinearGradient
+        colors={[`${theme.colors.primary}18`, "transparent"]}
+        style={styles.shimmer}
+        pointerEvents="none"
+      />
+
+      {/* Ambient glow blob */}
+      <View
+        style={[styles.glow, { backgroundColor: `${theme.colors.primary}10` }]}
+        pointerEvents="none"
+      />
+
+      {/* Profile */}
       <View style={styles.profile}>
-        <View
-          style={[styles.avatar, { backgroundColor: theme.colors.primary }]}
+        <LinearGradient
+          colors={[
+            theme.colors.primary,
+            (theme.colors as Record<string, string>)["primaryContainer"] ??
+              theme.colors.primary,
+          ]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.avatar}
         >
           <Typography
             variant="heading"
+            weight="extraBold"
             style={{ color: theme.colors.primaryText }}
           >
             {initial}
           </Typography>
-        </View>
+        </LinearGradient>
         {email ? (
           <Typography variant="body" color="textSecondary">
             {email}
@@ -57,40 +99,110 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
         ) : null}
       </View>
 
+      {/* Divider */}
       <View style={styles.divider} />
 
+      {/* Nav items */}
       <View style={styles.nav}>
         <Pressable
-          style={styles.navItem}
+          style={({ pressed }) => [
+            styles.navItem,
+            pressed && styles.navItemPressed,
+          ]}
           onPress={() => navigate("/(main)/(tabs)/(home)")}
         >
-          <Ionicons name="home-outline" size={20} color={theme.colors.text} />
-          <Typography variant="body">{t("home.title")}</Typography>
+          <View
+            style={[
+              styles.navIcon,
+              { backgroundColor: "rgba(255,255,255,0.05)" },
+            ]}
+          >
+            <Ionicons
+              name="albums-outline"
+              size={20}
+              color={theme.colors.primary}
+            />
+          </View>
+          <Typography variant="body" weight="semibold">
+            {t("home.title")}
+          </Typography>
         </Pressable>
 
         <Pressable
-          style={styles.navItem}
+          style={({ pressed }) => [
+            styles.navItem,
+            pressed && styles.navItemPressed,
+          ]}
           onPress={() => navigate("/(main)/(tabs)/(explore)")}
         >
-          <Ionicons name="search-outline" size={20} color={theme.colors.text} />
-          <Typography variant="body">{t("explore.title")}</Typography>
+          <View
+            style={[
+              styles.navIcon,
+              { backgroundColor: "rgba(255,255,255,0.05)" },
+            ]}
+          >
+            <Ionicons
+              name="search-outline"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
+          </View>
+          <Typography variant="body" weight="semibold">
+            {t("explore.title")}
+          </Typography>
         </Pressable>
 
         <Pressable
-          style={styles.navItem}
+          style={({ pressed }) => [
+            styles.navItem,
+            pressed && styles.navItemPressed,
+          ]}
+          onPress={() => navigate("/(main)/(tabs)/(saved)")}
+        >
+          <View
+            style={[
+              styles.navIcon,
+              { backgroundColor: "rgba(255,255,255,0.05)" },
+            ]}
+          >
+            <Ionicons
+              name="bookmark-outline"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
+          </View>
+          <Typography variant="body" weight="semibold">
+            {t("saved.title")}
+          </Typography>
+        </Pressable>
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.navItem,
+            pressed && styles.navItemPressed,
+          ]}
           onPress={() => navigate("/(main)/(settings)")}
         >
-          <Ionicons
-            name="settings-outline"
-            size={20}
-            color={theme.colors.text}
-          />
-          <Typography variant="body">{t("settings.title")}</Typography>
+          <View
+            style={[
+              styles.navIcon,
+              { backgroundColor: "rgba(255,255,255,0.05)" },
+            ]}
+          >
+            <Ionicons
+              name="settings-outline"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
+          </View>
+          <Typography variant="body" weight="semibold">
+            {t("settings.title")}
+          </Typography>
         </Pressable>
       </View>
 
       <View style={styles.footer}>
-        <Typography variant="caption">
+        <Typography variant="caption" style={{ opacity: 0.4 }}>
           {t("drawer.appVersion", { version })}
         </Typography>
         <Button
@@ -107,6 +219,22 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     paddingHorizontal: theme.spacing.lg,
+    overflow: "hidden" as const,
+  },
+  shimmer: {
+    position: "absolute" as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 120,
+  },
+  glow: {
+    position: "absolute" as const,
+    top: -60,
+    right: -60,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
   },
   nav: {
     flex: 1,
@@ -125,7 +253,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   divider: {
     height: 1,
-    backgroundColor: theme.colors.border,
+    backgroundColor: "rgba(255,255,255,0.07)",
     marginBottom: theme.spacing.md,
   },
   navItem: {
@@ -134,7 +262,19 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.md,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.sm,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
+  },
+  navItemPressed: {
+    backgroundColor: "rgba(255,255,255,0.05)",
+  },
+  navIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: theme.radius.lg,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.06)",
   },
   footer: {
     gap: theme.spacing.md,
