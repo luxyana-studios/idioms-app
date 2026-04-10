@@ -270,18 +270,15 @@ export default function HomeScreen() {
           </Pressable>
 
           {/* ── Skip / Save hints ── */}
-          <GlassView
-            intensity={50}
-            style={[styles.hintsGlass, { top: CARD_HEIGHT + 12 }]}
-          >
+          <View style={[styles.hints, { top: CARD_HEIGHT + 16 }]}>
             <TouchableOpacity
               style={styles.hintBtn}
               onPress={nextIdiom}
-              hitSlop={8}
+              hitSlop={12}
             >
               <Ionicons
                 name="close-circle-outline"
-                size={22}
+                size={26}
                 color={theme.colors.textSecondary}
               />
               <Typography
@@ -296,21 +293,16 @@ export default function HomeScreen() {
               </Typography>
             </TouchableOpacity>
 
-            <View
-              style={[
-                styles.hintDivider,
-                { backgroundColor: "rgba(255,255,255,0.1)" },
-              ]}
-            />
+            <View style={styles.hintDivider} />
 
             <TouchableOpacity
               style={styles.hintBtn}
               onPress={handleSave}
-              hitSlop={8}
+              hitSlop={12}
             >
               <Ionicons
                 name={isSaved ? "heart" : "heart-outline"}
-                size={22}
+                size={26}
                 color={theme.colors.primary}
               />
               <Typography
@@ -321,7 +313,7 @@ export default function HomeScreen() {
                 {t("home.saved")}
               </Typography>
             </TouchableOpacity>
-          </GlassView>
+          </View>
         </View>
 
         {/* ── Recommendations ── */}
@@ -481,11 +473,13 @@ const styles = StyleSheet.create((theme) => ({
   },
   scrollContent: {
     alignItems: "center",
+    paddingTop: theme.spacing.md,
   },
   // Section header
   sectionHeader: {
+    alignSelf: "stretch",
     alignItems: "center",
-    marginBottom: theme.spacing.xl,
+    marginBottom: theme.spacing.lg,
     paddingHorizontal: theme.spacing.lg,
   },
   sectionLabel: {
@@ -597,28 +591,25 @@ const styles = StyleSheet.create((theme) => ({
     letterSpacing: 1,
     fontSize: 10,
   },
-  // Hints glass pill
-  hintsGlass: {
+  // Hints — floating icons below the card
+  hints: {
     position: "absolute",
-    left: 16,
+    left: 0,
     right: 0,
-    width: "auto",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: theme.radius.full,
-    paddingVertical: 10,
-    paddingHorizontal: theme.spacing.xl,
-    gap: theme.spacing.xl,
-    overflow: "hidden",
+    gap: theme.spacing["2xl"],
+    opacity: 0.6,
   },
   hintBtn: {
     alignItems: "center",
-    gap: 4,
+    gap: 6,
   },
   hintDivider: {
     width: 1,
-    height: 28,
+    height: 32,
+    backgroundColor: "rgba(255,255,255,0.15)",
   },
   hintLabel: {
     textTransform: "uppercase",
