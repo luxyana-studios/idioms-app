@@ -20,6 +20,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: false,
 
   initialize: () => {
+    // Skip Supabase when running without credentials (demo/dev mode)
+    if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
+      set({
+        initialized: true,
+        session: {
+          user: { id: "demo", email: "demo@idiomdeck.app" },
+        } as Session,
+        user: { id: "demo", email: "demo@idiomdeck.app" } as User,
+      });
+      return;
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       set({ session, user: session?.user ?? null, initialized: true });
     });
