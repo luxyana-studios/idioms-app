@@ -1,5 +1,4 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -9,7 +8,10 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { Typography } from "@/shared/components/Typography";
@@ -19,7 +21,10 @@ export default function HomeScreen() {
   const { theme } = useUnistyles();
   const router = useRouter();
   const { width: screenWidth } = useWindowDimensions();
-  const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
+  // Tab bar = 60px + paddingBottom (see tabs _layout) + extra breathing room
+  const scrollPaddingBottom =
+    60 + Math.max(insets.bottom, 8) + theme.spacing.xl;
   const { idioms, currentIndex, savedIds, saveIdiom, unsaveIdiom, nextIdiom } =
     useIdiomsStore();
 
@@ -71,7 +76,7 @@ export default function HomeScreen() {
         style={styles.scroll}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: tabBarHeight + theme.spacing.lg },
+          { paddingBottom: scrollPaddingBottom },
         ]}
         showsVerticalScrollIndicator={false}
       >

@@ -1,7 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUnistyles } from "react-native-unistyles";
 
@@ -10,11 +9,9 @@ export default function TabsLayout() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
-  const TAB_BAR_HEIGHT = 56;
-  const tabBarPaddingBottom = Math.max(
-    insets.bottom,
-    Platform.OS === "web" ? 8 : 4,
-  );
+  const paddingBottom = Math.max(insets.bottom, 8);
+  // Icon 24px + label 12px + paddingTop 8 + paddingBottom + gap ≈ 60px minimum
+  const tabBarHeight = 60 + paddingBottom;
 
   return (
     <Tabs
@@ -27,16 +24,15 @@ export default function TabsLayout() {
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
-          height: TAB_BAR_HEIGHT + tabBarPaddingBottom,
-          paddingBottom: tabBarPaddingBottom,
+          height: tabBarHeight,
           paddingTop: 8,
+          paddingBottom,
         },
         tabBarLabelStyle: {
           fontFamily: theme.typography.fonts.sansBold,
           fontSize: 10,
           letterSpacing: 0.8,
           textTransform: "uppercase",
-          marginTop: 2,
         },
       }}
     >
