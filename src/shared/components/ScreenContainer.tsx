@@ -1,5 +1,6 @@
 import { View, type ViewProps } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { GlowBackground } from "./GlowBackground";
 
 interface ScreenContainerProps extends ViewProps {
   centered?: boolean;
@@ -8,13 +9,17 @@ interface ScreenContainerProps extends ViewProps {
 export function ScreenContainer({
   centered,
   style,
+  children,
   ...props
 }: ScreenContainerProps) {
   return (
     <View
       style={[styles.container, centered && styles.centered, style]}
       {...props}
-    />
+    >
+      <GlowBackground subtle />
+      {children}
+    </View>
   );
 }
 

@@ -5,8 +5,9 @@ import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Platform, Pressable, View } from "react-native";
+import { Platform, Pressable, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, { Circle, Defs, FeGaussianBlur, Filter } from "react-native-svg";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
@@ -21,6 +22,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
   const user = useAuthStore((s) => s.user);
   const { signOut } = useAuth();
 
+  const { width: drawerWidth, height: drawerHeight } = useWindowDimensions();
   const email = user?.email ?? "";
   const initial = email.charAt(0).toUpperCase() || "?";
   const version = Constants.expoConfig?.version ?? "1.0.0";
@@ -67,10 +69,44 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
       />
 
       {/* Ambient glow blob */}
-      <View
-        style={[styles.glow, { backgroundColor: `${theme.colors.primary}10` }]}
-        pointerEvents="none"
-      />
+      <View style={styles.glow} pointerEvents="none">
+        <Svg width={drawerWidth} height={drawerHeight}>
+          <Defs>
+            <Filter
+              id="blurDrawer1"
+              x="-100%"
+              y="-100%"
+              width="300%"
+              height="300%"
+            >
+              <FeGaussianBlur stdDeviation="35" />
+            </Filter>
+            <Filter
+              id="blurDrawer2"
+              x="-100%"
+              y="-100%"
+              width="300%"
+              height="300%"
+            >
+              <FeGaussianBlur stdDeviation="28" />
+            </Filter>
+          </Defs>
+          <Circle
+            cx={drawerWidth}
+            cy={0}
+            r={90}
+            fill={`${theme.colors.primary}40`}
+            filter="url(#blurDrawer1)"
+          />
+          <Circle
+            cx={0}
+            cy={drawerHeight}
+            r={80}
+            fill={`${theme.colors.secondary}30`}
+            filter="url(#blurDrawer2)"
+          />
+        </Svg>
+      </View>
 
       {/* Profile */}
       <View style={styles.profile}>
@@ -229,12 +265,7 @@ const styles = StyleSheet.create((theme) => ({
     height: 120,
   },
   glow: {
-    position: "absolute" as const,
-    top: -60,
-    right: -60,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    ...StyleSheet.absoluteFillObject,
   },
   nav: {
     flex: 1,

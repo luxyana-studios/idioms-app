@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, { Circle, Defs, FeGaussianBlur, Filter } from "react-native-svg";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { GlassView } from "@/shared/components/GlassView";
@@ -23,7 +24,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const navigation =
     useNavigation<DrawerNavigationProp<Record<string, undefined>>>();
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const scrollPaddingBottom =
     60 + Math.max(insets.bottom, 8) + theme.spacing.xl;
@@ -47,20 +48,42 @@ export default function HomeScreen() {
     <View style={[styles.root, { paddingTop: insets.top }]}>
       {/* ── Ambient glow blobs ── */}
       <View style={styles.blobsContainer} pointerEvents="none">
-        <View
-          style={[
-            styles.blob,
-            styles.blobTopRight,
-            { backgroundColor: `${theme.colors.primary}22` },
-          ]}
-        />
-        <View
-          style={[
-            styles.blob,
-            styles.blobBottomLeft,
-            { backgroundColor: `${theme.colors.secondary}18` },
-          ]}
-        />
+        <Svg width={screenWidth} height={screenHeight}>
+          <Defs>
+            <Filter
+              id="blurHomeTop"
+              x="-100%"
+              y="-100%"
+              width="300%"
+              height="300%"
+            >
+              <FeGaussianBlur stdDeviation="45" />
+            </Filter>
+            <Filter
+              id="blurHomeBottom"
+              x="-100%"
+              y="-100%"
+              width="300%"
+              height="300%"
+            >
+              <FeGaussianBlur stdDeviation="40" />
+            </Filter>
+          </Defs>
+          <Circle
+            cx={screenWidth}
+            cy={0}
+            r={130}
+            fill={`${theme.colors.primary}55`}
+            filter="url(#blurHomeTop)"
+          />
+          <Circle
+            cx={0}
+            cy={screenHeight}
+            r={120}
+            fill={`${theme.colors.secondary}48`}
+            filter="url(#blurHomeBottom)"
+          />
+        </Svg>
       </View>
 
       {/* ── Header ── */}
@@ -428,24 +451,6 @@ const styles = StyleSheet.create((theme) => ({
   // Ambient blobs
   blobsContainer: {
     ...StyleSheet.absoluteFillObject,
-    overflow: "hidden",
-  },
-  blob: {
-    position: "absolute",
-    borderRadius: 999,
-  },
-  blobTopRight: {
-    width: 280,
-    height: 280,
-    top: -80,
-    right: -80,
-    // Blur simulated via opacity + size
-  },
-  blobBottomLeft: {
-    width: 240,
-    height: 240,
-    bottom: 100,
-    left: -80,
   },
   // Header
   header: {
