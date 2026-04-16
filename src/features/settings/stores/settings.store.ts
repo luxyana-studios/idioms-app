@@ -35,8 +35,12 @@ export const useSettingsStore = create<SettingsState>()(
       storage: createJSONStorage(() => zustandMMKVStorage),
       onRehydrateStorage: () => (state) => {
         if (!state) return;
-        // Reapply persisted theme after store hydration
-        state.setThemeMode(state.themeMode);
+        // Sanitize legacy "system" value that may exist in persisted storage
+        const validModes: ThemeMode[] = ["light", "dark"];
+        const safeMode = validModes.includes(state.themeMode)
+          ? state.themeMode
+          : "dark";
+        state.setThemeMode(safeMode);
       },
     },
   ),
