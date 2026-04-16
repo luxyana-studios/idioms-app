@@ -5,7 +5,13 @@ import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Platform, Pressable, useWindowDimensions, View } from "react-native";
+import {
+  Image,
+  Platform,
+  Pressable,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Defs, FeGaussianBlur, Filter } from "react-native-svg";
 import {
@@ -29,7 +35,6 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
 
   const { width: drawerWidth, height: drawerHeight } = useWindowDimensions();
   const email = user?.email ?? "";
-  const initial = email.charAt(0).toUpperCase() || "?";
   const version = Constants.expoConfig?.version ?? "1.0.0";
 
   function navigate(href: Parameters<typeof router.navigate>[0]) {
@@ -115,24 +120,11 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
 
       {/* Profile */}
       <View style={styles.profile}>
-        <LinearGradient
-          colors={[
-            theme.colors.primary,
-            (theme.colors as Record<string, string>)["primaryContainer"] ??
-              theme.colors.primary,
-          ]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+        <Image
+          source={require("../../../app_stores/android/assets/IdiomDeckLogo.png")}
           style={styles.avatar}
-        >
-          <Typography
-            variant="heading"
-            weight="extraBold"
-            style={{ color: theme.colors.primaryText }}
-          >
-            {initial}
-          </Typography>
-        </LinearGradient>
+          resizeMode="contain"
+        />
         {email ? (
           <Typography variant="body" color="textSecondary">
             {email}
@@ -261,11 +253,10 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "flex-start" as const,
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: "center" as const,
-    justifyContent: "center" as const,
+    width: 72,
+    height: 72,
+    borderRadius: theme.radius.lg,
+    overflow: "hidden" as const,
   },
   divider: {
     height: 1,
