@@ -3,8 +3,10 @@ import type { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   TouchableOpacity,
@@ -28,13 +30,43 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const scrollPaddingBottom =
     60 + Math.max(insets.bottom, 8) + theme.spacing.xl;
-  const { idioms, currentIndex, savedIds, saveIdiom, unsaveIdiom, nextIdiom } =
-    useIdiomsStore();
+  const {
+    idioms,
+    currentIndex,
+    savedIds,
+    saveIdiom,
+    unsaveIdiom,
+    nextIdiom,
+    loading,
+    loadIdioms,
+  } = useIdiomsStore();
+
+  useEffect(() => {
+    loadIdioms();
+  }, [loadIdioms]);
 
   const CARD_WIDTH = Math.min(screenWidth - theme.spacing.lg * 2, 340);
   const CARD_HEIGHT = Math.round(CARD_WIDTH * (4 / 3));
 
   const current = idioms[currentIndex];
+
+  if (loading || !current) {
+    return (
+      <View
+        style={[
+          styles.root,
+          {
+            paddingTop: insets.top,
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
+      >
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
   const isSaved = savedIds.includes(current.id);
   const progress = (currentIndex + 1) / idioms.length;
 

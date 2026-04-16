@@ -40,8 +40,11 @@ To toggle theme at runtime, use the settings store `setThemeMode()` — it calls
 
 - Client uses MMKV for auth token storage (not AsyncStorage) — this is intentional for performance
 - `detectSessionInUrl: false` is required for React Native (not a browser)
-- Database types in `src/types/supabase.ts` — regenerate with `npx supabase gen types typescript`
-- The app runs without Supabase credentials (placeholder mode) — auth won't work until `.env` is set up
+- Database types in `src/types/supabase.ts` — **generated**, not hand-written. Regenerate after
+  any migration: `npx supabase gen types typescript --local > src/types/supabase.ts`
+- Postgres columns use `snake_case`; app-side types use `camelCase`. Mapping happens in store fetch methods
+- Local Supabase stack runs via Docker (`npx supabase start`). See root CLAUDE.md for full setup steps
+- Without `.env` configured, the app falls back to placeholder mode — auth won't work
 
 ## Providers
 

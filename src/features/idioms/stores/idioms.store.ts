@@ -1,13 +1,15 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
-import { MOCK_IDIOMS } from "../data/mock";
+import { supabase } from "@/core/supabase/client";
 import type { Idiom } from "../types";
 
 interface IdiomsState {
   idioms: Idiom[];
   savedIds: string[];
   currentIndex: number;
+  loading: boolean;
+  loadIdioms: () => Promise<void>;
   saveIdiom: (id: string) => void;
   unsaveIdiom: (id: string) => void;
   nextIdiom: () => void;
@@ -17,9 +19,36 @@ interface IdiomsState {
 export const useIdiomsStore = create<IdiomsState>()(
   persist(
     (set, get) => ({
-      idioms: MOCK_IDIOMS,
+      idioms: [],
       savedIds: [],
       currentIndex: 0,
+      loading: false,
+
+      loadIdioms: async () => {
+        if (get().idioms.length > 0 || get().loading) return;
+        set({ loading: true });
+
+        const { data, error } = await supabase.from("idioms").select("*");
+
+        if (error) {
+          console.error("Failed to load idioms:", error.message);
+          set({ loading: false });
+          return;
+        }
+
+        const idioms: Idiom[] = (data ?? []).map((row) => ({
+          id: row.id,
+          phrase: row.phrase,
+          definition: row.definition,
+          category: row.category,
+          level: row.level as Idiom["level"],
+          usersLearned: row.users_learned,
+          origin: row.origin ?? undefined,
+          examples: row.examples ?? undefined,
+        }));
+
+        set({ idioms, loading: false });
+      },
 
       saveIdiom: (id) =>
         set((state) => ({
