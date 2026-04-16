@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUnistyles } from "react-native-unistyles";
 
@@ -32,18 +32,29 @@ export default function TabsLayout() {
           paddingBottom,
         },
         tabBarBackground: () => (
-          <BlurView
-            intensity={60}
-            tint="dark"
-            style={[
-              StyleSheet.absoluteFillObject,
-              {
-                borderTopWidth: 1,
-                borderTopColor: "rgba(255,255,255,0.06)",
-                overflow: "hidden",
-              },
-            ]}
-          />
+          <View style={StyleSheet.absoluteFillObject}>
+            {/* Solid base on native — prevents content bleed-through on Android/iOS */}
+            {Platform.OS !== "web" && (
+              <View
+                style={[
+                  StyleSheet.absoluteFillObject,
+                  { backgroundColor: theme.colors.background, opacity: 0.92 },
+                ]}
+              />
+            )}
+            <BlurView
+              intensity={60}
+              tint="dark"
+              style={[
+                StyleSheet.absoluteFillObject,
+                {
+                  borderTopWidth: 1,
+                  borderTopColor: "rgba(255,255,255,0.06)",
+                  overflow: "hidden",
+                },
+              ]}
+            />
+          </View>
         ),
         tabBarLabelStyle: {
           fontFamily: theme.typography.fonts.sansBold,
