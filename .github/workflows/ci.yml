@@ -31,3 +31,22 @@ jobs:
       - run: npm run lint
 
       - run: npm run test:ci
+
+      - name: Security audit
+        run: |
+          npm audit --json > audit.json || true
+          node -e '
+            const data = JSON.parse(require("fs").readFileSync("audit.json","utf8"));
+            const vulns = Object.values(data.vulnerabilities || {});
+            for (const v of vulns) {
+              const fix = v.fixAvailable ? "fix available" : "no fix";
+              console.log(`${v.severity.toUpperCase()} ${v.name} (${fix})`);
+              v.via.filter(r => typeof r === "object").forEach(r => console.log(`  ${r.title} - ${r.url}`));
+            }
+            const fixable = vulns.filter(v => (v.severity === "high" || v.severity === "critical") && v.fixAvailable);
+            if (fixable.length) {
+              console.error(`\n${fixable.length} fixable high/critical vulnerabilities found.`);
+              process.exit(1);
+            }
+            console.log("\nNo fixable high/critical vulnerabilities.");
+          '
