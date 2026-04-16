@@ -41,6 +41,9 @@ export const useSettingsStore = create<SettingsState>()(
           ? state.themeMode
           : "dark";
         state.setThemeMode(safeMode);
+        // Re-apply persisted language — i18n inits with device locale,
+        // so we must sync it with the user's saved preference after rehydration
+        state.setLanguage(state.language);
       },
     },
   ),
