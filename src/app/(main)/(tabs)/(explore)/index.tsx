@@ -1,53 +1,33 @@
-import { FlashList } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
-import { View } from "react-native";
+import { ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { supabase } from "@/core/supabase/client";
 import { ScreenContainer } from "@/shared/components/ScreenContainer";
 import { Typography } from "@/shared/components/Typography";
 
-interface ExploreItem {
-  id: string;
-  title: string;
-}
-
-async function fetchItems(): Promise<ExploreItem[]> {
-  const { data, error } = await supabase.from("items").select("id, title");
+async function fetchIdioms() {
+  const { data, error } = await supabase.from("idioms").select("*");
   if (error) throw error;
-  return (data as ExploreItem[]) ?? [];
+  return data;
 }
 
 export default function ExploreScreen() {
-  const { t } = useTranslation();
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ["explore-items"],
-    queryFn: fetchItems,
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["idioms"],
+    queryFn: fetchIdioms,
   });
 
   return (
     <ScreenContainer style={styles.container}>
-      <FlashList
-        data={data ?? []}
-        refreshing={isLoading}
-        onRefresh={refetch}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Typography variant="body">{item.title}</Typography>
-          </View>
-        )}
-        ListEmptyComponent={
-          !isLoading ? (
-            <Typography
-              variant="body"
-              color="textSecondary"
-              style={styles.empty}
-            >
-              {t("explore.empty")}
-            </Typography>
-          ) : null
-        }
-      />
+      <ScrollView style={styles.scroll}>
+        <Typography variant="body" style={styles.pre}>
+          {isLoading
+            ? "Loading..."
+            : error
+              ? `Error: ${error.message}`
+              : JSON.stringify(data, null, 2)}
+        </Typography>
+      </ScrollView>
     </ScreenContainer>
   );
 }
@@ -56,13 +36,12 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     padding: 0,
   },
-  item: {
+  scroll: {
+    flex: 1,
     padding: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
   },
-  empty: {
-    textAlign: "center" as const,
-    marginTop: theme.spacing["2xl"],
+  pre: {
+    fontFamily: "monospace",
+    fontSize: 12,
   },
 }));
