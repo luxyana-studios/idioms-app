@@ -15,7 +15,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Defs, FeGaussianBlur, Filter } from "react-native-svg";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
-import { GlassView } from "@/shared/components/GlassView";
 import { Typography } from "@/shared/components/Typography";
 
 export default function HomeScreen() {
@@ -105,9 +104,7 @@ export default function HomeScreen() {
         </Typography>
 
         <TouchableOpacity style={styles.headerBtn} hitSlop={10}>
-          <GlassView intensity={30} style={styles.searchBtn}>
-            <Ionicons name="search" size={18} color={theme.colors.primary} />
-          </GlassView>
+          <Ionicons name="search" size={22} color={theme.colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -465,14 +462,6 @@ const styles = StyleSheet.create((theme) => ({
     height: 40,
     alignItems: "center",
     justifyContent: "center",
-  },
-  searchBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: theme.radius.full,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
   },
   logo: {
     letterSpacing: -0.5,
