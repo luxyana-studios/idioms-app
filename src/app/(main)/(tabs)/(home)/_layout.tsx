@@ -1,8 +1,10 @@
 import { Stack } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { useUnistyles } from "react-native-unistyles";
 
 export default function HomeLayout() {
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
 
   return (
     <Stack
@@ -16,7 +18,7 @@ export default function HomeLayout() {
         name="[id]"
         options={{
           headerShown: true,
-          title: "Idiom Details",
+          title: t("home.idiomDetails"),
           headerStyle: {
             backgroundColor: theme.colors.background,
           } as unknown as { backgroundColor: string },

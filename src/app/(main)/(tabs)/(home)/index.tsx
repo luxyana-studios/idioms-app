@@ -499,6 +499,7 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: 10,
   },
   sectionTitle: {
+    alignSelf: "stretch",
     textAlign: "center",
     letterSpacing: -0.5,
   },
