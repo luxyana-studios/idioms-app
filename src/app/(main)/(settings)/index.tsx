@@ -7,9 +7,9 @@ import { Button } from "@/shared/components/Button";
 import { ScreenContainer } from "@/shared/components/ScreenContainer";
 import { Typography } from "@/shared/components/Typography";
 
-type ThemeMode = "system" | "light" | "dark";
+type ThemeMode = "light" | "dark";
 
-const themeModes: ThemeMode[] = ["system", "light", "dark"];
+const themeModes: ThemeMode[] = ["light", "dark"];
 const languages = [
   { code: "en", labelKey: "settings.languageEn" },
   { code: "es", labelKey: "settings.languageEs" },
@@ -22,7 +22,6 @@ export default function SettingsScreen() {
 
   const themeLabelKey = (mode: ThemeMode) => {
     const map: Record<ThemeMode, string> = {
-      system: "settings.themeSystem",
       light: "settings.themeLight",
       dark: "settings.themeDark",
     };

@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import i18n from "@/core/i18n";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
 
-type ThemeMode = "system" | "light" | "dark";
+type ThemeMode = "light" | "dark";
 
 interface SettingsState {
   themeMode: ThemeMode;
@@ -16,16 +16,12 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      themeMode: "system",
-      language: i18n.language,
+      themeMode: "dark",
+      language: "en",
 
       setThemeMode: (mode) => {
-        if (mode === "system") {
-          UnistylesRuntime.setAdaptiveThemes(true);
-        } else {
-          UnistylesRuntime.setAdaptiveThemes(false);
-          UnistylesRuntime.setTheme(mode);
-        }
+        UnistylesRuntime.setAdaptiveThemes(false);
+        UnistylesRuntime.setTheme(mode);
         set({ themeMode: mode });
       },
 

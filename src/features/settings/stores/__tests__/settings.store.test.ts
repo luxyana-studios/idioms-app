@@ -26,14 +26,14 @@ jest.mock("@/core/storage/mmkv", () => ({
 describe("useSettingsStore", () => {
   beforeEach(() => {
     useSettingsStore.setState({
-      themeMode: "system",
+      themeMode: "dark",
       language: "en",
     });
   });
 
   it("has correct default state", () => {
     const state = useSettingsStore.getState();
-    expect(state.themeMode).toBe("system");
+    expect(state.themeMode).toBe("dark");
     expect(state.language).toBe("en");
   });
 
