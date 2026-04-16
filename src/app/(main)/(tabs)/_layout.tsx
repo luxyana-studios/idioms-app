@@ -4,10 +4,11 @@ import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Platform, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useUnistyles } from "react-native-unistyles";
+import { UnistylesRuntime, useUnistyles } from "react-native-unistyles";
 
 export default function TabsLayout() {
   const { theme } = useUnistyles();
+  const isDark = UnistylesRuntime.themeName === "dark";
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
@@ -44,7 +45,7 @@ export default function TabsLayout() {
             )}
             <BlurView
               intensity={60}
-              tint="dark"
+              tint={isDark ? "dark" : "light"}
               style={[
                 StyleSheet.absoluteFillObject,
                 {
