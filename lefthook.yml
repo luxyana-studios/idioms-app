@@ -13,3 +13,5 @@ pre-commit:
     typecheck:
       glob: "*.{ts,tsx}"
       run: npx tsc --noEmit
+    secrets:
+      run: gitleaks git --staged --no-banner
