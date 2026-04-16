@@ -48,9 +48,9 @@ jobs:
 
       - name: Security audit
         run: |
-          npm audit --json > audit.json || true
+          npm audit --json > /tmp/audit.json || true
           node -e '
-            const data = JSON.parse(require("fs").readFileSync("audit.json","utf8"));
+            const data = JSON.parse(require("fs").readFileSync("/tmp/audit.json","utf8"));
             const vulns = Object.values(data.vulnerabilities || {});
             for (const v of vulns) {
               const fix = v.fixAvailable ? "fix available" : "no fix";
