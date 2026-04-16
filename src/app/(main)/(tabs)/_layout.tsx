@@ -12,8 +12,8 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets();
 
   const paddingBottom = Math.max(insets.bottom, 8);
-  // Icon 24px + label 12px + paddingTop 8 + paddingBottom + gap ≈ 60px minimum
-  const tabBarHeight = 60 + paddingBottom;
+  // Icon 24px + paddingTop 8 + paddingBottom ≈ 44px minimum
+  const tabBarHeight = 44 + paddingBottom;
 
   return (
     <Tabs
@@ -56,12 +56,7 @@ export default function TabsLayout() {
             />
           </View>
         ),
-        tabBarLabelStyle: {
-          fontFamily: theme.typography.fonts.sansBold,
-          fontSize: 10,
-          letterSpacing: 0.8,
-          textTransform: "uppercase",
-        },
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
