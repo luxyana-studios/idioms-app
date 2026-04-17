@@ -252,7 +252,7 @@ export default function HomeScreen() {
                     { color: theme.colors.textSecondary },
                   ]}
                 >
-                  {current.category}
+                  {current.tags[0] ?? current.languageCode}
                 </Typography>
               </View>
               <TouchableOpacity
@@ -277,7 +277,7 @@ export default function HomeScreen() {
                 weight="extraBold"
                 style={[styles.phrase, { color: theme.colors.primary }]}
               >
-                {current.phrase}
+                {current.expression}
               </Typography>
               <Typography
                 variant="body"
@@ -286,7 +286,7 @@ export default function HomeScreen() {
                   { color: theme.colors.textSecondary },
                 ]}
               >
-                {current.definition}
+                {current.idiomaticMeaning}
               </Typography>
             </View>
 
@@ -311,14 +311,7 @@ export default function HomeScreen() {
                   weight="extraBold"
                   style={[styles.statText, { color: theme.colors.outline }]}
                 >
-                  {t("home.usersLearned", { count: current.usersLearned })}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  weight="extraBold"
-                  style={[styles.statText, { color: theme.colors.outline }]}
-                >
-                  {current.level}
+                  {current.languageCode.toUpperCase()}
                 </Typography>
               </View>
             </View>
