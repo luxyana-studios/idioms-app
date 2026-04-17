@@ -126,7 +126,7 @@ export type Database = {
           examples: string[] | null;
           explanation: string | null;
           expression: string;
-          expression_key: string | null;
+          expression_key: string;
           id: string;
           idiomatic_meaning: string;
           language_code: string;
@@ -140,7 +140,7 @@ export type Database = {
           examples?: string[] | null;
           explanation?: string | null;
           expression: string;
-          expression_key?: string | null;
+          expression_key?: string;
           id?: string;
           idiomatic_meaning: string;
           language_code: string;
@@ -154,7 +154,7 @@ export type Database = {
           examples?: string[] | null;
           explanation?: string | null;
           expression?: string;
-          expression_key?: string | null;
+          expression_key?: string;
           id?: string;
           idiomatic_meaning?: string;
           language_code?: string;

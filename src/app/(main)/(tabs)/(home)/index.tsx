@@ -313,13 +313,6 @@ export default function HomeScreen() {
                 >
                   {current.languageCode.toUpperCase()}
                 </Typography>
-                <Typography
-                  variant="caption"
-                  weight="extraBold"
-                  style={[styles.statText, { color: theme.colors.outline }]}
-                >
-                  {current.source}
-                </Typography>
               </View>
             </View>
           </Pressable>
