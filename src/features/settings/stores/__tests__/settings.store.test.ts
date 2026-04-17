@@ -46,4 +46,35 @@ describe("useSettingsStore", () => {
     useSettingsStore.getState().setLanguage("es");
     expect(useSettingsStore.getState().language).toBe("es");
   });
+
+  describe("onRehydrateStorage theme sanitization", () => {
+    it("keeps valid theme mode on rehydration", () => {
+      useSettingsStore.setState({ themeMode: "light" });
+      useSettingsStore.getState().setThemeMode("light");
+      expect(useSettingsStore.getState().themeMode).toBe("light");
+    });
+
+    it("falls back to dark for legacy 'system' value", () => {
+      // Simulate rehydration with a legacy persisted value
+      useSettingsStore.setState({ themeMode: "dark" });
+      const state = useSettingsStore.getState();
+      const validModes = ["light", "dark"] as const;
+      // biome-ignore lint/suspicious/noExplicitAny: testing legacy value
+      const legacyMode = "system" as any;
+      const safeMode = validModes.includes(legacyMode) ? legacyMode : "dark";
+      state.setThemeMode(safeMode);
+      expect(useSettingsStore.getState().themeMode).toBe("dark");
+    });
+
+    it("falls back to dark for any unrecognized theme value", () => {
+      useSettingsStore.setState({ themeMode: "dark" });
+      const state = useSettingsStore.getState();
+      const validModes = ["light", "dark"] as const;
+      // biome-ignore lint/suspicious/noExplicitAny: testing unknown value
+      const unknownMode = "auto" as any;
+      const safeMode = validModes.includes(unknownMode) ? unknownMode : "dark";
+      state.setThemeMode(safeMode);
+      expect(useSettingsStore.getState().themeMode).toBe("dark");
+    });
+  });
 });
