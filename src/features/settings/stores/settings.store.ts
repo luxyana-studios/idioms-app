@@ -40,7 +40,7 @@ export const useSettingsStore = create<SettingsState>()(
       onRehydrateStorage: () => (state) => {
         if (!state) return;
         const validModes: ThemeMode[] = ["system", "light", "dark"];
-        const safeMode = validModes.includes(state.themeMode)
+        const safeMode = (validModes as string[]).includes(state.themeMode)
           ? state.themeMode
           : "system";
         state.setThemeMode(safeMode);
