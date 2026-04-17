@@ -34,42 +34,134 @@ export type Database = {
   };
   public: {
     Tables: {
-      idioms: {
+      idiom_equivalents: {
         Row: {
-          category: string;
           created_at: string;
-          definition: string;
-          examples: string[] | null;
           id: string;
-          level: string;
-          origin: string | null;
-          phrase: string;
-          updated_at: string;
-          users_learned: number;
+          idiom_id_a: string;
+          idiom_id_b: string;
+          similarity_score: number;
+          verified: boolean;
         };
         Insert: {
-          category: string;
           created_at?: string;
-          definition: string;
-          examples?: string[] | null;
           id?: string;
-          level: string;
-          origin?: string | null;
-          phrase: string;
-          updated_at?: string;
-          users_learned?: number;
+          idiom_id_a: string;
+          idiom_id_b: string;
+          similarity_score: number;
+          verified?: boolean;
         };
         Update: {
-          category?: string;
           created_at?: string;
-          definition?: string;
-          examples?: string[] | null;
           id?: string;
-          level?: string;
-          origin?: string | null;
-          phrase?: string;
+          idiom_id_a?: string;
+          idiom_id_b?: string;
+          similarity_score?: number;
+          verified?: boolean;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "idiom_equivalents_idiom_id_a_fkey";
+            columns: ["idiom_id_a"];
+            isOneToOne: false;
+            referencedRelation: "idioms";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "idiom_equivalents_idiom_id_b_fkey";
+            columns: ["idiom_id_b"];
+            isOneToOne: false;
+            referencedRelation: "idioms";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      idiom_translations: {
+        Row: {
+          created_at: string;
+          explanation: string | null;
+          id: string;
+          idiom_id: string;
+          idiomatic_meaning: string;
+          language_code: string;
+          literal_translation: string;
+          source: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          explanation?: string | null;
+          id?: string;
+          idiom_id: string;
+          idiomatic_meaning: string;
+          language_code: string;
+          literal_translation: string;
+          source?: string;
           updated_at?: string;
-          users_learned?: number;
+        };
+        Update: {
+          created_at?: string;
+          explanation?: string | null;
+          id?: string;
+          idiom_id?: string;
+          idiomatic_meaning?: string;
+          language_code?: string;
+          literal_translation?: string;
+          source?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "idiom_translations_idiom_id_fkey";
+            columns: ["idiom_id"];
+            isOneToOne: false;
+            referencedRelation: "idioms";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      idioms: {
+        Row: {
+          created_at: string;
+          examples: string[] | null;
+          explanation: string | null;
+          expression: string;
+          expression_key: string | null;
+          id: string;
+          idiomatic_meaning: string;
+          language_code: string;
+          source: string;
+          status: string;
+          tags: string[];
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          examples?: string[] | null;
+          explanation?: string | null;
+          expression: string;
+          expression_key?: string | null;
+          id?: string;
+          idiomatic_meaning: string;
+          language_code: string;
+          source?: string;
+          status?: string;
+          tags?: string[];
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          examples?: string[] | null;
+          explanation?: string | null;
+          expression?: string;
+          expression_key?: string | null;
+          id?: string;
+          idiomatic_meaning?: string;
+          language_code?: string;
+          source?: string;
+          status?: string;
+          tags?: string[];
+          updated_at?: string;
         };
         Relationships: [];
       };

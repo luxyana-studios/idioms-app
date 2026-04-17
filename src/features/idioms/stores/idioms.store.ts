@@ -28,7 +28,10 @@ export const useIdiomsStore = create<IdiomsState>()(
         if (get().idioms.length > 0 || get().loading) return;
         set({ loading: true });
 
-        const { data, error } = await supabase.from("idioms").select("*");
+        const { data, error } = await supabase
+          .from("idioms")
+          .select("*")
+          .eq("status", "published");
 
         if (error) {
           console.error("Failed to load idioms:", error.message);
@@ -38,13 +41,14 @@ export const useIdiomsStore = create<IdiomsState>()(
 
         const idioms: Idiom[] = (data ?? []).map((row) => ({
           id: row.id,
-          phrase: row.phrase,
-          definition: row.definition,
-          category: row.category,
-          level: row.level as Idiom["level"],
-          usersLearned: row.users_learned,
-          origin: row.origin ?? undefined,
+          expression: row.expression,
+          languageCode: row.language_code,
+          idiomaticMeaning: row.idiomatic_meaning,
+          explanation: row.explanation ?? undefined,
           examples: row.examples ?? undefined,
+          tags: row.tags ?? [],
+          source: row.source as Idiom["source"],
+          status: row.status as Idiom["status"],
         }));
 
         set({ idioms, loading: false });
