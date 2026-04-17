@@ -17,7 +17,7 @@ export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       themeMode: "dark",
-      language: "en",
+      language: i18n.language,
 
       setThemeMode: (mode) => {
         UnistylesRuntime.setAdaptiveThemes(false);
