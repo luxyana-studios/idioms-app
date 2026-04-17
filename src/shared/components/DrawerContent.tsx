@@ -121,7 +121,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
       {/* Profile */}
       <View style={styles.profile}>
         <Image
-          source={require("../../../app_stores/android/assets/IdiomDeckLogo.png")}
+          source={require("../../../assets/logo.png")}
           style={styles.avatar}
           resizeMode="contain"
         />
