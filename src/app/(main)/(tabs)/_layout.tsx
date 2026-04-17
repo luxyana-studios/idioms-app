@@ -16,7 +16,7 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets();
 
   const paddingBottom = Math.max(insets.bottom, 8);
-  // Icon 24px + paddingTop 8 + paddingBottom ≈ 44px minimum
+  // Base 44px (icon row + top padding) plus bottom inset — minimum total ≈52px
   const tabBarHeight = 44 + paddingBottom;
 
   return (
