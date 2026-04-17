@@ -5,13 +5,7 @@ import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import {
-  Image,
-  Platform,
-  Pressable,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Platform, Pressable, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Defs, FeGaussianBlur, Filter } from "react-native-svg";
 import {
@@ -120,11 +114,11 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
 
       {/* Profile */}
       <View style={styles.profile}>
-        <Image
-          source={require("../../../assets/logo.png")}
-          style={styles.avatar}
-          resizeMode="contain"
-        />
+        <View style={styles.avatar}>
+          <Typography variant="heading" color="primary">
+            {email ? email[0].toUpperCase() : "?"}
+          </Typography>
+        </View>
         {email ? (
           <Typography variant="body" color="textSecondary">
             {email}
@@ -253,10 +247,14 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "flex-start" as const,
   },
   avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: theme.radius.lg,
-    overflow: "hidden" as const,
+    width: 56,
+    height: 56,
+    borderRadius: theme.radius.full,
+    backgroundColor: `${theme.colors.primary}20`,
+    borderWidth: 1,
+    borderColor: `${theme.colors.primary}40`,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
   },
   divider: {
     height: 1,

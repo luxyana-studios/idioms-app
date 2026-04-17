@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import i18n from "@/core/i18n";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
 
-type ThemeMode = "light" | "dark";
+export type ThemeMode = "system" | "light" | "dark";
 
 interface SettingsState {
   themeMode: ThemeMode;
@@ -16,12 +16,16 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
-      themeMode: "dark",
+      themeMode: "system",
       language: i18n.language,
 
       setThemeMode: (mode) => {
-        UnistylesRuntime.setAdaptiveThemes(false);
-        UnistylesRuntime.setTheme(mode);
+        if (mode === "system") {
+          UnistylesRuntime.setAdaptiveThemes(true);
+        } else {
+          UnistylesRuntime.setAdaptiveThemes(false);
+          UnistylesRuntime.setTheme(mode);
+        }
         set({ themeMode: mode });
       },
 
@@ -35,11 +39,10 @@ export const useSettingsStore = create<SettingsState>()(
       storage: createJSONStorage(() => zustandMMKVStorage),
       onRehydrateStorage: () => (state) => {
         if (!state) return;
-        // Sanitize legacy "system" value that may exist in persisted storage
-        const validModes: ThemeMode[] = ["light", "dark"];
+        const validModes: ThemeMode[] = ["system", "light", "dark"];
         const safeMode = validModes.includes(state.themeMode)
           ? state.themeMode
-          : "dark";
+          : "system";
         state.setThemeMode(safeMode);
         // Re-apply persisted language — i18n inits with device locale,
         // so we must sync it with the user's saved preference after rehydration

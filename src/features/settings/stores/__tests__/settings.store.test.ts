@@ -31,23 +31,32 @@ jest.mock("@/core/storage/mmkv", () => ({
 
 describe("useSettingsStore", () => {
   describe("default state", () => {
-    it("has dark theme and device language as defaults", () => {
-      // getInitialState() returns the state from create() before any hydration,
-      // verifying defaults without the beforeEach setState override.
+    it("has system theme and device language as defaults", () => {
       const state = useSettingsStore.getInitialState();
-      expect(state.themeMode).toBe("dark");
+      expect(state.themeMode).toBe("system");
       expect(state.language).toBe("en"); // mocked i18n.language
     });
   });
 
   describe("actions", () => {
     beforeEach(() => {
-      useSettingsStore.setState({ themeMode: "dark", language: "en" });
+      useSettingsStore.setState({ themeMode: "system", language: "en" });
+      (UnistylesRuntime.setAdaptiveThemes as jest.Mock).mockClear();
+      (UnistylesRuntime.setTheme as jest.Mock).mockClear();
     });
 
-    it("setThemeMode updates the theme mode", () => {
+    it("setThemeMode to system enables adaptive themes", () => {
+      useSettingsStore.getState().setThemeMode("system");
+      expect(useSettingsStore.getState().themeMode).toBe("system");
+      expect(UnistylesRuntime.setAdaptiveThemes).toHaveBeenCalledWith(true);
+      expect(UnistylesRuntime.setTheme).not.toHaveBeenCalled();
+    });
+
+    it("setThemeMode to light disables adaptive themes and sets light", () => {
       useSettingsStore.getState().setThemeMode("light");
       expect(useSettingsStore.getState().themeMode).toBe("light");
+      expect(UnistylesRuntime.setAdaptiveThemes).toHaveBeenCalledWith(false);
+      expect(UnistylesRuntime.setTheme).toHaveBeenCalledWith("light");
     });
 
     it("setLanguage updates the language", () => {
@@ -58,6 +67,7 @@ describe("useSettingsStore", () => {
 
   describe("onRehydrateStorage", () => {
     beforeEach(() => {
+      (UnistylesRuntime.setAdaptiveThemes as jest.Mock).mockClear();
       (UnistylesRuntime.setTheme as jest.Mock).mockClear();
       (i18n.changeLanguage as jest.Mock).mockClear();
       (zustandMMKVStorage.getItem as jest.Mock).mockReset();
@@ -71,22 +81,22 @@ describe("useSettingsStore", () => {
       await useSettingsStore.persist.rehydrate();
     };
 
-    it("applies a valid persisted theme", async () => {
+    it("applies a valid persisted light theme", async () => {
       await rehydrateWith({ themeMode: "light", language: "en" });
       expect(useSettingsStore.getState().themeMode).toBe("light");
       expect(UnistylesRuntime.setTheme).toHaveBeenCalledWith("light");
     });
 
-    it("falls back to dark for legacy 'system' value", async () => {
+    it("applies a valid persisted system theme", async () => {
       await rehydrateWith({ themeMode: "system", language: "en" });
-      expect(useSettingsStore.getState().themeMode).toBe("dark");
-      expect(UnistylesRuntime.setTheme).toHaveBeenCalledWith("dark");
+      expect(useSettingsStore.getState().themeMode).toBe("system");
+      expect(UnistylesRuntime.setAdaptiveThemes).toHaveBeenCalledWith(true);
     });
 
-    it("falls back to dark for any unrecognized theme value", async () => {
+    it("falls back to system for any unrecognized theme value", async () => {
       await rehydrateWith({ themeMode: "auto", language: "en" });
-      expect(useSettingsStore.getState().themeMode).toBe("dark");
-      expect(UnistylesRuntime.setTheme).toHaveBeenCalledWith("dark");
+      expect(useSettingsStore.getState().themeMode).toBe("system");
+      expect(UnistylesRuntime.setAdaptiveThemes).toHaveBeenCalledWith(true);
     });
 
     it("reapplies persisted language", async () => {
