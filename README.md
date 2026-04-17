@@ -39,6 +39,7 @@ Typography is set exclusively in **Manrope** (300–800 weights).
 ## Prerequisites
 
 - Node.js (LTS)
+- [gitleaks](https://github.com/gitleaks/gitleaks) (pre-commit secret scanning)
 - Android SDK (for Android builds)
 - JDK 17
 
