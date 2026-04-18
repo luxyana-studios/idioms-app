@@ -2,18 +2,22 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useUnistyles } from "react-native-unistyles";
+import {
+  StyleSheet,
+  UnistylesRuntime,
+  useUnistyles,
+} from "react-native-unistyles";
 
 export default function TabsLayout() {
   const { theme } = useUnistyles();
+  const isDark = UnistylesRuntime.themeName === "dark";
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const paddingBottom = Math.max(insets.bottom, 8);
-  // Icon 24px + label 12px + paddingTop 8 + paddingBottom + gap ≈ 60px minimum
-  const tabBarHeight = 60 + paddingBottom;
+  // Base 44px (icon row + top padding) plus bottom inset — minimum total ≈52px
+  const tabBarHeight = 44 + paddingBottom;
 
   return (
     <Tabs
@@ -33,30 +37,26 @@ export default function TabsLayout() {
         },
         tabBarBackground: () => (
           <BlurView
-            intensity={60}
-            tint="dark"
+            intensity={80}
+            tint={isDark ? "dark" : "light"}
             style={[
               StyleSheet.absoluteFill,
               {
                 borderTopWidth: 1,
-                borderTopColor: "rgba(255,255,255,0.06)",
+                borderTopColor: theme.colors.border,
                 overflow: "hidden",
               },
             ]}
           />
         ),
-        tabBarLabelStyle: {
-          fontFamily: theme.typography.fonts.sansBold,
-          fontSize: 10,
-          letterSpacing: 0.8,
-          textTransform: "uppercase",
-        },
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
         name="(home)"
         options={{
           title: t("home.title"),
+          tabBarAccessibilityLabel: t("home.title"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="albums-outline" size={size} color={color} />
           ),
@@ -66,6 +66,7 @@ export default function TabsLayout() {
         name="(explore)"
         options={{
           title: t("explore.title"),
+          tabBarAccessibilityLabel: t("explore.title"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search-outline" size={size} color={color} />
           ),
@@ -75,6 +76,7 @@ export default function TabsLayout() {
         name="(saved)"
         options={{
           title: t("saved.title"),
+          tabBarAccessibilityLabel: t("saved.title"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="bookmark-outline" size={size} color={color} />
           ),
@@ -84,6 +86,7 @@ export default function TabsLayout() {
         name="(library)"
         options={{
           title: t("library.title"),
+          tabBarAccessibilityLabel: t("library.title"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="library-outline" size={size} color={color} />
           ),

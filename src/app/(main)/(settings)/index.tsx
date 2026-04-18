@@ -3,11 +3,10 @@ import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useSettings } from "@/features/settings/hooks/useSettings";
+import type { ThemeMode } from "@/features/settings/stores/settings.store";
 import { Button } from "@/shared/components/Button";
 import { ScreenContainer } from "@/shared/components/ScreenContainer";
 import { Typography } from "@/shared/components/Typography";
-
-type ThemeMode = "system" | "light" | "dark";
 
 const themeModes: ThemeMode[] = ["system", "light", "dark"];
 const languages = [

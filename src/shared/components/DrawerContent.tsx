@@ -8,7 +8,11 @@ import { useTranslation } from "react-i18next";
 import { Platform, Pressable, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Defs, FeGaussianBlur, Filter } from "react-native-svg";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import {
+  StyleSheet,
+  UnistylesRuntime,
+  useUnistyles,
+} from "react-native-unistyles";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { Button } from "@/shared/components/Button";
@@ -17,6 +21,7 @@ import { Typography } from "@/shared/components/Typography";
 export function DrawerContent({ navigation }: DrawerContentComponentProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
+  const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -37,13 +42,13 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
       <View
         style={[
           StyleSheet.absoluteFillObject,
-          { backgroundColor: "rgba(22, 19, 14, 0.96)" },
+          { backgroundColor: theme.colors.background },
         ]}
       />
     ) : (
       <BlurView
         intensity={80}
-        tint="dark"
+        tint={isDark ? "dark" : "light"}
         style={StyleSheet.absoluteFillObject}
       />
     );
@@ -111,11 +116,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
       {/* Profile */}
       <View style={styles.profile}>
         <LinearGradient
-          colors={[
-            theme.colors.primary,
-            (theme.colors as Record<string, string>).primaryContainer ??
-              theme.colors.primary,
-          ]}
+          colors={[theme.colors.primary, theme.colors.primaryContainer]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.avatar}
@@ -147,12 +148,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
           ]}
           onPress={() => navigate("/(main)/(tabs)/(home)")}
         >
-          <View
-            style={[
-              styles.navIcon,
-              { backgroundColor: "rgba(255,255,255,0.05)" },
-            ]}
-          >
+          <View style={styles.navIcon}>
             <Ionicons
               name="albums-outline"
               size={20}
@@ -171,12 +167,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
           ]}
           onPress={() => navigate("/(main)/(tabs)/(explore)")}
         >
-          <View
-            style={[
-              styles.navIcon,
-              { backgroundColor: "rgba(255,255,255,0.05)" },
-            ]}
-          >
+          <View style={styles.navIcon}>
             <Ionicons
               name="search-outline"
               size={20}
@@ -195,12 +186,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
           ]}
           onPress={() => navigate("/(main)/(tabs)/(saved)")}
         >
-          <View
-            style={[
-              styles.navIcon,
-              { backgroundColor: "rgba(255,255,255,0.05)" },
-            ]}
-          >
+          <View style={styles.navIcon}>
             <Ionicons
               name="bookmark-outline"
               size={20}
@@ -219,12 +205,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
           ]}
           onPress={() => navigate("/(main)/(settings)")}
         >
-          <View
-            style={[
-              styles.navIcon,
-              { backgroundColor: "rgba(255,255,255,0.05)" },
-            ]}
-          >
+          <View style={styles.navIcon}>
             <Ionicons
               name="settings-outline"
               size={20}
@@ -278,13 +259,14 @@ const styles = StyleSheet.create((theme) => ({
   avatar: {
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: theme.radius.full,
     alignItems: "center" as const,
     justifyContent: "center" as const,
+    overflow: "hidden" as const,
   },
   divider: {
     height: 1,
-    backgroundColor: "rgba(255,255,255,0.07)",
+    backgroundColor: theme.colors.border,
     marginBottom: theme.spacing.md,
   },
   navItem: {
@@ -296,7 +278,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.lg,
   },
   navItemPressed: {
-    backgroundColor: "rgba(255,255,255,0.05)",
+    backgroundColor: theme.colors.surfaceContainerHigh,
   },
   navIcon: {
     width: 36,
@@ -305,7 +287,8 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center" as const,
     justifyContent: "center" as const,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.06)",
+    backgroundColor: theme.colors.surfaceContainer,
+    borderColor: theme.colors.border,
   },
   footer: {
     gap: theme.spacing.md,
