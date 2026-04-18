@@ -29,6 +29,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
 
   const { width: drawerWidth, height: drawerHeight } = useWindowDimensions();
   const email = user?.email ?? "";
+  const initial = email.charAt(0).toUpperCase() || "?";
   const version = Constants.expoConfig?.version ?? "1.0.0";
 
   function navigate(href: Parameters<typeof router.navigate>[0]) {
@@ -114,11 +115,20 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
 
       {/* Profile */}
       <View style={styles.profile}>
-        <View style={styles.avatar}>
-          <Typography variant="heading" color="primary">
-            {email ? email[0].toUpperCase() : "?"}
+        <LinearGradient
+          colors={[theme.colors.primary, theme.colors.primaryContainer]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.avatar}
+        >
+          <Typography
+            variant="heading"
+            weight="extraBold"
+            style={{ color: theme.colors.primaryText }}
+          >
+            {initial}
           </Typography>
-        </View>
+        </LinearGradient>
         {email ? (
           <Typography variant="body" color="textSecondary">
             {email}
@@ -250,11 +260,9 @@ const styles = StyleSheet.create((theme) => ({
     width: 56,
     height: 56,
     borderRadius: theme.radius.full,
-    backgroundColor: `${theme.colors.primary}20`,
-    borderWidth: 1,
-    borderColor: `${theme.colors.primary}40`,
     alignItems: "center" as const,
     justifyContent: "center" as const,
+    overflow: "hidden" as const,
   },
   divider: {
     height: 1,

@@ -1,0 +1,46 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
+    groups:
+      expo-react-native:
+        patterns:
+          - "expo"
+          - "expo-*"
+          - "jest-expo"
+          - "react"
+          - "react-dom"
+          - "react-native"
+          - "react-native-*"
+          - "react-i18next"
+          - "expo-router"
+          - "@react-navigation/*"
+        update-types:
+          - "minor"
+          - "patch"
+      all-non-major:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"

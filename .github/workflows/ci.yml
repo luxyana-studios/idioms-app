@@ -6,20 +6,41 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  secrets:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        run: |
+          GITLEAKS_VERSION=$(curl -s https://api.github.com/repos/gitleaks/gitleaks/releases/latest | grep -oP '"tag_name":\s*"v\K[^"]+')
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar xz -C /usr/local/bin gitleaks
+
+      - name: Scan for secrets
+        run: gitleaks git --no-banner
+
   quality:
     name: Typecheck & Lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -31,3 +52,22 @@ jobs:
       - run: npm run lint
 
       - run: npm run test:ci
+
+      - name: Security audit
+        run: |
+          npm audit --json > /tmp/audit.json || true
+          node -e '
+            const data = JSON.parse(require("fs").readFileSync("/tmp/audit.json","utf8"));
+            const vulns = Object.values(data.vulnerabilities || {});
+            for (const v of vulns) {
+              const fix = v.fixAvailable ? "fix available" : "no fix";
+              console.log(`${v.severity.toUpperCase()} ${v.name} (${fix})`);
+              v.via.filter(r => typeof r === "object").forEach(r => console.log(`  ${r.title} - ${r.url}`));
+            }
+            const fixable = vulns.filter(v => (v.severity === "high" || v.severity === "critical") && v.fixAvailable);
+            if (fixable.length) {
+              console.error(`\n${fixable.length} fixable high/critical vulnerabilities found.`);
+              process.exit(1);
+            }
+            console.log("\nNo fixable high/critical vulnerabilities.");
+          '

@@ -40,7 +40,7 @@ export default function TabsLayout() {
             intensity={80}
             tint={isDark ? "dark" : "light"}
             style={[
-              StyleSheet.absoluteFillObject,
+              StyleSheet.absoluteFill,
               {
                 borderTopWidth: 1,
                 borderTopColor: theme.colors.border,

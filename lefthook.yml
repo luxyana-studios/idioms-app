@@ -11,4 +11,7 @@ pre-commit:
       glob: "*.{ts,tsx,js,jsx,json}"
       run: npx biome format --no-errors-on-unmatched {staged_files}
     typecheck:
+      glob: "*.{ts,tsx}"
       run: npx tsc --noEmit
+    secrets:
+      run: gitleaks git --staged --no-banner
