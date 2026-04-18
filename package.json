@@ -57,7 +57,7 @@
     "jest-expo": "^55.0.9",
     "lefthook": "^2.1.5",
     "supabase": "^2.91.3",
-    "typescript": "~5.9.2"
+    "typescript": "~6.0.2"
   },
   "private": true
 }
