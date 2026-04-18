@@ -113,7 +113,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
         <LinearGradient
           colors={[
             theme.colors.primary,
-            (theme.colors as Record<string, string>)["primaryContainer"] ??
+            (theme.colors as Record<string, string>).primaryContainer ??
               theme.colors.primary,
           ]}
           start={{ x: 0, y: 0 }}

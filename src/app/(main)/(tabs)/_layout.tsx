@@ -36,7 +36,7 @@ export default function TabsLayout() {
             intensity={60}
             tint="dark"
             style={[
-              StyleSheet.absoluteFillObject,
+              StyleSheet.absoluteFill,
               {
                 borderTopWidth: 1,
                 borderTopColor: "rgba(255,255,255,0.06)",
