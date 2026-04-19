@@ -5,6 +5,7 @@
 ```
 profiles ──< bookmarks >── idioms ──< idiom_equivalents >── idioms
                            idioms ──< idiom_translations
+                           idioms ──< idiom_tags >── tags ──< tag_translations
 profiles ──< user_deck_saves >── decks ──< deck_idioms >── idioms
 profiles ──< decks (owner)
 profiles ──< follows >── profiles
@@ -39,7 +40,6 @@ language_code         text NOT NULL        -- ISO 639-1: 'en', 'es', 'de', 'fr'
 idiomatic_meaning     text NOT NULL        -- in the idiom's own language
 explanation           text                 -- etymology, in the idiom's own language
 examples              text[]               -- usage in sentences (native language)
-tags                  text[]               -- ['food', 'ease', 'informal']
 source                text DEFAULT 'human' -- 'human' | 'ai_mined'
 status                text NOT NULL DEFAULT 'draft' -- 'draft' | 'reviewed' | 'published'
 created_at            timestamptz DEFAULT now()
@@ -47,6 +47,9 @@ updated_at            timestamptz DEFAULT now()
 
 UNIQUE(expression_key, language_code)  -- normalized: case/whitespace variants collapse
 ```
+
+Note: `tags text[]` is no longer the intended long-term shape. Tags need canonical identity,
+localization, and future browsing/deck semantics, so model them as first-class taxonomy entities.
 
 ---
 
@@ -95,6 +98,65 @@ INDEX(idiom_id_b, similarity_score DESC)
 
 ---
 
+### `tags`
+Canonical taxonomy concepts attached to idioms. Tags are domain data, not UI-only strings.
+
+```sql
+id              uuid PRIMARY KEY DEFAULT gen_random_uuid()
+key             text UNIQUE NOT NULL      -- stable canonical id, e.g. 'food', 'informal', 'luck'
+facet           text NOT NULL             -- e.g. 'theme', 'occasion', 'register', 'meaning'
+is_browsable    boolean NOT NULL DEFAULT true
+created_at      timestamptz NOT NULL DEFAULT now()
+updated_at      timestamptz NOT NULL DEFAULT now()
+```
+
+Notes:
+- `key` is canonical and language-agnostic
+- tag order has no semantic meaning
+- if a future "primary classification" is needed, model it explicitly, do not infer it from ordering
+
+---
+
+### `tag_translations`
+Localized labels for tags. This is preferred over frontend i18n because tags are taxonomy data,
+not static interface copy.
+
+```sql
+id              uuid PRIMARY KEY DEFAULT gen_random_uuid()
+tag_id          uuid NOT NULL REFERENCES tags(id) ON DELETE CASCADE
+language_code   text NOT NULL
+label           text NOT NULL
+description     text
+created_at      timestamptz NOT NULL DEFAULT now()
+updated_at      timestamptz NOT NULL DEFAULT now()
+
+UNIQUE(tag_id, language_code)
+```
+
+Notes:
+- UI chooses the displayed tag label using the current app language
+- missing translations can fall back to a default language or canonical key, per product decision
+
+---
+
+### `idiom_tags`
+Many-to-many association between idioms and canonical tags.
+
+```sql
+id          uuid PRIMARY KEY DEFAULT gen_random_uuid()
+idiom_id    uuid NOT NULL REFERENCES idioms(id) ON DELETE CASCADE
+tag_id      uuid NOT NULL REFERENCES tags(id) ON DELETE CASCADE
+created_at  timestamptz NOT NULL DEFAULT now()
+
+UNIQUE(idiom_id, tag_id)
+```
+
+Notes:
+- pipeline/admin workflows attach canonical tags, not localized labels
+- tags are an unordered set of semantic facets on an idiom
+
+---
+
 ### `decks`
 Curated product decks and user-created collections in the same table.
 
@@ -110,6 +172,11 @@ is_premium      boolean DEFAULT false
 cover_image_url text
 created_at      timestamptz DEFAULT now()
 ```
+
+Notes:
+- decks remain first-class product objects, separate from tags
+- tags may help generate, suggest, or maintain decks, but do not replace explicit deck membership
+- because decks have ownership, visibility, premium gating, and ordering, they are richer than a tag query alone
 
 ---
 
@@ -180,6 +247,9 @@ All tables have RLS enabled. Key policies:
 | `idioms` | Public (only rows where `status = 'published'`) | Service role only (seeding pipeline) |
 | `idiom_translations` | Public (only for published parent idioms) | Service role only |
 | `idiom_equivalents` | Public | Service role only |
+| `tags` | Public | Service role only |
+| `tag_translations` | Public | Service role only |
+| `idiom_tags` | Public (for published parent idioms) | Service role only |
 | `decks` | Public if visibility='public', owner if private | Owner or service role |
 | `deck_idioms` | Follows deck visibility | Deck owner or service role |
 | `bookmarks` | Owner only | Owner only |
@@ -197,3 +267,6 @@ All tables have RLS enabled. Key policies:
 - `status` on `idioms` gates content visibility: AI-mined entries start as `draft`, move to `reviewed` after human QA, and to `published` when user-visible. Public read policy filters on `status = 'published'`
 - Translatable content lives on `idiom_translations`, not on `idioms`. The `idioms` row holds native-language content only; `idiom_translations` holds `literal_translation` + translated `idiomatic_meaning`/`explanation` for every other supported language. Pipeline invariant: a published idiom has translations in all supported languages
 - `similarity_score` on `idiom_equivalents` ranks equivalent candidates; the app shows top-N ordered by score (useful when no single exact match exists)
+- Tags should be treated as localized taxonomy, not frontend i18n keys. Canonical identity lives on `tags`, localized display lives on `tag_translations`, and idiom membership lives on `idiom_tags`
+- Introduce a small set of tag facets early, for example `theme`, `occasion`, `register`, and `meaning`, to support browsing without collapsing all semantics into one flat list
+- Decks and tags serve different purposes: tags classify idioms, decks package idioms. Decks may be seeded from tags, but remain curated/user-authored collections with explicit membership and order
