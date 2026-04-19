@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import i18n from "@/core/i18n";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
 import { supabase } from "@/core/supabase/client";
-import type { Idiom } from "../types";
+import type { Idiom, IdiomTag } from "../types";
 
 const MOCK_IDIOMS: Idiom[] = [
   {
@@ -128,6 +129,30 @@ interface IdiomsState {
   isSaved: (id: string) => boolean;
 }
 
+type IdiomTagsJoin = Array<{
+  tags: {
+    key: string;
+    facet: string;
+    tag_translations: Array<{ language_code: string; label: string }>;
+  } | null;
+}>;
+
+// Resolve the display label per tag: UI language → EN fallback → canonical key.
+const resolveTags = (
+  joins: IdiomTagsJoin | null,
+  uiLanguage: string,
+): IdiomTag[] =>
+  (joins ?? []).flatMap((row) => {
+    const t = row.tags;
+    if (!t) return [];
+    const translations = t.tag_translations;
+    const label =
+      translations.find((tr) => tr.language_code === uiLanguage)?.label ??
+      translations.find((tr) => tr.language_code === "en")?.label ??
+      t.key;
+    return [{ key: t.key, facet: t.facet, label }];
+  });
+
 export const useIdiomsStore = create<IdiomsState>()(
   persist(
     (set, get) => ({
@@ -142,7 +167,25 @@ export const useIdiomsStore = create<IdiomsState>()(
 
         const { data, error } = await supabase
           .from("idioms")
-          .select("*")
+          .select(
+            `
+            id,
+            expression,
+            language_code,
+            idiomatic_meaning,
+            explanation,
+            examples,
+            source,
+            status,
+            idiom_tags (
+              tags (
+                key,
+                facet,
+                tag_translations ( language_code, label )
+              )
+            )
+          `,
+          )
           .eq("status", "published");
 
         if (error) {
@@ -151,6 +194,7 @@ export const useIdiomsStore = create<IdiomsState>()(
           return;
         }
 
+        const uiLanguage = i18n.language;
         const idioms: Idiom[] = (data ?? []).map((row) => ({
           id: row.id,
           expression: row.expression,
@@ -158,7 +202,7 @@ export const useIdiomsStore = create<IdiomsState>()(
           idiomaticMeaning: row.idiomatic_meaning,
           explanation: row.explanation ?? undefined,
           examples: row.examples ?? undefined,
-          tags: row.tags ?? [],
+          tags: resolveTags(row.idiom_tags, uiLanguage),
           source: row.source as Idiom["source"],
           status: row.status as Idiom["status"],
         }));

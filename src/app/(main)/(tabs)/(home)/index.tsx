@@ -319,7 +319,7 @@ export default function HomeScreen() {
                   weight="extraBold"
                   style={[styles.chipText, { color: theme.colors.primary }]}
                 >
-                  {current.tags[0] ?? current.languageCode}
+                  {current.tags[0]?.label ?? current.languageCode}
                 </Typography>
               </View>
               <TouchableOpacity

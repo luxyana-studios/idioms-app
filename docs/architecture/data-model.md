@@ -48,8 +48,7 @@ updated_at            timestamptz DEFAULT now()
 UNIQUE(expression_key, language_code)  -- normalized: case/whitespace variants collapse
 ```
 
-Note: `tags text[]` is no longer the intended long-term shape. Tags need canonical identity,
-localization, and future browsing/deck semantics, so model them as first-class taxonomy entities.
+Tags are modeled as first-class taxonomy — see `tags`, `tag_translations`, and `idiom_tags` below.
 
 ---
 
