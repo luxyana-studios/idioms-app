@@ -42,8 +42,15 @@ export default function DetailScreen() {
         ]}
       >
         <View style={styles.notFound}>
+          <Typography
+            variant="heading"
+            weight="bold"
+            style={{ color: theme.colors.text }}
+          >
+            {t("detail.notFound")}
+          </Typography>
           <Typography variant="body" style={{ color: theme.colors.textMuted }}>
-            {t("home.idiomDetails")}
+            {t("detail.notFoundSubtitle")}
           </Typography>
         </View>
       </View>
@@ -206,7 +213,7 @@ export default function DetailScreen() {
               weight="extraBold"
               style={[styles.cardLabel, { color: theme.colors.textMuted }]}
             >
-              ORIGIN & MEANING
+              {t("detail.originLabel")}
             </Typography>
             <Typography
               variant="body"
@@ -245,7 +252,7 @@ export default function DetailScreen() {
               weight="extraBold"
               style={[styles.cardLabel, { color: theme.colors.textMuted }]}
             >
-              EXAMPLE
+              {t("detail.exampleLabel")}
             </Typography>
             {idiom.examples.map((example) => (
               <Typography
@@ -266,6 +273,7 @@ export default function DetailScreen() {
         {/* Pronunciation button */}
         <TouchableOpacity
           activeOpacity={0.85}
+          onPress={() => {}}
           style={[
             styles.pronunciationBtn,
             { backgroundColor: theme.colors.primary },

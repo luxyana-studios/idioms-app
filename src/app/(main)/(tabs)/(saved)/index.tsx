@@ -48,7 +48,7 @@ export default function SavedScreen() {
             variant="caption"
             style={{ color: theme.colors.textMuted }}
           >
-            {savedIdioms.length} saved
+            {t("saved.count", { count: savedIdioms.length })}
           </Typography>
         )}
       </View>

@@ -18,25 +18,18 @@ type TabIcon =
   | "bookmark-outline"
   | "library-outline";
 
-const TAB_ICONS: TabIcon[] = [
-  "albums-outline",
-  "search-outline",
-  "bookmark-outline",
-  "library-outline",
-];
+const TAB_CONFIG: Record<string, { icon: TabIcon; labelKey: string }> = {
+  "(home)": { icon: "albums-outline", labelKey: "tab.home" },
+  "(explore)": { icon: "search-outline", labelKey: "explore.title" },
+  "(saved)": { icon: "bookmark-outline", labelKey: "saved.title" },
+  "(library)": { icon: "library-outline", labelKey: "library.title" },
+};
 
 function PillTabBar({ state, navigation }: BottomTabBarProps) {
   const { theme } = useUnistyles();
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-
-  const TAB_LABELS = [
-    t("tab.home"),
-    t("explore.title"),
-    t("saved.title"),
-    t("library.title"),
-  ];
 
   const borderColor = isDark
     ? "rgba(160,200,100,0.14)"
@@ -66,8 +59,10 @@ function PillTabBar({ state, navigation }: BottomTabBarProps) {
         <View style={styles.inner}>
           {state.routes.map((route, index) => {
             const isFocused = state.index === index;
-            const icon = TAB_ICONS[index];
-            const label = TAB_LABELS[index];
+            const config = TAB_CONFIG[route.name];
+            if (!config) return null;
+            const icon = config.icon;
+            const label = t(config.labelKey);
 
             const onPress = () => {
               const event = navigation.emit({
@@ -80,12 +75,21 @@ function PillTabBar({ state, navigation }: BottomTabBarProps) {
               }
             };
 
+            const onLongPress = () => {
+              navigation.emit({
+                type: "tabLongPress",
+                target: route.key,
+              });
+            };
+
             return (
               <TouchableOpacity
                 key={route.key}
                 onPress={onPress}
+                onLongPress={onLongPress}
                 activeOpacity={0.75}
                 accessibilityRole="tab"
+                accessibilityLabel={label}
                 accessibilityState={{ selected: isFocused }}
               >
                 {isFocused ? (

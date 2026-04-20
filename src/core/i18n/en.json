@@ -53,5 +53,11 @@
   "settings.language": "Language",
   "settings.languageEn": "English",
   "settings.languageEs": "Español",
-  "drawer.appVersion": "Version {{version}}"
+  "drawer.appVersion": "Version {{version}}",
+  "detail.originLabel": "Origin & Meaning",
+  "detail.exampleLabel": "Example",
+  "detail.notFound": "Idiom not found",
+  "detail.notFoundSubtitle": "This idiom doesn't exist or was removed.",
+  "saved.count": "{{count}} saved",
+  "library.totalCount": "{{count}} idioms total"
 }

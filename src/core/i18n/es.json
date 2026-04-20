@@ -53,5 +53,11 @@
   "settings.language": "Idioma",
   "settings.languageEn": "English",
   "settings.languageEs": "Español",
-  "drawer.appVersion": "Versión {{version}}"
+  "drawer.appVersion": "Versión {{version}}",
+  "detail.originLabel": "Origen y significado",
+  "detail.exampleLabel": "Ejemplo",
+  "detail.notFound": "Modismo no encontrado",
+  "detail.notFoundSubtitle": "Este modismo no existe o fue eliminado.",
+  "saved.count": "{{count}} guardados",
+  "library.totalCount": "{{count}} modismos en total"
 }

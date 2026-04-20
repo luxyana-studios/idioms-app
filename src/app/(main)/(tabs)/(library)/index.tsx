@@ -75,7 +75,7 @@ export default function LibraryScreen() {
           {t("library.title")}
         </Typography>
         <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-          {idioms.length} idioms total
+          {t("library.totalCount", { count: idioms.length })}
         </Typography>
       </View>
 
