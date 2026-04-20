@@ -12,6 +12,7 @@
   "auth.noAccount": "¿No tienes una cuenta?",
   "auth.hasAccount": "¿Ya tienes una cuenta?",
   "home.title": "IdiomDeck",
+  "tab.home": "Inicio",
   "home.dailySelection": "Selección Diaria",
   "home.expandLexicon": "Amplía tu vocabulario",
   "home.skip": "Omitir",

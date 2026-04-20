@@ -31,25 +31,23 @@ function PillTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
 
-  const tabLabels = [
-    t("home.title"),
+  const TAB_LABELS = [
+    t("tab.home"),
     t("explore.title"),
     t("saved.title"),
     t("library.title"),
   ];
 
-  const barStyle = {
-    bottom: Math.max(insets.bottom, 8) + 8,
-  };
-
-  const bgColor = isDark ? "rgba(13,20,9,0.94)" : "rgba(248,244,238,0.96)";
-
   const borderColor = isDark
     ? "rgba(160,200,100,0.14)"
     : "rgba(145,71,49,0.10)";
+  const bgColor = isDark ? "rgba(13,20,9,0.94)" : "rgba(248,244,238,0.96)";
 
   return (
-    <View style={[styles.wrapper, barStyle]} pointerEvents="box-none">
+    <View
+      style={[styles.wrapper, { bottom: Math.max(insets.bottom, 8) + 8 }]}
+      pointerEvents="box-none"
+    >
       <View style={[styles.container, { borderColor }]}>
         {Platform.OS !== "android" ? (
           <BlurView
@@ -69,7 +67,7 @@ function PillTabBar({ state, navigation }: BottomTabBarProps) {
           {state.routes.map((route, index) => {
             const isFocused = state.index === index;
             const icon = TAB_ICONS[index];
-            const label = tabLabels[index];
+            const label = TAB_LABELS[index];
 
             const onPress = () => {
               const event = navigation.emit({
@@ -87,7 +85,6 @@ function PillTabBar({ state, navigation }: BottomTabBarProps) {
                 key={route.key}
                 onPress={onPress}
                 activeOpacity={0.75}
-                style={styles.tabItem}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: isFocused }}
               >
@@ -106,10 +103,7 @@ function PillTabBar({ state, navigation }: BottomTabBarProps) {
                     <Typography
                       variant="caption"
                       weight="bold"
-                      style={[
-                        styles.activeLabel,
-                        { color: theme.colors.primaryText },
-                      ]}
+                      style={{ color: theme.colors.primaryText, fontSize: 13 }}
                     >
                       {label}
                     </Typography>
@@ -136,9 +130,7 @@ export default function TabsLayout() {
   return (
     <Tabs
       tabBar={(props) => <PillTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-      }}
+      screenOptions={{ headerShown: false }}
     >
       <Tabs.Screen name="(home)" />
       <Tabs.Screen name="(explore)" />
@@ -151,8 +143,8 @@ export default function TabsLayout() {
 const styles = StyleSheet.create((theme) => ({
   wrapper: {
     position: "absolute",
-    left: 20,
-    right: 20,
+    left: 0,
+    right: 0,
     alignItems: "center",
   },
   container: {
@@ -164,31 +156,20 @@ const styles = StyleSheet.create((theme) => ({
     shadowOpacity: 0.15,
     shadowRadius: 20,
     elevation: 16,
-    width: "100%",
   },
   inner: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 6,
-    gap: 4,
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    padding: 5,
+    gap: 2,
   },
   activePill: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     gap: 6,
     height: 44,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
     borderRadius: theme.radius.full,
-  },
-  activeLabel: {
-    fontSize: 13,
-    letterSpacing: 0.2,
   },
   inactivePill: {
     width: 44,
