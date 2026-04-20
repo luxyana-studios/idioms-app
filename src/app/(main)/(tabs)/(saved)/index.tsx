@@ -273,7 +273,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   expression: {
     fontSize: 22,
-    color: "inherit",
+
     marginBottom: theme.spacing.sm,
     letterSpacing: -0.5,
   },

@@ -5,6 +5,7 @@
   "common.save": "Save",
   "common.cancel": "Cancel",
   "common.logout": "Log out",
+  "common.goBack": "Go back",
   "auth.login": "Log in",
   "auth.signup": "Sign up",
   "auth.email": "Email",

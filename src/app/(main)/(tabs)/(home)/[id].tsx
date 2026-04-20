@@ -105,6 +105,8 @@ export default function DetailScreen() {
             ]}
             onPress={() => router.back()}
             hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t("common.goBack")}
           >
             <Ionicons
               name="chevron-back"
@@ -158,6 +160,8 @@ export default function DetailScreen() {
               isSaved ? unsaveIdiom(idiom.id) : saveIdiom(idiom.id)
             }
             hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t(isSaved ? "home.saved" : "common.save")}
           >
             <Ionicons
               name={isSaved ? "heart" : "heart-outline"}
@@ -273,10 +277,10 @@ export default function DetailScreen() {
         {/* Pronunciation button */}
         <TouchableOpacity
           activeOpacity={0.85}
-          onPress={() => {}}
+          disabled
           style={[
             styles.pronunciationBtn,
-            { backgroundColor: theme.colors.primary },
+            { backgroundColor: theme.colors.primary, opacity: 0.6 },
           ]}
         >
           <Ionicons

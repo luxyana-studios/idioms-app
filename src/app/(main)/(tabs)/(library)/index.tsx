@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
+import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -12,7 +13,7 @@ import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { Typography } from "@/shared/components/Typography";
 
-type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
+type IoniconsName = ComponentProps<typeof Ionicons>["name"];
 
 interface Topic {
   icon: IoniconsName;
@@ -88,7 +89,14 @@ export default function LibraryScreen() {
         showsVerticalScrollIndicator={false}
       >
         {TOPICS.map((topic) => (
-          <TouchableOpacity key={topic.labelKey} activeOpacity={0.8}>
+          <TouchableOpacity
+            key={topic.labelKey}
+            activeOpacity={0.8}
+            disabled
+            accessibilityRole="button"
+            accessibilityLabel={t(topic.labelKey)}
+            accessibilityState={{ disabled: true }}
+          >
             {topic.accent ? (
               /* Accent card — solid primary */
               <View

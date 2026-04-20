@@ -486,7 +486,12 @@ export default function HomeScreen() {
         {/* ── Recommendations ── */}
         <View style={styles.recommendations}>
           {/* Origin Stories */}
-          <TouchableOpacity activeOpacity={0.75}>
+          <TouchableOpacity
+            activeOpacity={0.75}
+            onPress={() => router.push("/(main)/(tabs)/(library)")}
+            accessibilityRole="button"
+            accessibilityLabel={t("home.originStories")}
+          >
             <View
               style={[
                 styles.recCard,
@@ -534,7 +539,12 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           {/* Quick Quiz — accent card */}
-          <TouchableOpacity activeOpacity={0.75}>
+          <TouchableOpacity
+            activeOpacity={0.75}
+            onPress={() => router.push("/(main)/(tabs)/(library)")}
+            accessibilityRole="button"
+            accessibilityLabel={t("home.quickQuiz")}
+          >
             <View
               style={[
                 styles.recCard,
