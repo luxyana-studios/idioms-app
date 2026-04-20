@@ -87,7 +87,7 @@ export default function HomeScreen() {
     ? "rgba(160,200,100,0.14)"
     : "rgba(0,0,0,0.07)";
 
-  const cardBg = isDark ? "rgba(30,42,22,0.82)" : "rgba(255,255,255,0.78)";
+  const cardBg = isDark ? "rgba(26,36,18,0.62)" : "rgba(255,255,255,0.78)";
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
@@ -257,8 +257,8 @@ export default function HomeScreen() {
             {/* Glass background */}
             {Platform.OS !== "android" ? (
               <BlurView
-                intensity={60}
-                tint="default"
+                intensity={isDark ? 80 : 60}
+                tint={isDark ? "dark" : "light"}
                 style={StyleSheet.absoluteFillObject}
               />
             ) : (
@@ -273,17 +273,27 @@ export default function HomeScreen() {
             {/* Top shimmer */}
             <LinearGradient
               colors={[
-                isDark ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.90)",
+                isDark ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.90)",
                 "transparent",
               ]}
               style={styles.cardShimmer}
               pointerEvents="none"
             />
+            {/* Warm accent glow — top-right corner in dark mode */}
+            {isDark && (
+              <LinearGradient
+                colors={[`${theme.colors.primary}18`, "transparent"]}
+                start={{ x: 1, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={StyleSheet.absoluteFillObject}
+                pointerEvents="none"
+              />
+            )}
             {/* Bottom shadow gradient */}
             <LinearGradient
               colors={[
                 "transparent",
-                isDark ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.04)",
+                isDark ? "rgba(0,0,0,0.20)" : "rgba(0,0,0,0.04)",
               ]}
               style={styles.cardShadowGradient}
               pointerEvents="none"
