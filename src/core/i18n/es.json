@@ -26,6 +26,7 @@
   "explore.title": "Explorar",
   "explore.search": "Buscar modismos, categorías o mazos...",
   "explore.noResults": "Ningún modismo coincide con tu búsqueda",
+  "explore.resultsCount": "{{count}} modismos",
   "explore.newArrivals": "Recién llegados",
   "explore.viewAll": "Ver todo",
   "explore.empty": "No se encontraron modismos",

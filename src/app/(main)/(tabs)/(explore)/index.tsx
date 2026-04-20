@@ -23,6 +23,13 @@ import { Typography } from "@/shared/components/Typography";
 
 const CATEGORIES = ["All", "English", "French", "German", "Slang"];
 
+const CATEGORY_LANG_CODES: Record<string, string[]> = {
+  English: ["en"],
+  French: ["fr"],
+  German: ["de"],
+  Spanish: ["es"],
+};
+
 export default function ExploreScreen() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
@@ -39,12 +46,14 @@ export default function ExploreScreen() {
       idiom.expression.toLowerCase().includes(search.toLowerCase()) ||
       idiom.idiomaticMeaning.toLowerCase().includes(search.toLowerCase());
 
+    const langCodes = CATEGORY_LANG_CODES[activeCategory];
     const matchesCategory =
       activeCategory === "All" ||
-      idiom.languageCode.toLowerCase().includes(activeCategory.toLowerCase()) ||
-      idiom.tags.some((tag) =>
-        tag.toLowerCase().includes(activeCategory.toLowerCase()),
-      );
+      (langCodes
+        ? langCodes.includes(idiom.languageCode)
+        : idiom.tags.some(
+            (tag) => tag.toLowerCase() === activeCategory.toLowerCase(),
+          ));
 
     return matchesSearch && matchesCategory;
   });
@@ -161,7 +170,7 @@ export default function ExploreScreen() {
       {/* Results count */}
       <View style={styles.resultsHeader}>
         <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-          {filtered.length} {filtered.length === 1 ? "idiom" : "idioms"}
+          {t("explore.resultsCount", { count: filtered.length })}
         </Typography>
       </View>
 

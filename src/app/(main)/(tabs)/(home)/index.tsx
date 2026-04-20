@@ -158,6 +158,9 @@ export default function HomeScreen() {
             { backgroundColor: headerBtnBg, borderColor: headerBtnBorder },
           ]}
           hitSlop={10}
+          onPress={() => router.push("/(main)/(tabs)/(explore)")}
+          accessibilityRole="button"
+          accessibilityLabel={t("explore.title")}
         >
           <Ionicons name="search" size={20} color={theme.colors.primary} />
         </TouchableOpacity>
@@ -409,6 +412,8 @@ export default function HomeScreen() {
               ]}
               onPress={nextIdiom}
               hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={t("home.skip")}
             >
               <Ionicons
                 name="close-circle-outline"
@@ -431,6 +436,8 @@ export default function HomeScreen() {
               ]}
               onPress={() => router.push(`/(main)/(tabs)/(home)/${current.id}`)}
               hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={t("home.idiomDetails")}
             >
               <Ionicons
                 name="chevron-forward"
@@ -462,6 +469,8 @@ export default function HomeScreen() {
               ]}
               onPress={handleSave}
               hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={t(isSaved ? "home.saved" : "common.save")}
             >
               <Ionicons
                 name={isSaved ? "heart" : "heart-outline"}
