@@ -132,7 +132,7 @@ export default function HomeScreen() {
           weight="extraBold"
           style={[styles.logo, { color: theme.colors.primary }]}
         >
-          IdiomDeck Luxyana Rocks!
+          IdiomDeck, does Luxyana really rock!
         </Typography>
 
         <TouchableOpacity style={styles.headerBtn} hitSlop={10}>

@@ -67,6 +67,7 @@ export default function SettingsScreen() {
                 color={language === lang.code ? "primary" : "text"}
               >
                 {t(lang.labelKey)}
+                Testststeststs
               </Typography>
             </Pressable>
           ))}
