@@ -134,7 +134,7 @@ type IdiomTagsJoin = Array<{
     key: string;
     facet: string;
     tag_translations: Array<{ language_code: string; label: string }>;
-  } | null;
+  };
 }>;
 
 // Resolve the display label per tag: UI language → EN fallback → canonical key.
@@ -142,15 +142,12 @@ const resolveTags = (
   joins: IdiomTagsJoin | null,
   uiLanguage: string,
 ): IdiomTag[] =>
-  (joins ?? []).flatMap((row) => {
-    const t = row.tags;
-    if (!t) return [];
-    const translations = t.tag_translations;
+  (joins ?? []).map(({ tags: t }) => {
     const label =
-      translations.find((tr) => tr.language_code === uiLanguage)?.label ??
-      translations.find((tr) => tr.language_code === "en")?.label ??
+      t.tag_translations.find((tr) => tr.language_code === uiLanguage)?.label ??
+      t.tag_translations.find((tr) => tr.language_code === "en")?.label ??
       t.key;
-    return [{ key: t.key, facet: t.facet, label }];
+    return { key: t.key, facet: t.facet as IdiomTag["facet"], label };
   });
 
 export const useIdiomsStore = create<IdiomsState>()(

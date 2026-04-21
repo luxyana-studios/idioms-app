@@ -145,7 +145,11 @@ select i.id, 'en',
 from public.idioms i where i.expression = 'Irse de la lengua' and i.language_code = 'es';
 
 -- ── Tags taxonomy ────────────────────────────────────────────────────────
--- Canonical tag keys + facet. Facets are free text; staying lean on purpose.
+-- Canonical tag keys + facet. Facet rubric (kept in TS union IdiomTag.facet):
+--   theme    — what the idiom is about (food, health, secrets)
+--   register — social tone (formal, informal)
+--   context  — setting it belongs to (theater, business)
+--   meaning  — semantic payload (luck, courage, disclosure)
 
 insert into public.tags (key, facet) values
   ('luck',         'meaning'),

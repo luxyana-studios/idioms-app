@@ -1,9 +1,11 @@
 export type IdiomStatus = "draft" | "reviewed" | "published";
 export type IdiomSource = "human" | "ai_mined";
 
+export type TagFacet = "theme" | "register" | "context" | "meaning";
+
 export interface IdiomTag {
   key: string;
-  facet: string;
+  facet: TagFacet;
   label: string;
 }
 
