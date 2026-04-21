@@ -1,9 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import i18n from "@/core/i18n";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
-import { supabase } from "@/core/supabase/client";
-import type { Idiom, IdiomTag } from "../types";
 
 const MOCK_IDIOMS: Idiom[] = [
   {
@@ -118,97 +115,19 @@ const MOCK_IDIOMS: Idiom[] = [
 ];
 
 interface IdiomsState {
-  idioms: Idiom[];
   savedIds: string[];
   currentIndex: number;
-  loading: boolean;
-  loadIdioms: () => Promise<void>;
   saveIdiom: (id: string) => void;
   unsaveIdiom: (id: string) => void;
-  nextIdiom: () => void;
+  nextIdiom: (total: number) => void;
   isSaved: (id: string) => boolean;
 }
-
-type IdiomTagsJoin = Array<{
-  tags: {
-    key: string;
-    facet: string;
-    tag_translations: Array<{ language_code: string; label: string }>;
-  };
-}>;
-
-// Resolve the display label per tag: UI language → EN fallback → canonical key.
-const resolveTags = (
-  joins: IdiomTagsJoin | null,
-  uiLanguage: string,
-): IdiomTag[] =>
-  (joins ?? []).map(({ tags: t }) => {
-    const label =
-      t.tag_translations.find((tr) => tr.language_code === uiLanguage)?.label ??
-      t.tag_translations.find((tr) => tr.language_code === "en")?.label ??
-      t.key;
-    return { key: t.key, facet: t.facet as IdiomTag["facet"], label };
-  });
 
 export const useIdiomsStore = create<IdiomsState>()(
   persist(
     (set, get) => ({
-      idioms: [],
       savedIds: [],
       currentIndex: 0,
-      loading: false,
-
-      loadIdioms: async () => {
-        if (get().idioms.length > 0 || get().loading) return;
-        set({ loading: true });
-
-        const { data, error } = await supabase
-          .from("idioms")
-          .select(
-            `
-            id,
-            expression,
-            language_code,
-            idiomatic_meaning,
-            explanation,
-            examples,
-            source,
-            status,
-            idiom_tags (
-              tags (
-                key,
-                facet,
-                tag_translations ( language_code, label )
-              )
-            )
-          `,
-          )
-          .eq("status", "published");
-
-        if (error) {
-          // Supabase not configured — fall back to mock data
-          set({ idioms: MOCK_IDIOMS, loading: false });
-          return;
-        }
-
-        const uiLanguage = i18n.language;
-        const idioms: Idiom[] = (data ?? []).map((row) => ({
-          id: row.id,
-          expression: row.expression,
-          languageCode: row.language_code,
-          idiomaticMeaning: row.idiomatic_meaning,
-          explanation: row.explanation ?? undefined,
-          examples: row.examples ?? undefined,
-          tags: resolveTags(row.idiom_tags, uiLanguage),
-          source: row.source as Idiom["source"],
-          status: row.status as Idiom["status"],
-        }));
-
-        set({
-          idioms: idioms.length > 0 ? idioms : MOCK_IDIOMS,
-          loading: false,
-        });
-      },
 
       saveIdiom: (id) =>
         set((state) => ({
@@ -222,9 +141,9 @@ export const useIdiomsStore = create<IdiomsState>()(
           savedIds: state.savedIds.filter((s) => s !== id),
         })),
 
-      nextIdiom: () =>
+      nextIdiom: (total) =>
         set((state) => ({
-          currentIndex: (state.currentIndex + 1) % state.idioms.length,
+          currentIndex: total > 0 ? (state.currentIndex + 1) % total : 0,
         })),
 
       isSaved: (id) => get().savedIds.includes(id),

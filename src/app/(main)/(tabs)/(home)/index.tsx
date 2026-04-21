@@ -4,7 +4,6 @@ import { useNavigation } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -22,6 +21,7 @@ import {
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
+import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { Typography } from "@/shared/components/Typography";
 
@@ -36,27 +36,16 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const scrollPaddingBottom =
     80 + Math.max(insets.bottom, 8) + theme.spacing.xl;
-  const {
-    idioms,
-    currentIndex,
-    savedIds,
-    saveIdiom,
-    unsaveIdiom,
-    nextIdiom,
-    loading,
-    loadIdioms,
-  } = useIdiomsStore();
-
-  useEffect(() => {
-    loadIdioms();
-  }, [loadIdioms]);
+  const { data: idioms = [], isLoading } = useIdioms();
+  const { currentIndex, savedIds, saveIdiom, unsaveIdiom, nextIdiom } =
+    useIdiomsStore();
 
   const CARD_WIDTH = Math.min(screenWidth - theme.spacing.lg * 2, 340);
   const CARD_HEIGHT = Math.round(CARD_WIDTH * (4 / 3));
 
   const current = idioms[currentIndex];
 
-  if (loading || !current) {
+  if (isLoading || !current) {
     return (
       <View
         style={[
@@ -79,7 +68,7 @@ export default function HomeScreen() {
   const handleSave = () => {
     if (isSaved) unsaveIdiom(current.id);
     else saveIdiom(current.id);
-    nextIdiom();
+    nextIdiom(idioms.length);
   };
 
   const headerBtnBg = isDark ? "rgba(38,52,30,0.80)" : "rgba(255,255,255,0.75)";
@@ -420,7 +409,7 @@ export default function HomeScreen() {
                     : "rgba(0,0,0,0.08)",
                 },
               ]}
-              onPress={nextIdiom}
+              onPress={() => nextIdiom(idioms.length)}
               hitSlop={8}
               accessibilityRole="button"
               accessibilityLabel={t("home.skip")}
