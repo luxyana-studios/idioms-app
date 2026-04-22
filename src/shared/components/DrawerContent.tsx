@@ -99,15 +99,15 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
           <Circle
             cx={drawerWidth}
             cy={0}
-            r={90}
-            fill={`${theme.colors.primary}40`}
+            r={120}
+            fill={`${theme.colors.blob1}55`}
             filter="url(#blurDrawer1)"
           />
           <Circle
             cx={0}
             cy={drawerHeight}
-            r={80}
-            fill={`${theme.colors.secondary}30`}
+            r={100}
+            fill={`${theme.colors.blob2}45`}
             filter="url(#blurDrawer2)"
           />
         </Svg>

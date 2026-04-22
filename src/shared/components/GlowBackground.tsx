@@ -1,27 +1,28 @@
 import { useWindowDimensions, View } from "react-native";
 import Svg, { Circle, Defs, FeGaussianBlur, Filter } from "react-native-svg";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import {
+  StyleSheet,
+  UnistylesRuntime,
+  useUnistyles,
+} from "react-native-unistyles";
 
 interface GlowBackgroundProps {
   subtle?: boolean;
 }
 
-/**
- * Full-screen ambient glow blobs using SVG feGaussianBlur.
- * Works identically on iOS, Android, and web.
- * - Default: same intensity as the home screen
- * - subtle: smaller/more transparent, for secondary screens
- */
 export function GlowBackground({ subtle = false }: GlowBackgroundProps) {
   const { width, height } = useWindowDimensions();
   const { theme } = useUnistyles();
+  const isDark = UnistylesRuntime.themeName === "dark";
 
-  const r1 = subtle ? 100 : 130;
-  const r2 = subtle ? 90 : 120;
-  const blur1 = subtle ? 35 : 45;
-  const blur2 = subtle ? 30 : 40;
-  const opacity1 = subtle ? "38" : "55";
-  const opacity2 = subtle ? "30" : "48";
+  const r1 = subtle ? 140 : 220;
+  const r2 = subtle ? 120 : 200;
+  const blur1 = subtle ? 50 : 70;
+  const blur2 = subtle ? 45 : 65;
+
+  // Dark mode: much lower opacity so blobs diffuse into the background naturally
+  const opacity1 = isDark ? (subtle ? "22" : "30") : subtle ? "55" : "88";
+  const opacity2 = isDark ? (subtle ? "1a" : "28") : subtle ? "45" : "72";
 
   return (
     <View style={styles.container} pointerEvents="none">
@@ -38,14 +39,14 @@ export function GlowBackground({ subtle = false }: GlowBackgroundProps) {
           cx={width}
           cy={0}
           r={r1}
-          fill={`${theme.colors.primary}${opacity1}`}
+          fill={`${theme.colors.blob1}${opacity1}`}
           filter="url(#blurBg1)"
         />
         <Circle
           cx={0}
           cy={height}
           r={r2}
-          fill={`${theme.colors.secondary}${opacity2}`}
+          fill={`${theme.colors.blob2}${opacity2}`}
           filter="url(#blurBg2)"
         />
       </Svg>
