@@ -121,6 +121,7 @@ interface IdiomsState {
   savedIds: string[];
   currentIndex: number;
   loading: boolean;
+  error: string | null;
   loadIdioms: () => Promise<void>;
   saveIdiom: (id: string) => void;
   unsaveIdiom: (id: string) => void;
@@ -135,10 +136,22 @@ export const useIdiomsStore = create<IdiomsState>()(
       savedIds: [],
       currentIndex: 0,
       loading: false,
+      error: null,
 
       loadIdioms: async () => {
         if (get().idioms.length > 0 || get().loading) return;
-        set({ loading: true });
+
+        const isConfigured =
+          !!process.env.EXPO_PUBLIC_SUPABASE_URL &&
+          process.env.EXPO_PUBLIC_SUPABASE_URL !==
+            "https://placeholder.supabase.co";
+
+        if (!isConfigured) {
+          set({ idioms: MOCK_IDIOMS, loading: false, error: null });
+          return;
+        }
+
+        set({ loading: true, error: null });
 
         const { data, error } = await supabase
           .from("idioms")
@@ -146,16 +159,8 @@ export const useIdiomsStore = create<IdiomsState>()(
           .eq("status", "published");
 
         if (error) {
-          const isUnconfigured =
-            error.message.includes("Failed to fetch") ||
-            error.message.includes("ERR_NAME_NOT_RESOLVED") ||
-            error.message.includes("placeholder");
-          if (isUnconfigured) {
-            set({ idioms: MOCK_IDIOMS, loading: false });
-          } else {
-            console.error("Failed to load idioms:", error.message);
-            set({ loading: false });
-          }
+          console.error("Failed to load idioms:", error.message);
+          set({ loading: false, error: error.message });
           return;
         }
 
@@ -174,6 +179,7 @@ export const useIdiomsStore = create<IdiomsState>()(
         set({
           idioms: idioms.length > 0 ? idioms : MOCK_IDIOMS,
           loading: false,
+          error: null,
         });
       },
 
@@ -191,7 +197,10 @@ export const useIdiomsStore = create<IdiomsState>()(
 
       nextIdiom: () =>
         set((state) => ({
-          currentIndex: (state.currentIndex + 1) % state.idioms.length,
+          currentIndex:
+            state.idioms.length > 0
+              ? (state.currentIndex + 1) % state.idioms.length
+              : 0,
         })),
 
       isSaved: (id) => get().savedIds.includes(id),
