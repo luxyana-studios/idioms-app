@@ -146,8 +146,16 @@ export const useIdiomsStore = create<IdiomsState>()(
           .eq("status", "published");
 
         if (error) {
-          // Supabase not configured — fall back to mock data
-          set({ idioms: MOCK_IDIOMS, loading: false });
+          const isUnconfigured =
+            error.message.includes("Failed to fetch") ||
+            error.message.includes("ERR_NAME_NOT_RESOLVED") ||
+            error.message.includes("placeholder");
+          if (isUnconfigured) {
+            set({ idioms: MOCK_IDIOMS, loading: false });
+          } else {
+            console.error("Failed to load idioms:", error.message);
+            set({ loading: false });
+          }
           return;
         }
 
