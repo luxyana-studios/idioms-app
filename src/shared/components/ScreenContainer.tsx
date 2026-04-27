@@ -28,6 +28,7 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     backgroundColor: theme.colors.background,
     padding: theme.spacing.md,
+    position: "relative",
   },
   centered: {
     justifyContent: "center" as const,

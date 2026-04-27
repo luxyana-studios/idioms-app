@@ -1,58 +1,160 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
-import { supabase } from "@/core/supabase/client";
 import type { Idiom } from "../types";
+
+const MOCK_IDIOMS: Idiom[] = [
+  {
+    id: "mock-1",
+    expression: "Break the ice",
+    languageCode: "en",
+    idiomaticMeaning:
+      "To initiate conversation in a socially awkward situation",
+    explanation:
+      "Originally a nautical term — icebreaker ships would clear frozen waterways to open trade routes. By the 17th century it had shifted to mean clearing social tension before negotiations or meetings.",
+    examples: [
+      "She broke the ice at the party by telling a funny story about her cat.",
+    ],
+    tags: [
+      { key: "social", facet: "theme", label: "Social" },
+      { key: "english", facet: "context", label: "English" },
+    ],
+    source: "human",
+    status: "published",
+  },
+  {
+    id: "mock-2",
+    expression: "Bite the bullet",
+    languageCode: "en",
+    idiomaticMeaning: "To endure a painful or difficult situation",
+    explanation:
+      "Dating back to battlefield surgery before anesthesia, soldiers were given a bullet to bite on to endure the pain of operations. The physical act became a metaphor for stoic endurance.",
+    examples: [
+      "I hated going to the dentist but I bit the bullet and made the appointment.",
+    ],
+    tags: [
+      { key: "courage", facet: "theme", label: "Courage" },
+      { key: "english", facet: "context", label: "English" },
+    ],
+    source: "human",
+    status: "published",
+  },
+  {
+    id: "mock-3",
+    expression: "Casser les pieds",
+    languageCode: "fr",
+    idiomaticMeaning: "To annoy someone intensely",
+    explanation:
+      "Literally 'to break someone's feet', this French expression evokes the persistent, grinding nature of extreme annoyance — as if someone were stomping on your feet repeatedly.",
+    examples: [
+      "Tu me casses les pieds avec tes questions ! — You're really getting on my nerves with your questions!",
+    ],
+    tags: [
+      { key: "emotions", facet: "theme", label: "Emotions" },
+      { key: "french", facet: "context", label: "French" },
+    ],
+    source: "human",
+    status: "published",
+  },
+  {
+    id: "mock-4",
+    expression: "Spill the beans",
+    languageCode: "en",
+    idiomaticMeaning: "To reveal secret or confidential information",
+    explanation:
+      "Ancient Greek voting used beans — white beans for yes, black for no. Accidentally knocking over the jar would reveal the vote count before the official count. Leaking information became 'spilling the beans.'",
+    examples: ["Who spilled the beans about the surprise party?"],
+    tags: [
+      { key: "secrets", facet: "theme", label: "Secrets" },
+      { key: "english", facet: "context", label: "English" },
+    ],
+    source: "human",
+    status: "published",
+  },
+  {
+    id: "mock-5",
+    expression: "Ins Fettnäpfchen treten",
+    languageCode: "de",
+    idiomaticMeaning: "To put your foot in it; to commit a social blunder",
+    explanation:
+      "Literally 'to step into the grease bowl.' In old German farmhouses, a small bowl of grease sat near the door to lubricate boots. Stepping into it was messy and embarrassing — a perfect metaphor for social gaffes.",
+    examples: [
+      "Mit seinem Kommentar ist er ins Fettnäpfchen getreten. — With his comment he really put his foot in it.",
+    ],
+    tags: [
+      { key: "social", facet: "theme", label: "Social" },
+      { key: "german", facet: "context", label: "German" },
+    ],
+    source: "human",
+    status: "published",
+  },
+  {
+    id: "mock-6",
+    expression: "Hit the sack",
+    languageCode: "en",
+    idiomaticMeaning: "To go to bed",
+    explanation:
+      "In the early 1900s, mattresses were often burlap sacks stuffed with straw or hay. Going to bed literally meant hitting the sack. The phrase stuck long after proper mattresses became standard.",
+    examples: ["I'm exhausted — I'm going to hit the sack early tonight."],
+    tags: [
+      { key: "daily_life", facet: "context", label: "Daily life" },
+      { key: "slang", facet: "register", label: "Slang" },
+    ],
+    source: "human",
+    status: "published",
+  },
+  {
+    id: "mock-7",
+    expression: "No hay mal que por bien no venga",
+    languageCode: "es",
+    idiomaticMeaning: "Every cloud has a silver lining",
+    explanation:
+      "Literally 'there is no bad from which good does not come.' This Spanish proverb reflects the Mediterranean philosophical tradition of finding redemption in adversity.",
+    examples: [
+      "Perdí ese trabajo pero encontré uno mejor — no hay mal que por bien no venga.",
+    ],
+    tags: [
+      { key: "wisdom", facet: "theme", label: "Wisdom" },
+      { key: "spanish", facet: "context", label: "Spanish" },
+    ],
+    source: "human",
+    status: "published",
+  },
+  {
+    id: "mock-8",
+    expression: "Burn the midnight oil",
+    languageCode: "en",
+    idiomaticMeaning: "To work late into the night",
+    explanation:
+      "Before electricity, oil lamps were the only way to work after dark. Burning lamp oil past midnight was a deliberate, costly choice — signaling serious dedication to the task at hand.",
+    examples: [
+      "She's been burning the midnight oil to finish her thesis before the deadline.",
+    ],
+    tags: [
+      { key: "work", facet: "context", label: "Work" },
+      { key: "english", facet: "context", label: "English" },
+    ],
+    source: "human",
+    status: "published",
+  },
+];
 
 interface IdiomsState {
   idioms: Idiom[];
   savedIds: string[];
   currentIndex: number;
-  loading: boolean;
-  loadIdioms: () => Promise<void>;
   saveIdiom: (id: string) => void;
   unsaveIdiom: (id: string) => void;
-  nextIdiom: () => void;
+  nextIdiom: (total: number) => void;
   isSaved: (id: string) => boolean;
 }
 
 export const useIdiomsStore = create<IdiomsState>()(
   persist(
     (set, get) => ({
-      idioms: [],
+      idioms: MOCK_IDIOMS,
       savedIds: [],
       currentIndex: 0,
-      loading: false,
-
-      loadIdioms: async () => {
-        if (get().idioms.length > 0 || get().loading) return;
-        set({ loading: true });
-
-        const { data, error } = await supabase
-          .from("idioms")
-          .select("*")
-          .eq("status", "published");
-
-        if (error) {
-          console.error("Failed to load idioms:", error.message);
-          set({ loading: false });
-          return;
-        }
-
-        const idioms: Idiom[] = (data ?? []).map((row) => ({
-          id: row.id,
-          expression: row.expression,
-          languageCode: row.language_code,
-          idiomaticMeaning: row.idiomatic_meaning,
-          explanation: row.explanation ?? undefined,
-          examples: row.examples ?? undefined,
-          tags: row.tags ?? [],
-          source: row.source as Idiom["source"],
-          status: row.status as Idiom["status"],
-        }));
-
-        set({ idioms, loading: false });
-      },
 
       saveIdiom: (id) =>
         set((state) => ({
@@ -66,9 +168,9 @@ export const useIdiomsStore = create<IdiomsState>()(
           savedIds: state.savedIds.filter((s) => s !== id),
         })),
 
-      nextIdiom: () =>
+      nextIdiom: (total) =>
         set((state) => ({
-          currentIndex: (state.currentIndex + 1) % state.idioms.length,
+          currentIndex: total > 0 ? (state.currentIndex + 1) % total : 0,
         })),
 
       isSaved: (id) => get().savedIds.includes(id),

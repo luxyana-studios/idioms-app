@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import i18n from "@/core/i18n";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
 
-type ThemeMode = "system" | "light" | "dark";
+export type ThemeMode = "system" | "light" | "dark";
 
 interface SettingsState {
   themeMode: ThemeMode;
@@ -39,8 +39,14 @@ export const useSettingsStore = create<SettingsState>()(
       storage: createJSONStorage(() => zustandMMKVStorage),
       onRehydrateStorage: () => (state) => {
         if (!state) return;
-        // Reapply persisted theme after store hydration
-        state.setThemeMode(state.themeMode);
+        const validModes: ThemeMode[] = ["system", "light", "dark"];
+        const safeMode = (validModes as string[]).includes(state.themeMode)
+          ? state.themeMode
+          : "system";
+        state.setThemeMode(safeMode);
+        // Re-apply persisted language — i18n inits with device locale,
+        // so we must sync it with the user's saved preference after rehydration
+        state.setLanguage(state.language);
       },
     },
   ),

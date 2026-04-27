@@ -1,5 +1,6 @@
 import { BlurView } from "expo-blur";
 import { Platform, View, type ViewProps } from "react-native";
+import { UnistylesRuntime } from "react-native-unistyles";
 
 interface GlassViewProps extends ViewProps {
   intensity?: number;
@@ -10,20 +11,24 @@ interface GlassViewProps extends ViewProps {
 /**
  * Cross-platform glassmorphism surface.
  * - iOS/Web: BlurView with backdrop-filter
- * - Android: semi-transparent fallback
+ * - Android: theme-aware semi-transparent fallback
  */
 export function GlassView({
-  intensity = 40,
-  tint = "dark",
+  intensity = 60,
+  tint = "default",
   border = true,
   style,
   children,
   ...props
 }: GlassViewProps) {
+  const isDark = UnistylesRuntime.themeName === "dark";
+
   const borderStyle = border
     ? {
         borderWidth: 1,
-        borderColor: "rgba(255, 255, 255, 0.08)",
+        borderColor: isDark
+          ? "rgba(180,210,140,0.10)"
+          : "rgba(255,255,255,0.85)",
       }
     : {};
 
@@ -31,7 +36,11 @@ export function GlassView({
     return (
       <View
         style={[
-          { backgroundColor: "rgba(35, 31, 26, 0.85)" },
+          {
+            backgroundColor: isDark
+              ? "rgba(30,42,22,0.88)"
+              : "rgba(255,255,255,0.80)",
+          },
           borderStyle,
           style,
         ]}
@@ -45,7 +54,7 @@ export function GlassView({
   return (
     <BlurView
       intensity={intensity}
-      tint={tint}
+      tint={isDark ? "dark" : tint === "default" ? "light" : tint}
       style={[borderStyle, style]}
       {...props}
     >

@@ -76,6 +76,42 @@ export type Database = {
           },
         ];
       };
+      idiom_tags: {
+        Row: {
+          created_at: string;
+          id: string;
+          idiom_id: string;
+          tag_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          idiom_id: string;
+          tag_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          idiom_id?: string;
+          tag_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "idiom_tags_idiom_id_fkey";
+            columns: ["idiom_id"];
+            isOneToOne: false;
+            referencedRelation: "idioms";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "idiom_tags_tag_id_fkey";
+            columns: ["tag_id"];
+            isOneToOne: false;
+            referencedRelation: "tags";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       idiom_translations: {
         Row: {
           created_at: string;
@@ -132,7 +168,6 @@ export type Database = {
           language_code: string;
           source: string;
           status: string;
-          tags: string[];
           updated_at: string;
         };
         Insert: {
@@ -146,7 +181,6 @@ export type Database = {
           language_code: string;
           source?: string;
           status?: string;
-          tags?: string[];
           updated_at?: string;
         };
         Update: {
@@ -160,7 +194,71 @@ export type Database = {
           language_code?: string;
           source?: string;
           status?: string;
-          tags?: string[];
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      tag_translations: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          id: string;
+          label: string;
+          language_code: string;
+          tag_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          label: string;
+          language_code: string;
+          tag_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          label?: string;
+          language_code?: string;
+          tag_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tag_translations_tag_id_fkey";
+            columns: ["tag_id"];
+            isOneToOne: false;
+            referencedRelation: "tags";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tags: {
+        Row: {
+          created_at: string;
+          facet: string;
+          id: string;
+          is_browsable: boolean;
+          key: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          facet: string;
+          id?: string;
+          is_browsable?: boolean;
+          key: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          facet?: string;
+          id?: string;
+          is_browsable?: boolean;
+          key?: string;
           updated_at?: string;
         };
         Relationships: [];
