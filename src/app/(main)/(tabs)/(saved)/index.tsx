@@ -10,6 +10,7 @@ import {
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
+import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { Typography } from "@/shared/components/Typography";
@@ -20,7 +21,8 @@ export default function SavedScreen() {
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { idioms, savedIds, unsaveIdiom } = useIdiomsStore();
+  const { data: idioms = [] } = useIdioms();
+  const { savedIds, unsaveIdiom } = useIdiomsStore();
 
   const savedIdioms = idioms.filter((idiom) => savedIds.includes(idiom.id));
 
@@ -163,7 +165,7 @@ export default function SavedScreen() {
                         letterSpacing: 1.5,
                       }}
                     >
-                      {idiom.tags[0] ?? idiom.languageCode}
+                      {idiom.tags[0]?.label ?? idiom.languageCode}
                     </Typography>
                   </View>
                   <TouchableOpacity

@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
-import { supabase } from "@/core/supabase/client";
 import type { Idiom } from "../types";
 
 const MOCK_IDIOMS: Idiom[] = [
@@ -16,7 +15,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "She broke the ice at the party by telling a funny story about her cat.",
     ],
-    tags: ["Social", "English"],
+    tags: [
+      { key: "social", facet: "theme", label: "Social" },
+      { key: "english", facet: "context", label: "English" },
+    ],
     source: "human",
     status: "published",
   },
@@ -30,7 +32,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "I hated going to the dentist but I bit the bullet and made the appointment.",
     ],
-    tags: ["Courage", "English"],
+    tags: [
+      { key: "courage", facet: "theme", label: "Courage" },
+      { key: "english", facet: "context", label: "English" },
+    ],
     source: "human",
     status: "published",
   },
@@ -44,7 +49,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "Tu me casses les pieds avec tes questions ! — You're really getting on my nerves with your questions!",
     ],
-    tags: ["Emotions", "French"],
+    tags: [
+      { key: "emotions", facet: "theme", label: "Emotions" },
+      { key: "french", facet: "context", label: "French" },
+    ],
     source: "human",
     status: "published",
   },
@@ -56,7 +64,10 @@ const MOCK_IDIOMS: Idiom[] = [
     explanation:
       "Ancient Greek voting used beans — white beans for yes, black for no. Accidentally knocking over the jar would reveal the vote count before the official count. Leaking information became 'spilling the beans.'",
     examples: ["Who spilled the beans about the surprise party?"],
-    tags: ["Secrets", "English"],
+    tags: [
+      { key: "secrets", facet: "theme", label: "Secrets" },
+      { key: "english", facet: "context", label: "English" },
+    ],
     source: "human",
     status: "published",
   },
@@ -70,7 +81,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "Mit seinem Kommentar ist er ins Fettnäpfchen getreten. — With his comment he really put his foot in it.",
     ],
-    tags: ["Social", "German"],
+    tags: [
+      { key: "social", facet: "theme", label: "Social" },
+      { key: "german", facet: "context", label: "German" },
+    ],
     source: "human",
     status: "published",
   },
@@ -82,7 +96,10 @@ const MOCK_IDIOMS: Idiom[] = [
     explanation:
       "In the early 1900s, mattresses were often burlap sacks stuffed with straw or hay. Going to bed literally meant hitting the sack. The phrase stuck long after proper mattresses became standard.",
     examples: ["I'm exhausted — I'm going to hit the sack early tonight."],
-    tags: ["Daily life", "Slang"],
+    tags: [
+      { key: "daily_life", facet: "context", label: "Daily life" },
+      { key: "slang", facet: "register", label: "Slang" },
+    ],
     source: "human",
     status: "published",
   },
@@ -96,7 +113,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "Perdí ese trabajo pero encontré uno mejor — no hay mal que por bien no venga.",
     ],
-    tags: ["Wisdom", "Spanish"],
+    tags: [
+      { key: "wisdom", facet: "theme", label: "Wisdom" },
+      { key: "spanish", facet: "context", label: "Spanish" },
+    ],
     source: "human",
     status: "published",
   },
@@ -110,7 +130,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "She's been burning the midnight oil to finish her thesis before the deadline.",
     ],
-    tags: ["Work", "English"],
+    tags: [
+      { key: "work", facet: "context", label: "Work" },
+      { key: "english", facet: "context", label: "English" },
+    ],
     source: "human",
     status: "published",
   },
@@ -120,54 +143,18 @@ interface IdiomsState {
   idioms: Idiom[];
   savedIds: string[];
   currentIndex: number;
-  loading: boolean;
-  loadIdioms: () => Promise<void>;
   saveIdiom: (id: string) => void;
   unsaveIdiom: (id: string) => void;
-  nextIdiom: () => void;
+  nextIdiom: (total: number) => void;
   isSaved: (id: string) => boolean;
 }
 
 export const useIdiomsStore = create<IdiomsState>()(
   persist(
     (set, get) => ({
-      idioms: [],
+      idioms: MOCK_IDIOMS,
       savedIds: [],
       currentIndex: 0,
-      loading: false,
-
-      loadIdioms: async () => {
-        if (get().idioms.length > 0 || get().loading) return;
-        set({ loading: true });
-
-        const { data, error } = await supabase
-          .from("idioms")
-          .select("*")
-          .eq("status", "published");
-
-        if (error) {
-          // Supabase not configured — fall back to mock data
-          set({ idioms: MOCK_IDIOMS, loading: false });
-          return;
-        }
-
-        const idioms: Idiom[] = (data ?? []).map((row) => ({
-          id: row.id,
-          expression: row.expression,
-          languageCode: row.language_code,
-          idiomaticMeaning: row.idiomatic_meaning,
-          explanation: row.explanation ?? undefined,
-          examples: row.examples ?? undefined,
-          tags: row.tags ?? [],
-          source: row.source as Idiom["source"],
-          status: row.status as Idiom["status"],
-        }));
-
-        set({
-          idioms: idioms.length > 0 ? idioms : MOCK_IDIOMS,
-          loading: false,
-        });
-      },
 
       saveIdiom: (id) =>
         set((state) => ({
@@ -181,9 +168,9 @@ export const useIdiomsStore = create<IdiomsState>()(
           savedIds: state.savedIds.filter((s) => s !== id),
         })),
 
-      nextIdiom: () =>
+      nextIdiom: (total) =>
         set((state) => ({
-          currentIndex: (state.currentIndex + 1) % state.idioms.length,
+          currentIndex: total > 0 ? (state.currentIndex + 1) % total : 0,
         })),
 
       isSaved: (id) => get().savedIds.includes(id),

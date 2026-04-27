@@ -1,7 +1,7 @@
 -- Seed: native-language idioms + cross-language translations + equivalents.
 
 insert into public.idioms
-  (expression, language_code, idiomatic_meaning, explanation, examples, tags, source, status)
+  (expression, language_code, idiomatic_meaning, explanation, examples, source, status)
 values
 (
   'Break a leg',
@@ -9,7 +9,6 @@ values
   'A superstitious way to wish someone good luck, especially before a performance.',
   'Believed to originate in early 20th-century theater culture, where wishing someone ''good luck'' directly was considered bad luck.',
   array['You''re going to do great at the audition — break a leg!', 'The whole team told her to break a leg before the presentation.'],
-  array['luck', 'theater', 'informal'],
   'human',
   'published'
 ),
@@ -19,7 +18,6 @@ values
   'To endure a painful or unpleasant situation that is unavoidable.',
   'Historically, soldiers were given a lead bullet to bite during surgery before anesthesia was available. First written record: Rudyard Kipling, 1891.',
   array['I hate going to the dentist, but I just have to bite the bullet.', 'The company bit the bullet and issued a full recall.'],
-  array['courage', 'endurance', 'formal'],
   'human',
   'published'
 ),
@@ -29,7 +27,6 @@ values
   'To describe exactly what is causing a situation or problem.',
   'From carpentry — hitting a nail precisely on its head drives it in cleanly, while a glancing blow bends it.',
   array['You hit the nail on the head — that''s exactly what''s wrong.', 'Her analysis hit the nail on the head.'],
-  array['accuracy', 'insight', 'informal'],
   'human',
   'published'
 ),
@@ -39,7 +36,6 @@ values
   'Feeling ill or below par.',
   'A nautical expression — a sick sailor would go below deck to shelter from the weather, hence "under the weather".',
   array['I''m feeling a bit under the weather today.', 'She called in sick — she''s been under the weather all week.'],
-  array['health', 'illness', 'informal'],
   'human',
   'published'
 ),
@@ -49,7 +45,6 @@ values
   'To reveal secret information accidentally or prematurely.',
   'Possibly from ancient Greek voting practices using beans, where spilling them would prematurely reveal the tally.',
   array['Don''t spill the beans about the surprise party!', 'He accidentally spilled the beans about the merger.'],
-  array['secrets', 'disclosure', 'informal'],
   'human',
   'published'
 ),
@@ -59,7 +54,6 @@ values
   'Estar distraído o no prestar atención a lo que está pasando alrededor.',
   'Las nubes evocan una distancia mental respecto al suelo, es decir, a la realidad — quien "está en las nubes" está ausente.',
   array['¡Presta atención! Estás en las nubes otra vez.', 'Durante toda la reunión estuvo en las nubes.'],
-  array['distraction', 'daydreaming', 'informal'],
   'human',
   'published'
 ),
@@ -69,7 +63,6 @@ values
   'Revelar accidentalmente algo que debía permanecer en secreto.',
   'Hace referencia a la lengua que "se escapa" del control — el habla se adelanta a la discreción.',
   array['Se fue de la lengua y contó todo el plan.', 'No le digas nada, siempre se va de la lengua.'],
-  array['secrets', 'disclosure', 'informal'],
   'human',
   'published'
 );
@@ -150,6 +143,84 @@ select i.id, 'en',
   'Refers to the tongue "escaping" control — speech running ahead of discretion.',
   'ai_mined'
 from public.idioms i where i.expression = 'Irse de la lengua' and i.language_code = 'es';
+
+-- ── Tags taxonomy ────────────────────────────────────────────────────────
+-- Canonical tag keys + facet. Facet rubric (kept in TS union IdiomTag.facet):
+--   theme    — what the idiom is about (food, health, secrets)
+--   register — social tone (formal, informal)
+--   context  — setting it belongs to (theater, business)
+--   meaning  — semantic payload (luck, courage, disclosure)
+
+insert into public.tags (key, facet) values
+  ('luck',         'meaning'),
+  ('theater',      'context'),
+  ('informal',     'register'),
+  ('courage',      'meaning'),
+  ('endurance',    'meaning'),
+  ('formal',       'register'),
+  ('accuracy',     'meaning'),
+  ('insight',      'meaning'),
+  ('health',       'theme'),
+  ('illness',      'theme'),
+  ('secrets',      'theme'),
+  ('disclosure',   'meaning'),
+  ('distraction',  'meaning'),
+  ('daydreaming',  'meaning');
+
+-- EN labels
+insert into public.tag_translations (tag_id, language_code, label)
+select id, 'en', initcap(key) from public.tags;
+
+-- ES labels (explicit per tag)
+insert into public.tag_translations (tag_id, language_code, label)
+select t.id, 'es', v.label
+from public.tags t
+join (values
+  ('luck',         'Suerte'),
+  ('theater',      'Teatro'),
+  ('informal',     'Informal'),
+  ('courage',      'Valor'),
+  ('endurance',    'Resistencia'),
+  ('formal',       'Formal'),
+  ('accuracy',     'Precisión'),
+  ('insight',      'Perspicacia'),
+  ('health',       'Salud'),
+  ('illness',      'Enfermedad'),
+  ('secrets',      'Secretos'),
+  ('disclosure',   'Revelación'),
+  ('distraction',  'Distracción'),
+  ('daydreaming',  'Ensoñación')
+) as v(key, label) on v.key = t.key;
+
+-- idiom ↔ tag links
+insert into public.idiom_tags (idiom_id, tag_id)
+select i.id, t.id
+from public.idioms i
+join (values
+  ('Break a leg',              'en', 'luck'),
+  ('Break a leg',              'en', 'theater'),
+  ('Break a leg',              'en', 'informal'),
+  ('Bite the bullet',          'en', 'courage'),
+  ('Bite the bullet',          'en', 'endurance'),
+  ('Bite the bullet',          'en', 'formal'),
+  ('Hit the nail on the head', 'en', 'accuracy'),
+  ('Hit the nail on the head', 'en', 'insight'),
+  ('Hit the nail on the head', 'en', 'informal'),
+  ('Under the weather',        'en', 'health'),
+  ('Under the weather',        'en', 'illness'),
+  ('Under the weather',        'en', 'informal'),
+  ('Spill the beans',          'en', 'secrets'),
+  ('Spill the beans',          'en', 'disclosure'),
+  ('Spill the beans',          'en', 'informal'),
+  ('Estar en las nubes',       'es', 'distraction'),
+  ('Estar en las nubes',       'es', 'daydreaming'),
+  ('Estar en las nubes',       'es', 'informal'),
+  ('Irse de la lengua',        'es', 'secrets'),
+  ('Irse de la lengua',        'es', 'disclosure'),
+  ('Irse de la lengua',        'es', 'informal')
+) as v(expression, language_code, tag_key)
+  on v.expression = i.expression and v.language_code = i.language_code
+join public.tags t on t.key = v.tag_key;
 
 -- ── Cross-language equivalent with similarity score ──────────────────────
 -- "Spill the beans" (en) ↔ "Irse de la lengua" (es) — very close, 0.92.
