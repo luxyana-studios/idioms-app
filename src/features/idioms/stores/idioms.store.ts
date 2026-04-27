@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
+import type { Idiom } from "../types";
 
 const MOCK_IDIOMS: Idiom[] = [
   {
@@ -14,7 +15,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "She broke the ice at the party by telling a funny story about her cat.",
     ],
-    tags: ["Social", "English"],
+    tags: [
+      { key: "social", facet: "theme", label: "Social" },
+      { key: "english", facet: "context", label: "English" },
+    ],
     source: "human",
     status: "published",
   },
@@ -28,7 +32,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "I hated going to the dentist but I bit the bullet and made the appointment.",
     ],
-    tags: ["Courage", "English"],
+    tags: [
+      { key: "courage", facet: "theme", label: "Courage" },
+      { key: "english", facet: "context", label: "English" },
+    ],
     source: "human",
     status: "published",
   },
@@ -42,7 +49,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "Tu me casses les pieds avec tes questions ! — You're really getting on my nerves with your questions!",
     ],
-    tags: ["Emotions", "French"],
+    tags: [
+      { key: "emotions", facet: "theme", label: "Emotions" },
+      { key: "french", facet: "context", label: "French" },
+    ],
     source: "human",
     status: "published",
   },
@@ -54,7 +64,10 @@ const MOCK_IDIOMS: Idiom[] = [
     explanation:
       "Ancient Greek voting used beans — white beans for yes, black for no. Accidentally knocking over the jar would reveal the vote count before the official count. Leaking information became 'spilling the beans.'",
     examples: ["Who spilled the beans about the surprise party?"],
-    tags: ["Secrets", "English"],
+    tags: [
+      { key: "secrets", facet: "theme", label: "Secrets" },
+      { key: "english", facet: "context", label: "English" },
+    ],
     source: "human",
     status: "published",
   },
@@ -68,7 +81,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "Mit seinem Kommentar ist er ins Fettnäpfchen getreten. — With his comment he really put his foot in it.",
     ],
-    tags: ["Social", "German"],
+    tags: [
+      { key: "social", facet: "theme", label: "Social" },
+      { key: "german", facet: "context", label: "German" },
+    ],
     source: "human",
     status: "published",
   },
@@ -80,7 +96,10 @@ const MOCK_IDIOMS: Idiom[] = [
     explanation:
       "In the early 1900s, mattresses were often burlap sacks stuffed with straw or hay. Going to bed literally meant hitting the sack. The phrase stuck long after proper mattresses became standard.",
     examples: ["I'm exhausted — I'm going to hit the sack early tonight."],
-    tags: ["Daily life", "Slang"],
+    tags: [
+      { key: "daily_life", facet: "context", label: "Daily life" },
+      { key: "slang", facet: "register", label: "Slang" },
+    ],
     source: "human",
     status: "published",
   },
@@ -94,7 +113,10 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "Perdí ese trabajo pero encontré uno mejor — no hay mal que por bien no venga.",
     ],
-    tags: ["Wisdom", "Spanish"],
+    tags: [
+      { key: "wisdom", facet: "theme", label: "Wisdom" },
+      { key: "spanish", facet: "context", label: "Spanish" },
+    ],
     source: "human",
     status: "published",
   },
@@ -108,13 +130,17 @@ const MOCK_IDIOMS: Idiom[] = [
     examples: [
       "She's been burning the midnight oil to finish her thesis before the deadline.",
     ],
-    tags: ["Work", "English"],
+    tags: [
+      { key: "work", facet: "context", label: "Work" },
+      { key: "english", facet: "context", label: "English" },
+    ],
     source: "human",
     status: "published",
   },
 ];
 
 interface IdiomsState {
+  idioms: Idiom[];
   savedIds: string[];
   currentIndex: number;
   saveIdiom: (id: string) => void;
@@ -126,6 +152,7 @@ interface IdiomsState {
 export const useIdiomsStore = create<IdiomsState>()(
   persist(
     (set, get) => ({
+      idioms: MOCK_IDIOMS,
       savedIds: [],
       currentIndex: 0,
 

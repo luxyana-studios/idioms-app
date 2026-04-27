@@ -9,7 +9,7 @@ import {
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
-import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
+import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { Typography } from "@/shared/components/Typography";
 
@@ -54,7 +54,7 @@ export default function LibraryScreen() {
   const { theme } = useUnistyles();
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
-  const { idioms } = useIdiomsStore();
+  const { data: idioms = [] } = useIdioms();
 
   const cardBg = isDark ? "rgba(26,36,21,0.70)" : "rgba(255,255,255,0.65)";
 

@@ -17,7 +17,8 @@ import {
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
-import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
+import { useIdioms } from "@/features/idioms/hooks/useIdioms";
+import type { IdiomTag } from "@/features/idioms/types";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { Typography } from "@/shared/components/Typography";
 
@@ -36,7 +37,7 @@ export default function ExploreScreen() {
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { idioms } = useIdiomsStore();
+  const { data: idioms = [] } = useIdioms();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
 
@@ -52,7 +53,8 @@ export default function ExploreScreen() {
       (langCodes
         ? langCodes.includes(idiom.languageCode)
         : idiom.tags.some(
-            (tag) => tag.toLowerCase() === activeCategory.toLowerCase(),
+            (tag: IdiomTag) =>
+              tag.label.toLowerCase() === activeCategory.toLowerCase(),
           ));
 
     return matchesSearch && matchesCategory;

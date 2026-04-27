@@ -11,6 +11,7 @@ import {
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
+import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { Typography } from "@/shared/components/Typography";
 
@@ -21,7 +22,8 @@ export default function DetailScreen() {
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { idioms, savedIds, saveIdiom, unsaveIdiom } = useIdiomsStore();
+  const { data: idioms = [] } = useIdioms();
+  const { savedIds, saveIdiom, unsaveIdiom } = useIdiomsStore();
 
   const idiom = idioms.find((i) => i.id === id);
   const isSaved = idiom ? savedIds.includes(idiom.id) : false;
@@ -139,7 +141,7 @@ export default function DetailScreen() {
                 letterSpacing: 1.5,
               }}
             >
-              {idiom.tags[0] ?? idiom.languageCode}
+              {idiom.tags[0]?.label ?? idiom.languageCode}
             </Typography>
           </View>
 
