@@ -34,7 +34,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   experiments: {
     typedRoutes: true,
   },
-  plugins: [["expo-router", { root: "./src/app" }], "expo-localization"],
+  plugins: [
+    ["expo-router", { root: "./src/app" }],
+    "expo-localization",
+    "expo-web-browser",
+    "expo-font",
+  ],
   extra: {
     supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,

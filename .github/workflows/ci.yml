@@ -33,7 +33,7 @@ jobs:
         run: gitleaks git --no-banner
 
   quality:
-    name: Typecheck & Lint
+    name: Typecheck, Lint & Test
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -52,6 +52,21 @@ jobs:
       - run: npm run lint
 
       - run: npm run test:ci
+
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
 
       - name: Security audit
         run: |
