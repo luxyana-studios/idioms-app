@@ -233,3 +233,110 @@ select
 from
   (select id from public.idioms where expression = 'Spill the beans' and language_code = 'en') en,
   (select id from public.idioms where expression = 'Irse de la lengua' and language_code = 'es') es;
+
+-- ── Cross-language equivalents of "Bite the bullet" ──────────────────────
+-- ES, FR, DE native idioms expressing the same idea, linked via idiom_equivalents.
+
+insert into public.idioms
+  (expression, language_code, idiomatic_meaning, explanation, examples, source, status)
+values
+(
+  'Hacer de tripas corazón',
+  'es',
+  'Armarse de valor para afrontar una situación difícil o desagradable.',
+  'Literalmente "hacer corazón con las tripas" — convertir las vísceras (sede del miedo en la tradición popular) en corazón (valentía). Documentada desde el Siglo de Oro.',
+  array['Hice de tripas corazón y le dije la verdad.', 'Tuvo que hacer de tripas corazón para entrar al quirófano.'],
+  'human',
+  'published'
+),
+(
+  'Prendre son courage à deux mains',
+  'fr',
+  'Rassembler tout son courage pour faire quelque chose de difficile ou d''effrayant.',
+  'Image d''empoigner son courage fermement, comme on saisirait un objet à deux mains pour ne pas le laisser tomber. Attestée depuis le XVIIe siècle.',
+  array['Elle a pris son courage à deux mains et a démissionné.', 'Prends ton courage à deux mains et appelle-le.'],
+  'human',
+  'published'
+),
+(
+  'In den sauren Apfel beißen',
+  'de',
+  'Eine unangenehme, aber unvermeidliche Aufgabe in Angriff nehmen.',
+  'Wörtlich "in den sauren Apfel beißen" — etwas Unangenehmes hinunterwürgen. Belegt seit Luthers Zeit (16. Jh.) als Bild für widerwilliges Erdulden.',
+  array['Ich muss in den sauren Apfel beißen und zum Zahnarzt gehen.', 'Am Ende biss er in den sauren Apfel und entschuldigte sich.'],
+  'human',
+  'published'
+);
+
+-- Translations: each new idiom rendered in the other 3 languages.
+insert into public.idiom_translations
+  (idiom_id, language_code, literal_translation, idiomatic_meaning, explanation, source)
+select i.id, v.language_code, v.literal_translation, v.idiomatic_meaning, v.explanation, 'ai_mined'
+from public.idioms i
+join (values
+  -- Hacer de tripas corazón
+  ('Hacer de tripas corazón', 'es', 'en', 'To make heart out of guts',
+    'To steel oneself to face a difficult or unpleasant situation.',
+    'Literally "to make a heart out of one''s guts" — turning the viscera (folkloric seat of fear) into a heart (courage). Attested from the Spanish Golden Age.'),
+  ('Hacer de tripas corazón', 'es', 'fr', 'Faire un cœur de tripes',
+    'Se forcer au courage pour affronter une situation difficile ou désagréable.',
+    'Littéralement "faire un cœur avec les tripes" — transformer les viscères (siège populaire de la peur) en cœur (courage). Attestée depuis le Siècle d''or espagnol.'),
+  ('Hacer de tripas corazón', 'es', 'de', 'Aus Eingeweiden ein Herz machen',
+    'Sich Mut antun, um eine schwierige oder unangenehme Lage zu meistern.',
+    'Wörtlich "aus den Eingeweiden ein Herz machen" — die Eingeweide (volkstümlich Sitz der Angst) in Herz (Mut) verwandeln. Belegt seit dem spanischen Goldenen Zeitalter.'),
+  -- Prendre son courage à deux mains
+  ('Prendre son courage à deux mains', 'fr', 'en', 'To take one''s courage in both hands',
+    'To gather up all one''s courage to do something hard or scary.',
+    'Image of gripping one''s courage firmly, as one would grasp an object with both hands to avoid dropping it. Attested since the 17th century.'),
+  ('Prendre son courage à deux mains', 'fr', 'es', 'Tomar el valor con las dos manos',
+    'Reunir todo el valor para hacer algo difícil o que da miedo.',
+    'Imagen de agarrar el propio valor con firmeza, como se sujetaría un objeto con ambas manos para no dejarlo caer. Atestiguada desde el siglo XVII.'),
+  ('Prendre son courage à deux mains', 'fr', 'de', 'Seinen Mut mit beiden Händen ergreifen',
+    'Allen Mut zusammennehmen, um etwas Schwieriges oder Beängstigendes zu tun.',
+    'Bild des festen Zugreifens nach dem eigenen Mut, wie man einen Gegenstand mit beiden Händen hält, um ihn nicht fallen zu lassen. Belegt seit dem 17. Jahrhundert.'),
+  -- In den sauren Apfel beißen
+  ('In den sauren Apfel beißen', 'de', 'en', 'To bite into the sour apple',
+    'To take on an unpleasant but unavoidable task.',
+    'Literally "to bite into the sour apple" — to swallow something disagreeable. Attested since Luther''s time (16th century) as an image of reluctant endurance.'),
+  ('In den sauren Apfel beißen', 'de', 'es', 'Morder la manzana ácida',
+    'Asumir una tarea desagradable pero inevitable.',
+    'Literalmente "morder la manzana ácida" — tragar algo desagradable. Atestiguada desde la época de Lutero (siglo XVI) como imagen de aguante a regañadientes.'),
+  ('In den sauren Apfel beißen', 'de', 'fr', 'Mordre dans la pomme acide',
+    'S''attaquer à une tâche désagréable mais inévitable.',
+    'Littéralement "mordre dans la pomme acide" — avaler quelque chose de désagréable. Attestée depuis l''époque de Luther (XVIe siècle) comme image d''une endurance résignée.')
+) as v(expression, parent_lang, language_code, literal_translation, idiomatic_meaning, explanation)
+  on v.expression = i.expression and v.parent_lang = i.language_code;
+
+-- Tag links: courage + endurance + informal for all three.
+insert into public.idiom_tags (idiom_id, tag_id)
+select i.id, t.id
+from public.idioms i
+join (values
+  ('Hacer de tripas corazón',          'es', 'courage'),
+  ('Hacer de tripas corazón',          'es', 'endurance'),
+  ('Hacer de tripas corazón',          'es', 'informal'),
+  ('Prendre son courage à deux mains', 'fr', 'courage'),
+  ('Prendre son courage à deux mains', 'fr', 'endurance'),
+  ('Prendre son courage à deux mains', 'fr', 'informal'),
+  ('In den sauren Apfel beißen',       'de', 'courage'),
+  ('In den sauren Apfel beißen',       'de', 'endurance'),
+  ('In den sauren Apfel beißen',       'de', 'informal')
+) as v(expression, language_code, tag_key)
+  on v.expression = i.expression and v.language_code = i.language_code
+join public.tags t on t.key = v.tag_key;
+
+-- Equivalence edges to "Bite the bullet" (en).
+--   DE  in den sauren Apfel beißen           — 0.95 (near-perfect)
+--   ES  hacer de tripas corazón              — 0.85
+--   FR  prendre son courage à deux mains     — 0.75
+insert into public.idiom_equivalents (idiom_id_a, idiom_id_b, verified, similarity_score)
+select least(en.id, x.id), greatest(en.id, x.id), true, x.score
+from
+  (select id from public.idioms where expression = 'Bite the bullet' and language_code = 'en') en,
+  (
+    select id, 0.85::numeric(3,2) as score from public.idioms where expression = 'Hacer de tripas corazón' and language_code = 'es'
+    union all
+    select id, 0.75::numeric(3,2) from public.idioms where expression = 'Prendre son courage à deux mains' and language_code = 'fr'
+    union all
+    select id, 0.95::numeric(3,2) from public.idioms where expression = 'In den sauren Apfel beißen' and language_code = 'de'
+  ) x;
