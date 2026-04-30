@@ -17,7 +17,7 @@
   "dependencies": {
     "@expo-google-fonts/manrope": "^0.4.2",
     "@expo/vector-icons": "^15.0.2",
-    "@react-navigation/drawer": "^7.9.8",
+    "@react-navigation/drawer": "^7.9.9",
     "@shopify/flash-list": "2.3.1",
     "@supabase/supabase-js": "^2.103.3",
     "@tanstack/react-query": "^5.99.0",
@@ -37,7 +37,7 @@
     "react": "19.2.5",
     "react-dom": "19.2.5",
     "react-i18next": "^16.5.8",
-    "react-native": "0.85.1",
+    "react-native": "0.85.2",
     "react-native-gesture-handler": "~2.31.1",
     "react-native-mmkv": "^4.3.1",
     "react-native-reanimated": "~4.3.0",
