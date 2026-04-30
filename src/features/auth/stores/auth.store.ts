@@ -23,14 +23,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     // Skip Supabase when running without credentials or in dev bypass mode
     if (
       !process.env.EXPO_PUBLIC_SUPABASE_URL ||
-      process.env.EXPO_PUBLIC_DEV_BYPASS_AUTH === "true"
+      (__DEV__ && process.env.EXPO_PUBLIC_DEV_BYPASS_AUTH === "true")
     ) {
+      const demoUser = { id: "demo", email: "demo@idiomdeck.app" } as User;
       set({
         initialized: true,
-        session: {
-          user: { id: "demo", email: "demo@idiomdeck.app" },
-        } as Session,
-        user: { id: "demo", email: "demo@idiomdeck.app" } as User,
+        session: { user: demoUser } as Session,
+        user: demoUser,
+        signIn: async () => {},
+        signOut: async () => set({ session: null, user: null }),
       });
       return;
     }
