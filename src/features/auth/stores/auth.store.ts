@@ -20,8 +20,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   loading: false,
 
   initialize: () => {
-    // Skip Supabase when running without credentials (demo/dev mode)
-    if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
+    // Skip Supabase when running without credentials or in dev bypass mode
+    if (
+      !process.env.EXPO_PUBLIC_SUPABASE_URL ||
+      process.env.EXPO_PUBLIC_DEV_BYPASS_AUTH === "true"
+    ) {
       set({
         initialized: true,
         session: {
