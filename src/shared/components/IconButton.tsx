@@ -1,19 +1,20 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { TouchableOpacity, type ViewStyle } from "react-native";
+import type { ComponentProps } from "react";
+import { type StyleProp, TouchableOpacity, type ViewStyle } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-type IconName = React.ComponentProps<typeof Ionicons>["name"];
+type IconName = ComponentProps<typeof Ionicons>["name"];
 
 interface IconButtonProps {
   icon: IconName;
-  onPress?: () => void;
+  onPress: () => void;
   iconSize?: number;
   containerSize?: number;
   borderRadius?: number;
   variant?: "glass" | "primary";
   accessibilityLabel?: string;
   hitSlop?: number;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }
 
 export function IconButton({

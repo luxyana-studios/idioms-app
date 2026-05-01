@@ -32,10 +32,14 @@ export const lightTheme = {
     // Glass surface tokens
     glassBtn: "rgba(255,255,255,0.75)",
     glassBtnBorder: "rgba(0,0,0,0.07)",
+    glassSurface: "rgba(255,255,255,0.78)",
     chipBg: "rgba(145,71,49,0.09)",
     chipBorder: "rgba(145,71,49,0.18)",
     progressTrack: "rgba(145,71,49,0.12)",
-    cardShimmer: "rgba(255,255,255,0.80)",
+    cardShimmer: "rgba(255,255,255,0.90)",
+    cardShadowOverlay: "rgba(0,0,0,0.04)",
+    stackCardMidBg: "rgba(255,255,255,0.55)",
+    stackCardFarBg: "rgba(255,255,255,0.35)",
     // Backward-compat aliases
     secondary: "#596244",
     secondaryContainer: "#dee7c0",
@@ -80,10 +84,14 @@ export const darkTheme = {
     // Glass surface tokens
     glassBtn: "rgba(38,52,30,0.80)",
     glassBtnBorder: "rgba(160,200,100,0.14)",
+    glassSurface: "rgba(26,36,18,0.62)",
     chipBg: "rgba(236,190,142,0.10)",
     chipBorder: "rgba(236,190,142,0.18)",
     progressTrack: "rgba(168,196,128,0.14)",
-    cardShimmer: "rgba(255,255,255,0.06)",
+    cardShimmer: "rgba(255,255,255,0.12)",
+    cardShadowOverlay: "rgba(0,0,0,0.20)",
+    stackCardMidBg: "rgba(25,38,18,0.65)",
+    stackCardFarBg: "rgba(20,32,14,0.55)",
     // Backward-compat aliases
     secondary: "#a8c480",
     secondaryContainer: "#2e4024",

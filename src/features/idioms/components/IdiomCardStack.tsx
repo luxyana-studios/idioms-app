@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTranslation } from "react-i18next";
 import {
   Platform,
   Pressable,
@@ -41,19 +42,13 @@ export function IdiomCardStack({
   onDetails,
   onSave,
 }: IdiomCardStackProps) {
+  const { t } = useTranslation();
   const { theme } = useUnistyles();
   const isDark = UnistylesRuntime.themeName === "dark";
   const { width: screenWidth } = useWindowDimensions();
 
   const CARD_WIDTH = Math.min(screenWidth - theme.spacing.lg * 2, 340);
   const CARD_HEIGHT = Math.round(CARD_WIDTH * (4 / 3));
-
-  const cardAndroidBg = isDark
-    ? "rgba(26,36,18,0.62)"
-    : "rgba(255,255,255,0.78)";
-  const shimmerTop = isDark
-    ? "rgba(255,255,255,0.12)"
-    : "rgba(255,255,255,0.90)";
 
   return (
     <View
@@ -70,9 +65,7 @@ export function IdiomCardStack({
           {
             width: CARD_WIDTH,
             height: CARD_HEIGHT,
-            backgroundColor: isDark
-              ? "rgba(20,32,14,0.55)"
-              : "rgba(255,255,255,0.35)",
+            backgroundColor: theme.colors.stackCardFarBg,
             borderColor: theme.colors.cardBorder,
             transform: [
               { translateX: 10 },
@@ -90,9 +83,7 @@ export function IdiomCardStack({
           {
             width: CARD_WIDTH,
             height: CARD_HEIGHT,
-            backgroundColor: isDark
-              ? "rgba(25,38,18,0.65)"
-              : "rgba(255,255,255,0.55)",
+            backgroundColor: theme.colors.stackCardMidBg,
             borderColor: theme.colors.cardBorder,
             transform: [
               { translateX: 5 },
@@ -127,13 +118,13 @@ export function IdiomCardStack({
           <View
             style={[
               StyleSheet.absoluteFillObject,
-              { backgroundColor: cardAndroidBg },
+              { backgroundColor: theme.colors.glassSurface },
             ]}
           />
         )}
 
         <LinearGradient
-          colors={[shimmerTop, "transparent"]}
+          colors={[theme.colors.cardShimmer, "transparent"]}
           style={styles.cardShimmer}
           pointerEvents="none"
         />
@@ -147,10 +138,7 @@ export function IdiomCardStack({
           />
         )}
         <LinearGradient
-          colors={[
-            "transparent",
-            isDark ? "rgba(0,0,0,0.20)" : "rgba(0,0,0,0.04)",
-          ]}
+          colors={["transparent", theme.colors.cardShadowOverlay]}
           style={styles.cardShadowGradient}
           pointerEvents="none"
         />
@@ -158,7 +146,12 @@ export function IdiomCardStack({
         {/* Category chip + audio */}
         <View style={styles.cardTop}>
           <CategoryChip label={idiom.tags[0]?.label ?? idiom.languageCode} />
-          <TouchableOpacity style={styles.audioBtn} hitSlop={8}>
+          <TouchableOpacity
+            style={styles.audioBtn}
+            hitSlop={8}
+            disabled
+            accessibilityLabel={t("home.playPronunciation")}
+          >
             <Ionicons
               name="volume-medium"
               size={18}

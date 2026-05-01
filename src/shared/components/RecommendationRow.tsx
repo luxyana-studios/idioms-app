@@ -1,15 +1,16 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import type { ComponentProps } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Typography } from "./Typography";
 
-type IconName = React.ComponentProps<typeof Ionicons>["name"];
+type IconName = ComponentProps<typeof Ionicons>["name"];
 
 interface RecommendationRowProps {
   icon: IconName;
   title: string;
   subtitle: string;
-  onPress?: () => void;
+  onPress: () => void;
   variant?: "default" | "accent";
   accessibilityLabel?: string;
 }
