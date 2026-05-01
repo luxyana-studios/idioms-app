@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Platform, TouchableOpacity, View } from "react-native";
+import { Platform, TouchableOpacity, View } from "react-native";
 import {
   StyleSheet,
   UnistylesRuntime,
@@ -21,12 +21,14 @@ export function LoginForm() {
   const { signIn, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async () => {
+    setError(null);
     try {
       await signIn(email, password);
-    } catch (error) {
-      Alert.alert(t("common.error"), (error as Error).message);
+    } catch (err) {
+      setError((err as Error).message);
     }
   };
 
@@ -127,6 +129,16 @@ export function LoginForm() {
             />
           </View>
         </View>
+
+        {error ? (
+          <Typography
+            variant="caption"
+            color="error"
+            style={{ textAlign: "center" }}
+          >
+            {error}
+          </Typography>
+        ) : null}
 
         <TouchableOpacity
           style={[

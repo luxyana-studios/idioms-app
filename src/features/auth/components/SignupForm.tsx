@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { Button } from "@/shared/components/Button";
 import { TextInput } from "@/shared/components/TextInput";
@@ -13,12 +13,18 @@ export function SignupForm() {
   const { signUp, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleSignup = async () => {
+    setError(null);
+    if (password.length < 6) {
+      setError(t("auth.passwordTooShort"));
+      return;
+    }
     try {
       await signUp(email, password);
-    } catch (error) {
-      Alert.alert(t("common.error"), (error as Error).message);
+    } catch (err) {
+      setError((err as Error).message);
     }
   };
 
@@ -40,6 +46,15 @@ export function SignupForm() {
         onChangeText={setPassword}
         secureTextEntry
       />
+      {error ? (
+        <Typography
+          variant="caption"
+          color="error"
+          style={{ textAlign: "center" }}
+        >
+          {error}
+        </Typography>
+      ) : null}
       <Button
         title={t("auth.signup")}
         onPress={handleSignup}

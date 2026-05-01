@@ -44,6 +44,7 @@
   "library.byLanguageSubtitle": "Explora por idioma",
   "library.slangModern": "Jerga y modernismos",
   "library.slangModernSubtitle": "Expresiones contemporáneas",
+  "auth.passwordTooShort": "La contraseña debe tener al menos 6 caracteres.",
   "auth.tagline": "Amplía tu vocabulario, un modismo a la vez.",
   "auth.emailPlaceholder": "tu@email.com",
   "auth.passwordPlaceholder": "••••••••",
