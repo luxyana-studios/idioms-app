@@ -29,6 +29,13 @@ export const lightTheme = {
     outlineVariant: "#dac1bb",
     error: "#ba1a1a",
     success: "#596244",
+    // Glass surface tokens
+    glassBtn: "rgba(255,255,255,0.75)",
+    glassBtnBorder: "rgba(0,0,0,0.07)",
+    chipBg: "rgba(145,71,49,0.09)",
+    chipBorder: "rgba(145,71,49,0.18)",
+    progressTrack: "rgba(145,71,49,0.12)",
+    cardShimmer: "rgba(255,255,255,0.80)",
     // Backward-compat aliases
     secondary: "#596244",
     secondaryContainer: "#dee7c0",
@@ -70,6 +77,13 @@ export const darkTheme = {
     outlineVariant: "rgba(160,200,100,0.18)",
     error: "#ffb4ab",
     success: "#a8c480",
+    // Glass surface tokens
+    glassBtn: "rgba(38,52,30,0.80)",
+    glassBtnBorder: "rgba(160,200,100,0.14)",
+    chipBg: "rgba(236,190,142,0.10)",
+    chipBorder: "rgba(236,190,142,0.18)",
+    progressTrack: "rgba(168,196,128,0.14)",
+    cardShimmer: "rgba(255,255,255,0.06)",
     // Backward-compat aliases
     secondary: "#a8c480",
     secondaryContainer: "#2e4024",

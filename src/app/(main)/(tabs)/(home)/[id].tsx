@@ -1,25 +1,23 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, { Circle, Defs, FeGaussianBlur, Filter } from "react-native-svg";
-import {
-  StyleSheet,
-  UnistylesRuntime,
-  useUnistyles,
-} from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
+import { CategoryChip } from "@/shared/components/CategoryChip";
+import { GlassView } from "@/shared/components/GlassView";
+import { GlowBackground } from "@/shared/components/GlowBackground";
+import { IconButton } from "@/shared/components/IconButton";
+import { ScreenHeader } from "@/shared/components/ScreenHeader";
 import { Typography } from "@/shared/components/Typography";
 
 export default function DetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t } = useTranslation();
   const { theme } = useUnistyles();
-  const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { data: idioms = [] } = useIdioms();
@@ -28,21 +26,9 @@ export default function DetailScreen() {
   const idiom = idioms.find((i) => i.id === id);
   const isSaved = idiom ? savedIds.includes(idiom.id) : false;
 
-  const cardBg = isDark ? "rgba(26,36,21,0.72)" : "rgba(255,255,255,0.68)";
-
-  const headerBtnBg = isDark ? "rgba(38,52,30,0.80)" : "rgba(255,255,255,0.75)";
-  const headerBtnBorder = isDark
-    ? "rgba(160,200,100,0.14)"
-    : "rgba(0,0,0,0.07)";
-
   if (!idiom) {
     return (
-      <View
-        style={[
-          styles.root,
-          { backgroundColor: theme.colors.background, paddingTop: insets.top },
-        ]}
-      >
+      <View style={[styles.root, { paddingTop: insets.top }]}>
         <View style={styles.notFound}>
           <Typography
             variant="heading"
@@ -60,36 +46,30 @@ export default function DetailScreen() {
   }
 
   return (
-    <View
-      style={[
-        styles.root,
-        { backgroundColor: theme.colors.background, paddingTop: insets.top },
-      ]}
-    >
-      {/* Ambient blobs */}
-      <View style={styles.blobs} pointerEvents="none">
-        <Svg width="100%" height="100%">
-          <Defs>
-            <Filter
-              id="blurDetail1"
-              x="-100%"
-              y="-100%"
-              width="300%"
-              height="300%"
-            >
-              <FeGaussianBlur stdDeviation="50" />
-            </Filter>
-          </Defs>
-          <Circle
-            cx="100%"
-            cy="0"
-            r={180}
-            fill={`${theme.colors.blob1}${isDark ? "28" : "55"}`}
-            filter="url(#blurDetail1)"
+    <View style={[styles.root, { paddingTop: insets.top }]}>
+      <GlowBackground subtle />
+      <ScreenHeader
+        left={
+          <IconButton
+            icon="chevron-back"
+            onPress={() => router.back()}
+            accessibilityLabel={t("common.goBack")}
           />
-        </Svg>
-      </View>
-
+        }
+        center={
+          <CategoryChip label={idiom.tags[0]?.label ?? idiom.languageCode} />
+        }
+        right={
+          <IconButton
+            icon={isSaved ? "heart" : "heart-outline"}
+            onPress={() =>
+              isSaved ? unsaveIdiom(idiom.id) : saveIdiom(idiom.id)
+            }
+            variant={isSaved ? "primary" : "glass"}
+            accessibilityLabel={t(isSaved ? "home.saved" : "common.save")}
+          />
+        }
+      />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={[
@@ -98,82 +78,6 @@ export default function DetailScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header row */}
-        <View style={styles.headerRow}>
-          <TouchableOpacity
-            style={[
-              styles.headerBtn,
-              { backgroundColor: headerBtnBg, borderColor: headerBtnBorder },
-            ]}
-            onPress={() => router.back()}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={t("common.goBack")}
-          >
-            <Ionicons
-              name="chevron-back"
-              size={20}
-              color={theme.colors.primary}
-            />
-          </TouchableOpacity>
-
-          {/* Category chip */}
-          <View
-            style={[
-              styles.chip,
-              {
-                backgroundColor: isDark
-                  ? "rgba(236,190,142,0.10)"
-                  : "rgba(145,71,49,0.09)",
-                borderColor: isDark
-                  ? "rgba(236,190,142,0.18)"
-                  : "rgba(145,71,49,0.18)",
-              },
-            ]}
-          >
-            <Typography
-              variant="caption"
-              weight="extraBold"
-              style={{
-                color: theme.colors.primary,
-                fontSize: 10,
-                textTransform: "uppercase",
-                letterSpacing: 1.5,
-              }}
-            >
-              {idiom.tags[0]?.label ?? idiom.languageCode}
-            </Typography>
-          </View>
-
-          <TouchableOpacity
-            style={[
-              styles.headerBtn,
-              isSaved
-                ? {
-                    backgroundColor: theme.colors.primary,
-                    borderColor: "transparent",
-                  }
-                : {
-                    backgroundColor: headerBtnBg,
-                    borderColor: headerBtnBorder,
-                  },
-            ]}
-            onPress={() =>
-              isSaved ? unsaveIdiom(idiom.id) : saveIdiom(idiom.id)
-            }
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={t(isSaved ? "home.saved" : "common.save")}
-          >
-            <Ionicons
-              name={isSaved ? "heart" : "heart-outline"}
-              size={20}
-              color={isSaved ? theme.colors.primaryText : theme.colors.primary}
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Expression */}
         <Typography
           variant="display"
           weight="extraBold"
@@ -182,7 +86,6 @@ export default function DetailScreen() {
           {idiom.expression}
         </Typography>
 
-        {/* Meaning */}
         <Typography
           variant="heading"
           weight="semibold"
@@ -191,26 +94,10 @@ export default function DetailScreen() {
           "{idiom.idiomaticMeaning}"
         </Typography>
 
-        {/* Origin & Meaning card */}
         {idiom.explanation && (
-          <View
-            style={[
-              styles.infoCard,
-              { backgroundColor: cardBg, borderColor: theme.colors.cardBorder },
-            ]}
-          >
-            {Platform.OS !== "android" ? (
-              <BlurView
-                intensity={50}
-                tint={isDark ? "dark" : "light"}
-                style={[StyleSheet.absoluteFillObject, { borderRadius: 20 }]}
-              />
-            ) : null}
+          <GlassView style={styles.infoCard}>
             <LinearGradient
-              colors={[
-                isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.80)",
-                "transparent",
-              ]}
+              colors={[theme.colors.cardShimmer, "transparent"]}
               style={styles.cardShimmer}
               pointerEvents="none"
             />
@@ -227,29 +114,13 @@ export default function DetailScreen() {
             >
               {idiom.explanation}
             </Typography>
-          </View>
+          </GlassView>
         )}
 
-        {/* Example card */}
         {idiom.examples && idiom.examples.length > 0 && (
-          <View
-            style={[
-              styles.infoCard,
-              { backgroundColor: cardBg, borderColor: theme.colors.cardBorder },
-            ]}
-          >
-            {Platform.OS !== "android" ? (
-              <BlurView
-                intensity={50}
-                tint={isDark ? "dark" : "light"}
-                style={[StyleSheet.absoluteFillObject, { borderRadius: 20 }]}
-              />
-            ) : null}
+          <GlassView style={styles.infoCard}>
             <LinearGradient
-              colors={[
-                isDark ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.80)",
-                "transparent",
-              ]}
+              colors={[theme.colors.cardShimmer, "transparent"]}
               style={styles.cardShimmer}
               pointerEvents="none"
             />
@@ -273,10 +144,9 @@ export default function DetailScreen() {
                 {example}
               </Typography>
             ))}
-          </View>
+          </GlassView>
         )}
 
-        {/* Pronunciation button */}
         <TouchableOpacity
           activeOpacity={0.85}
           disabled
@@ -306,9 +176,7 @@ export default function DetailScreen() {
 const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
-  },
-  blobs: {
-    ...StyleSheet.absoluteFillObject,
+    backgroundColor: theme.colors.background,
   },
   notFound: {
     flex: 1,
@@ -322,26 +190,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.lg,
     paddingTop: theme.spacing.md,
     gap: theme.spacing.md,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: theme.spacing.sm,
-  },
-  headerBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-  },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
   },
   expression: {
     fontSize: 38,
@@ -357,7 +205,6 @@ const styles = StyleSheet.create((theme) => ({
   infoCard: {
     borderRadius: 20,
     padding: 18,
-    borderWidth: 1,
     gap: theme.spacing.sm,
     overflow: "hidden",
   },
