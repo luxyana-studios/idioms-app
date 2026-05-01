@@ -133,7 +133,8 @@ export function LoginForm() {
         {error ? (
           <Typography
             variant="caption"
-            style={{ color: theme.colors.error, textAlign: "center" }}
+            color="error"
+            style={{ textAlign: "center" }}
           >
             {error}
           </Typography>

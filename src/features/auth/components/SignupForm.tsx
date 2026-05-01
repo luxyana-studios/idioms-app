@@ -2,7 +2,7 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { Button } from "@/shared/components/Button";
 import { TextInput } from "@/shared/components/TextInput";
 import { Typography } from "@/shared/components/Typography";
@@ -10,7 +10,6 @@ import { useAuth } from "../hooks/useAuth";
 
 export function SignupForm() {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
   const { signUp, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,7 +49,8 @@ export function SignupForm() {
       {error ? (
         <Typography
           variant="caption"
-          style={{ color: theme.colors.error, textAlign: "center" }}
+          color="error"
+          style={{ textAlign: "center" }}
         >
           {error}
         </Typography>
