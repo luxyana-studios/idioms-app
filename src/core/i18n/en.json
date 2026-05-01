@@ -44,6 +44,7 @@
   "library.byLanguageSubtitle": "Browse by language",
   "library.slangModern": "Slang & Modern",
   "library.slangModernSubtitle": "Contemporary expressions",
+  "auth.passwordTooShort": "Password must be at least 6 characters.",
   "auth.tagline": "Expand your lexicon, one idiom at a time.",
   "auth.emailPlaceholder": "you@email.com",
   "auth.passwordPlaceholder": "••••••••",
