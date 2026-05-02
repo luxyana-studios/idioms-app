@@ -35,6 +35,7 @@ export const typography = {
     "2xl": 24,
     "3xl": 30,
     "4xl": 36,
+    "5xl": 38,
   },
   weights: {
     regular: "400" as const,
