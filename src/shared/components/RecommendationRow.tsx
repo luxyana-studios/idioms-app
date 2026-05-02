@@ -102,7 +102,7 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     backgroundColor: theme.colors.card,
     borderColor: theme.colors.cardBorder,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
     shadowRadius: 12,

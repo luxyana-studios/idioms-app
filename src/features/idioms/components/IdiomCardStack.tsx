@@ -130,7 +130,7 @@ export function IdiomCardStack({
         />
         {isDark && (
           <LinearGradient
-            colors={[`${theme.colors.primary}18`, "transparent"]}
+            colors={[theme.colors.primaryGlow, "transparent"]}
             start={{ x: 1, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={StyleSheet.absoluteFillObject}
@@ -290,12 +290,12 @@ const styles = StyleSheet.create((theme) => ({
   },
   progressTrack: {
     height: 2.5,
-    borderRadius: 99,
+    borderRadius: theme.radius.full,
     overflow: "hidden",
   },
   progressFill: {
     height: "100%",
-    borderRadius: 99,
+    borderRadius: theme.radius.full,
   },
   stats: {
     flexDirection: "row",

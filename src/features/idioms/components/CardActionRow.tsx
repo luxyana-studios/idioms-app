@@ -86,7 +86,7 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 24,
+    gap: theme.spacing.lg,
   },
   btnLg: {
     width: 50,
@@ -101,7 +101,7 @@ const styles = StyleSheet.create((theme) => ({
   btnSm: {
     width: 40,
     height: 40,
-    borderRadius: 12,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     borderStyle: "dashed",
     borderColor: theme.colors.outline,
