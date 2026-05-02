@@ -19,7 +19,7 @@ export function CategoryChip({ label }: CategoryChipProps) {
 const styles = StyleSheet.create((theme) => ({
   chip: {
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: theme.spacing.xs,
     borderRadius: theme.radius.full,
     borderWidth: 1,
     backgroundColor: theme.colors.chipBg,

@@ -6,6 +6,7 @@
   "common.cancel": "Cancelar",
   "common.logout": "Cerrar sesión",
   "common.goBack": "Volver",
+  "common.openMenu": "Abrir menú",
   "auth.login": "Iniciar sesión",
   "auth.signup": "Registrarse",
   "auth.email": "Correo electrónico",

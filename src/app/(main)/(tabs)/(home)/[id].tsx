@@ -230,7 +230,7 @@ const styles = StyleSheet.create((theme) => ({
     height: 52,
     borderRadius: theme.radius.full,
     marginTop: theme.spacing.sm,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,

@@ -47,7 +47,7 @@ export function RecommendationRow({
             styles.iconBox,
             {
               backgroundColor: isAccent
-                ? "rgba(255,255,255,0.20)"
+                ? theme.colors.primaryIconBg
                 : theme.colors.surfaceContainerHighest,
             },
           ]}

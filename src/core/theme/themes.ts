@@ -40,6 +40,8 @@ export const lightTheme = {
     cardShadowOverlay: "rgba(0,0,0,0.04)",
     stackCardMidBg: "rgba(255,255,255,0.55)",
     stackCardFarBg: "rgba(255,255,255,0.35)",
+    shadow: "#000",
+    primaryIconBg: "rgba(255,255,255,0.20)",
     // Backward-compat aliases
     secondary: "#596244",
     secondaryContainer: "#dee7c0",
@@ -92,6 +94,8 @@ export const darkTheme = {
     cardShadowOverlay: "rgba(0,0,0,0.20)",
     stackCardMidBg: "rgba(25,38,18,0.65)",
     stackCardFarBg: "rgba(20,32,14,0.55)",
+    shadow: "#000",
+    primaryIconBg: "rgba(255,255,255,0.20)",
     // Backward-compat aliases
     secondary: "#a8c480",
     secondaryContainer: "#2e4024",

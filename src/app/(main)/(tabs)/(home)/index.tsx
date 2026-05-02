@@ -64,7 +64,7 @@ export default function HomeScreen() {
           <IconButton
             icon="menu"
             onPress={() => navigation.openDrawer()}
-            accessibilityLabel={t("settings.title")}
+            accessibilityLabel={t("common.openMenu")}
           />
         }
         center={

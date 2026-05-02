@@ -237,7 +237,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   cardFront: {
     padding: theme.spacing.lg,
-    shadowColor: "#000",
+    shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 40,
