@@ -17,16 +17,20 @@ you only challenge. Approval comes from the human peer reviewer.
 - Use `gh pr diff <number>` to get the full diff against the base branch
 - Read the PR title and description to understand the **stated goal** of the PR
 
-### 2. Read project context
+### 2. Load CLAUDE.md as the rulebook
 
-- Read `CLAUDE.md` at the project root for conventions and architecture
-- Read the relevant nested CLAUDE.md files (`src/app/CLAUDE.md`, `src/features/CLAUDE.md`,
-  `src/core/CLAUDE.md`) based on which directories the PR touches
-- This is your source of truth for what "correct" looks like in this project
+**This step is non-negotiable. Skipping it invalidates the review.**
+
+- Read the project root `CLAUDE.md` end-to-end
+- Read every nested CLAUDE.md whose directory the PR touches (`src/app/CLAUDE.md`, `src/features/CLAUDE.md`, `src/core/CLAUDE.md`, etc.)
+- Treat these files as the **source of truth**. Every rule below in step 3 traces back to a section in CLAUDE.md — when in doubt, CLAUDE.md wins, and the skill should be updated to match
+- If CLAUDE.md and this skill conflict, flag it to the user at the end of the review so the inconsistency gets fixed
 
 ### 3. Analyze the full diff
 
-Review every changed file. For each change, evaluate:
+Review every changed file. **Every finding must be justifiable against a CLAUDE.md rule or a category below.** If a concern doesn't map to either, treat it as a `[Question]` rather than a directive.
+
+Evaluate each change across these axes:
 
 **Correctness & Bugs**
 - Logic errors, off-by-one, race conditions, missing error handling
@@ -52,13 +56,41 @@ Review every changed file. For each change, evaluate:
 - Are translations added for all user-facing strings?
 - Are styles using theme tokens instead of magic numbers?
 
-**Pattern Adherence**
-- Route screens use default exports, components use named exports
-- StyleSheet imported from `react-native-unistyles`, not `react-native`
-- Stores follow `<name>.store.ts` / `use<Name>Store` convention
-- Tests mock native modules properly
-- FlashList does NOT use `estimatedItemSize`
-- No AsyncStorage usage (should use MMKV)
+**Theming & Responsiveness** — rules in CLAUDE.md > *Styling Pattern > Theming rules / Responsive sizing*
+
+Grep the diff for these anti-patterns and flag every hit:
+- Color literals in style values or inline styles: `#[0-9a-fA-F]{3,8}`, `rgb(`, `rgba(`, `hsl(`, named colors (`"white"`, `"black"`)
+- `Dimensions.get(` — banned, use `rt.screen` or `useWindowDimensions()`
+- Numeric `width:` / `height:` / `padding:` / `margin:` / `fontSize:` / `borderRadius:` literals inside `StyleSheet.create` blocks
+- Inline `style={{ color: "..." }}` / `style={{ backgroundColor: "..." }}` literals
+- Fixed pixel widths on layout containers (no `flex` / `%` / `maxWidth` + breakpoint)
+- New colors used without being added to BOTH `lightColors` and `darkColors` in `src/core/theme/themes.ts`
+
+**Component Size & Decomposition** — rules in CLAUDE.md > *Component Guidelines > Size & Decomposition*
+
+Smell thresholds (any one is enough to flag):
+- Component file >250 lines, or route screen file >150 lines
+- JSX nesting >3 levels of conditionals, or a single render block >60 lines
+- 4+ `useState` or 3+ `useEffect` in one component
+- Multi-line inline arrow handlers in JSX
+- Same JSX shape repeated 2+ times
+- Mixed concerns: data fetching + business logic + presentation in one file
+- Route screen (`src/app/**/*.tsx`) containing fetch logic, business rules, or complex state
+
+When you suggest extraction, name the destination using the table in CLAUDE.md > *Component Guidelines > Size & Decomposition*.
+
+**Component Hygiene** — rules in CLAUDE.md > *Component Guidelines > Component Hygiene*
+
+Flag concrete violations:
+- Inline business logic in route screens (should be in `features/<name>/`)
+- Prop drilling 3+ levels deep
+- Interactive elements missing `accessibilityLabel` / `accessibilityRole`, or touch targets <44pt
+- FlashList with inline arrow `renderItem` doing heavy work, or missing stable `keyExtractor`
+- Missing or gratuitous memoization (cuts both ways)
+- React Query consumers not handling `isLoading` / `isError` (and no opt-out comment)
+- New Zustand stores or custom hooks without a colocated `__tests__/*.test.ts(x)`
+
+**Pattern Adherence** — verify against CLAUDE.md > *File Conventions*, *Common Pitfalls*, *Tech Stack* version-specific notes. CLAUDE.md is authoritative; do not duplicate the list here. Common ones to spot-check: default vs named exports, `StyleSheet` import source, store naming, no `AsyncStorage`, no FlashList `estimatedItemSize`, native module mocks in tests.
 
 ### 4. Post inline comments
 

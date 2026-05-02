@@ -172,6 +172,61 @@ Font families in `typography.fonts` map to DM Sans weights loaded via `expo-font
 To toggle theme: settings store calls `StyleSheet.configure()` with either
 `adaptiveThemes: true` (system) or `adaptiveThemes: false, initialTheme: mode`.
 
+#### Theming rules (no exceptions)
+
+- **No color literals in components.** No `#fff`, `rgb(...)`, `rgba(...)`, `hsl(...)`, or named colors like `"white"` / `"black"` in style values or inline styles. Always `theme.colors.*`
+- **New colors land in `themes.ts` first** — both `lightColors` and `darkColors` — before being used anywhere
+- **No raw numbers in styles.** Spacing, radius, font size, font weight, line height all come from `theme.spacing.*`, `theme.radius.*`, `theme.typography.*`. If you need a value the tokens don't have, add it to `tokens.ts`
+- **No inline `style={{ ... }}` with literal colors or dimensions.** Move into a `StyleSheet.create` block
+
+#### Responsive sizing (universal app: iOS, Android, Web)
+
+The app targets phones, tablets, and web. Layouts must adapt:
+
+- **Use Unistyles breakpoint syntax** inside `StyleSheet.create`:
+  ```ts
+  padding: { xs: theme.spacing.sm, md: theme.spacing.lg, lg: theme.spacing.xl }
+  ```
+- **Use the `rt` argument** for runtime screen info — `StyleSheet.create((theme, rt) => ...)` exposes `rt.screen.width`, `rt.breakpoint`, `rt.insets`. Re-renders correctly on rotation/resize
+- **Never `Dimensions.get(...)`.** It's a one-shot read and breaks on rotation and web resize. Use `rt.screen` (Unistyles) or `useWindowDimensions()` (RN) instead
+- **No fixed pixel widths on layout containers.** Use `flex`, `%`, or `maxWidth` with breakpoints
+- **Constrain content width on web.** Apply `maxWidth` + `alignSelf: "center"` to top-level content containers so wide screens don't stretch text lines to unreadable widths
+- **`Platform.select` is for behavior that genuinely differs per platform** (e.g. shadow vs elevation), not a substitute for breakpoints
+
+### Component Guidelines
+
+#### Size & Decomposition
+
+A component file is too big when any of these is true. Cut early — don't wait for it to become a monster:
+
+- Component file >250 lines, or route screen file >150 lines
+- JSX nesting exceeds 3 levels of conditionals, or a single render block is >60 lines
+- 4+ `useState` calls in one component → extract a custom hook or Zustand slice
+- 3+ `useEffect` calls in one component → extract into `use<Thing>` hook
+- The same JSX shape is repeated 2+ times → extract a component
+- Multi-line inline arrow handlers in JSX → hoist to named functions (`useCallback` if passed to memoized children)
+- Mixed concerns in one file (data fetching + business logic + presentation) → split: hook for data, component for UI
+
+**Where extracted code goes:**
+
+| Extracted unit | Destination |
+|---|---|
+| Component used in 2+ features | `src/shared/components/<Name>.tsx` |
+| Component used by one feature only | `src/features/<name>/components/<Name>.tsx` |
+| Reusable stateful logic | `src/features/<name>/hooks/use<Name>.ts` |
+| Server state / data fetching | React Query hook in `features/<name>/hooks/` |
+| Client state shared across components | Zustand store in `features/<name>/stores/` |
+
+#### Component Hygiene
+
+- **Route screens stay thin.** Files in `src/app/` should orchestrate, not implement. Fetch logic, business rules, and complex state belong in `features/<name>/`
+- **Avoid prop drilling.** 3+ levels of passthrough props is a smell — reach for a store, context, or composition
+- **Accessibility:** interactive elements need `accessibilityLabel` and `accessibilityRole`. Touch targets ≥44pt
+- **List performance:** FlashList items need a stable `keyExtractor` and a memoized `renderItem`. Don't put heavy work in inline arrow `renderItem`
+- **Memoization discipline:** use `useMemo` / `useCallback` where it actually matters (list item renderers, expensive computes, deps of memoized children). Don't memoize cheap values — it's just noise
+- **Loading & error states:** every React Query consumer must handle `isLoading` and `isError` visibly, or explicitly opt out with a comment explaining why
+- **Tests are not optional.** New Zustand stores and custom hooks ship with a colocated `__tests__/*.test.ts(x)` file
+
 ### i18n Pattern
 
 - Flat key translations in `src/core/i18n/en.json` and `es.json`
