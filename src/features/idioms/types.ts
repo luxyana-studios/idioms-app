@@ -30,3 +30,13 @@ export interface IdiomTranslation {
   explanation?: string;
   source: IdiomSource;
 }
+
+export interface IdiomEquivalent {
+  id: string;
+  equivalentId: string;
+  expression: string;
+  languageCode: string;
+  idiomaticMeaning: string;
+  similarityScore: number;
+  verified: boolean;
+}

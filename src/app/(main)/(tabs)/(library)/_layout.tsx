@@ -17,6 +17,8 @@ export default function LibraryLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: t("library.title") }} />
+      <Stack.Screen name="by-language" options={{ headerShown: false }} />
+      <Stack.Screen name="[lang]" options={{ headerShown: false }} />
     </Stack>
   );
 }
