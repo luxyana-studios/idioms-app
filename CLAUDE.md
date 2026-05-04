@@ -253,8 +253,12 @@ A component file is too big when any of these is true. Cut early — don't wait 
   (same every time for the same project) — set them once in `.env`
 - **.env setup**: copy `.env.example` to `.env`, fill in local Supabase URL (`http://127.0.0.1:54321`)
   and the publishable key from `supabase start` output
-- **Remote DB**: not yet configured. Migrations and CI for remote deployment are planned for later.
-  Do NOT run `supabase db push` or link to a remote project yet
+- **Remote DB (prod)**: deployed automatically by `.github/workflows/supabase-deploy.yml` on
+  push to `main` when files under `supabase/migrations/**` or `supabase/config.toml` change.
+  The workflow runs `supabase link` + `supabase db push` using the `SUPABASE_ACCESS_TOKEN`,
+  `SUPABASE_DB_PASSWORD`, and `SUPABASE_PROJECT_ID` repo secrets. Can also be run manually
+  from the Actions tab (workflow_dispatch). Do NOT run `supabase db push` from your local
+  machine — let CI own prod state. Seed data is NOT applied to prod by the workflow
 
 ### Testing
 
