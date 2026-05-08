@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
-import { useRouter } from "expo-router";
+import { type Href, useRouter } from "expo-router";
 import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
@@ -21,7 +21,7 @@ interface Topic {
   labelKey: string;
   subtitleKey: string;
   accent: boolean;
-  route?: string;
+  route?: Href;
 }
 
 const TOPICS: Topic[] = [
@@ -42,7 +42,7 @@ const TOPICS: Topic[] = [
     labelKey: "library.byLanguage",
     subtitleKey: "library.byLanguageSubtitle",
     accent: false,
-    route: "/(main)/(tabs)/(library)/by-language",
+    route: "/(main)/(tabs)/(library)/by-language" as Href,
   },
   {
     icon: "search-outline",
@@ -98,7 +98,7 @@ export default function LibraryScreen() {
             activeOpacity={0.8}
             disabled={!topic.route}
             onPress={
-              topic.route ? () => router.push(topic.route as never) : undefined
+              topic.route ? () => router.push(topic.route as Href) : undefined
             }
             accessibilityRole="button"
             accessibilityLabel={t(topic.labelKey)}

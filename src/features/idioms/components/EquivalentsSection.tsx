@@ -3,17 +3,11 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { LANG_KEY } from "@/features/idioms/constants";
 import { useIdiomEquivalents } from "@/features/idioms/hooks/useIdiomEquivalents";
 import type { IdiomEquivalent } from "@/features/idioms/types";
 import { Typography } from "@/shared/components/Typography";
 import { IdiomInfoCard } from "./IdiomInfoCard";
-
-const LANG_KEY: Record<string, string> = {
-  en: "lang.en",
-  es: "lang.es",
-  de: "lang.de",
-  fr: "lang.fr",
-};
 
 interface EquivalentsSectionProps {
   idiomId: string;
@@ -41,7 +35,7 @@ function EquivalentCard({ equiv }: { equiv: IdiomEquivalent }) {
         <Typography
           variant="body"
           weight="bold"
-          style={{ color: theme.colors.text, fontSize: 14 }}
+          style={{ color: theme.colors.text }}
         >
           {equiv.expression}
         </Typography>
@@ -64,14 +58,15 @@ function EquivalentCard({ equiv }: { equiv: IdiomEquivalent }) {
 
 export function EquivalentsSection({ idiomId }: EquivalentsSectionProps) {
   const { t } = useTranslation();
-  const { data: equivalents = [] } = useIdiomEquivalents(idiomId);
+  const { data: equivalents = [], isError } = useIdiomEquivalents(idiomId);
 
-  if (equivalents.length === 0) return null;
+  if (isError || equivalents.length === 0) return null;
 
   const byLanguage = equivalents.reduce<Record<string, IdiomEquivalent[]>>(
     (acc, equiv) => {
       const key = equiv.languageCode;
-      acc[key] = [...(acc[key] ?? []), equiv];
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(equiv);
       return acc;
     },
     {},
@@ -113,7 +108,7 @@ const styles = StyleSheet.create((theme) => ({
   langHeader: {
     color: theme.colors.accent,
     letterSpacing: 1.2,
-    fontSize: 10,
+    fontSize: theme.typography.sizes["2xs"],
     marginBottom: theme.spacing.xs,
   },
   groupCards: {
@@ -122,9 +117,9 @@ const styles = StyleSheet.create((theme) => ({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    borderRadius: 14,
-    padding: 12,
+    gap: theme.spacing.sm,
+    borderRadius: theme.radius.chip,
+    padding: theme.spacing.sm,
     borderWidth: 1,
   },
   cardText: {

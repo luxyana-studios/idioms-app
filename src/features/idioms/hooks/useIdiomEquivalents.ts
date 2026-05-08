@@ -5,16 +5,20 @@ import type { IdiomEquivalent } from "../types";
 const fetchEquivalents = async (
   idiomId: string,
 ): Promise<IdiomEquivalent[]> => {
-  const [{ data: asA }, { data: asB }] = await Promise.all([
-    supabase
-      .from("idiom_equivalents")
-      .select("id, similarity_score, verified, idiom_id_b")
-      .eq("idiom_id_a", idiomId),
-    supabase
-      .from("idiom_equivalents")
-      .select("id, similarity_score, verified, idiom_id_a")
-      .eq("idiom_id_b", idiomId),
-  ]);
+  const [{ data: asA, error: errA }, { data: asB, error: errB }] =
+    await Promise.all([
+      supabase
+        .from("idiom_equivalents")
+        .select("id, similarity_score, verified, idiom_id_b")
+        .eq("idiom_id_a", idiomId),
+      supabase
+        .from("idiom_equivalents")
+        .select("id, similarity_score, verified, idiom_id_a")
+        .eq("idiom_id_b", idiomId),
+    ]);
+
+  if (errA) throw errA;
+  if (errB) throw errB;
 
   const refs = [
     ...(asA ?? []).map((r) => ({
