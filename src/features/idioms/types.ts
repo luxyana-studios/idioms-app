@@ -32,7 +32,7 @@ export interface IdiomTranslation {
 }
 
 export interface IdiomEquivalent {
-  id: string;
+  edgeId: string;
   equivalentId: string;
   expression: string;
   languageCode: string;

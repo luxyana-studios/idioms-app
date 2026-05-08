@@ -5,6 +5,9 @@ export interface LanguageCount {
   count: number;
 }
 
+// Derives counts from the shared useIdioms cache. Known trade-off: the cache key
+// includes UI language, so this refetches on locale change even though catalog
+// language distribution is locale-independent. Acceptable at current dataset size.
 export const useLanguageCounts = () => {
   const { data: idioms = [], isLoading, isError } = useIdioms();
 
@@ -14,7 +17,7 @@ export const useLanguageCounts = () => {
       return acc;
     }, {}),
   )
-    .sort(([, a], [, b]) => b - a)
+    .sort(([codeA, a], [codeB, b]) => b - a || codeA.localeCompare(codeB))
     .map(([code, count]) => ({ code, count }));
 
   return { languages, isLoading, isError };

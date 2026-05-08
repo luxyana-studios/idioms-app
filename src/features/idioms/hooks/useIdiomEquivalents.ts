@@ -51,11 +51,12 @@ const fetchEquivalents = async (
   const idiomMap = new Map((idioms ?? []).map((i) => [i.id, i]));
 
   return refs
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
     .map(({ rowId, equivalentId, score, verified }) => {
       const idiom = idiomMap.get(equivalentId);
       if (!idiom) return null;
       return {
-        id: rowId,
+        edgeId: rowId,
         equivalentId: idiom.id,
         expression: idiom.expression,
         languageCode: idiom.language_code,

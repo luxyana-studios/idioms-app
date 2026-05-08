@@ -60,6 +60,7 @@ export function EquivalentsSection({ idiomId }: EquivalentsSectionProps) {
   const { t } = useTranslation();
   const { data: equivalents = [], isError } = useIdiomEquivalents(idiomId);
 
+  // Equivalents are supplementary — a failed fetch should not degrade the main idiom detail view.
   if (isError || equivalents.length === 0) return null;
 
   const byLanguage = equivalents.reduce<Record<string, IdiomEquivalent[]>>(
@@ -92,7 +93,7 @@ export function EquivalentsSection({ idiomId }: EquivalentsSectionProps) {
           </Typography>
           <View style={styles.groupCards}>
             {equivs.map((equiv) => (
-              <EquivalentCard key={equiv.id} equiv={equiv} />
+              <EquivalentCard key={equiv.edgeId} equiv={equiv} />
             ))}
           </View>
         </View>

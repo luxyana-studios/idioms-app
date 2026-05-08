@@ -59,6 +59,14 @@ export default function ByLanguageScreen() {
             {t("common.error")}
           </Typography>
         )}
+        {!isLoading && !isError && languages.length === 0 && (
+          <Typography
+            variant="body"
+            style={{ color: theme.colors.textMuted, textAlign: "center" }}
+          >
+            {t("byLanguage.noIdioms")}
+          </Typography>
+        )}
         {!isLoading &&
           !isError &&
           languages.map(({ code, count }) => (
