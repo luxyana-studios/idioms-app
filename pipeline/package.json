@@ -6,6 +6,7 @@
   "scripts": {
     "mine": "tsx src/cli.ts mine",
     "discover": "tsx src/cli.ts discover",
+    "enrich": "tsx src/cli.ts enrich",
     "lint": "biome check src/",
     "lint:fix": "biome check --write src/",
     "typecheck": "tsc --noEmit"

@@ -1,4 +1,5 @@
 import { runDiscover } from "./jobs/discover.js";
+import { runEnrich } from "./jobs/enrich.js";
 import { runMine } from "./jobs/mine.js";
 import { isLanguage } from "./types.js";
 
@@ -25,6 +26,7 @@ function usage(): never {
   console.error(
     "  pipeline discover [--top-n <n>] [--per-lang-cap <n>] [--max-iter <n>] [--concurrency <n>]",
   );
+  console.error("  pipeline enrich   [--concurrency <n>]");
   process.exit(1);
 }
 
@@ -54,6 +56,10 @@ async function main() {
         maxIterations: optionalNumber(flags["max-iter"]),
         expressionConcurrency: optionalNumber(flags.concurrency),
       });
+      return;
+    }
+    case "enrich": {
+      await runEnrich({ concurrency: optionalNumber(flags.concurrency) });
       return;
     }
     default:
