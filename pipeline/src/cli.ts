@@ -1,3 +1,4 @@
+import { runDiscover } from "./jobs/discover.js";
 import { runMine } from "./jobs/mine.js";
 import { isLanguage } from "./types.js";
 
@@ -19,8 +20,19 @@ function parseFlags(argv: string[]): Record<string, string> {
 }
 
 function usage(): never {
-  console.error("usage: pipeline mine --lang <en|es|de|fr> [--count <n>]");
+  console.error("usage:");
+  console.error("  pipeline mine     --lang <en|es|de|fr> [--count <n>]");
+  console.error(
+    "  pipeline discover [--top-n <n>] [--per-lang-cap <n>] [--max-iter <n>] [--concurrency <n>]",
+  );
   process.exit(1);
+}
+
+function optionalNumber(value: string | undefined): number | undefined {
+  if (value === undefined) return undefined;
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) usage();
+  return n;
 }
 
 async function main() {
@@ -31,9 +43,17 @@ async function main() {
     case "mine": {
       const lang = flags.lang;
       if (!lang || !isLanguage(lang)) usage();
-      const count = Number(flags.count ?? 50);
-      if (!Number.isFinite(count) || count <= 0) usage();
+      const count = optionalNumber(flags.count) ?? 50;
       await runMine({ language: lang, count });
+      return;
+    }
+    case "discover": {
+      await runDiscover({
+        topN: optionalNumber(flags["top-n"]),
+        perLanguageCap: optionalNumber(flags["per-lang-cap"]),
+        maxIterations: optionalNumber(flags["max-iter"]),
+        expressionConcurrency: optionalNumber(flags.concurrency),
+      });
       return;
     }
     default:
