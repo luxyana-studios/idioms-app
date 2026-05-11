@@ -1,6 +1,7 @@
 import { runDiscover } from "./jobs/discover.js";
 import { runEnrich } from "./jobs/enrich.js";
 import { runMine } from "./jobs/mine.js";
+import { runTranslate } from "./jobs/translate.js";
 import { isLanguage } from "./types.js";
 
 function parseFlags(argv: string[]): Record<string, string> {
@@ -26,7 +27,10 @@ function usage(): never {
   console.error(
     "  pipeline discover [--top-n <n>] [--per-lang-cap <n>] [--max-iter <n>] [--concurrency <n>]",
   );
-  console.error("  pipeline enrich   [--concurrency <n>]");
+  console.error("  pipeline enrich    [--concurrency <n>]");
+  console.error(
+    "  pipeline translate --lang <en|es|de|fr> [--concurrency <n>]",
+  );
   process.exit(1);
 }
 
@@ -60,6 +64,15 @@ async function main() {
     }
     case "enrich": {
       await runEnrich({ concurrency: optionalNumber(flags.concurrency) });
+      return;
+    }
+    case "translate": {
+      const lang = flags.lang;
+      if (!lang || !isLanguage(lang)) usage();
+      await runTranslate({
+        targetLanguage: lang,
+        concurrency: optionalNumber(flags.concurrency),
+      });
       return;
     }
     default:
