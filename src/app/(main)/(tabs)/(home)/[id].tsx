@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { EquivalentsSection } from "@/features/idioms/components/EquivalentsSection";
 import { IdiomInfoCard } from "@/features/idioms/components/IdiomInfoCard";
 import { PronunciationButton } from "@/features/idioms/components/PronunciationButton";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
@@ -121,6 +122,8 @@ export default function DetailScreen() {
             ))}
           </IdiomInfoCard>
         )}
+
+        <EquivalentsSection idiomId={idiom.id} />
 
         <PronunciationButton />
       </ScrollView>

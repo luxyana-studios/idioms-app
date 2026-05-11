@@ -63,5 +63,14 @@
   "detail.notFound": "Idiom not found",
   "detail.notFoundSubtitle": "This idiom doesn't exist or was removed.",
   "saved.count": "{{count}} saved",
-  "library.totalCount": "{{count}} idioms total"
+  "library.totalCount": "{{count}} idioms total",
+  "detail.equivalents": "Also in other languages",
+  "byLanguage.title": "By Language",
+  "byLanguage.idiomCount_one": "{{count}} idiom",
+  "byLanguage.idiomCount_other": "{{count}} idioms",
+  "byLanguage.noIdioms": "No idioms in this language yet",
+  "lang.en": "English",
+  "lang.es": "Spanish",
+  "lang.de": "German",
+  "lang.fr": "French"
 }

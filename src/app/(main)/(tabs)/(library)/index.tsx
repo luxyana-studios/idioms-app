@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
+import { type Href, useRouter } from "expo-router";
 import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
@@ -20,6 +21,7 @@ interface Topic {
   labelKey: string;
   subtitleKey: string;
   accent: boolean;
+  route?: Href;
 }
 
 const TOPICS: Topic[] = [
@@ -40,6 +42,7 @@ const TOPICS: Topic[] = [
     labelKey: "library.byLanguage",
     subtitleKey: "library.byLanguageSubtitle",
     accent: false,
+    route: "/(main)/(tabs)/(library)/by-language" as Href,
   },
   {
     icon: "search-outline",
@@ -54,6 +57,7 @@ export default function LibraryScreen() {
   const { theme } = useUnistyles();
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { data: idioms = [] } = useIdioms();
 
   const cardBg = isDark ? "rgba(26,36,21,0.70)" : "rgba(255,255,255,0.65)";
@@ -92,10 +96,13 @@ export default function LibraryScreen() {
           <TouchableOpacity
             key={topic.labelKey}
             activeOpacity={0.8}
-            disabled
+            disabled={!topic.route}
+            onPress={
+              topic.route ? () => router.push(topic.route as Href) : undefined
+            }
             accessibilityRole="button"
             accessibilityLabel={t(topic.labelKey)}
-            accessibilityState={{ disabled: true }}
+            accessibilityState={{ disabled: !topic.route }}
           >
             {topic.accent ? (
               /* Accent card — solid primary */

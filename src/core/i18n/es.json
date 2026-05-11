@@ -63,5 +63,14 @@
   "detail.notFound": "Modismo no encontrado",
   "detail.notFoundSubtitle": "Este modismo no existe o fue eliminado.",
   "saved.count": "{{count}} guardados",
-  "library.totalCount": "{{count}} modismos en total"
+  "library.totalCount": "{{count}} modismos en total",
+  "detail.equivalents": "También en otros idiomas",
+  "byLanguage.title": "Por idioma",
+  "byLanguage.idiomCount_one": "{{count}} modismo",
+  "byLanguage.idiomCount_other": "{{count}} modismos",
+  "byLanguage.noIdioms": "Aún no hay modismos en este idioma",
+  "lang.en": "Inglés",
+  "lang.es": "Español",
+  "lang.de": "Alemán",
+  "lang.fr": "Francés"
 }

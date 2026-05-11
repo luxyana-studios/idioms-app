@@ -12,7 +12,9 @@ export const radius = {
   md: 8,
   lg: 12,
   xl: 16,
+  card: 20,
   "2xl": 24,
+  chip: 14,
   "3xl": 32,
   full: 9999,
 } as const;
@@ -27,6 +29,7 @@ export const typography = {
     sansExtraBold: "Manrope_800ExtraBold",
   },
   sizes: {
+    "2xs": 10,
     xs: 12,
     sm: 14,
     md: 16,
