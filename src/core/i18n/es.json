@@ -72,5 +72,11 @@
   "lang.en": "Inglés",
   "lang.es": "Español",
   "lang.de": "Alemán",
-  "lang.fr": "Francés"
+  "lang.fr": "Francés",
+  "settings.targetLanguage": "Idioma de traducción",
+  "settings.targetLanguageNone": "Ninguno",
+  "detail.translationLabel": "En {{lang}}",
+  "detail.translationReveal": "Toca para revelar",
+  "detail.translationLiteral": "Literal",
+  "detail.translationMeaning": "Significado"
 }

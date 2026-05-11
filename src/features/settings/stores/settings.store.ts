@@ -9,8 +9,10 @@ export type ThemeMode = "system" | "light" | "dark";
 interface SettingsState {
   themeMode: ThemeMode;
   language: string;
+  targetLanguage: string | null;
   setThemeMode: (mode: ThemeMode) => void;
   setLanguage: (language: string) => void;
+  setTargetLanguage: (language: string | null) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -18,6 +20,7 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       themeMode: "system",
       language: i18n.language,
+      targetLanguage: null,
 
       setThemeMode: (mode) => {
         if (mode === "system") {
@@ -32,6 +35,10 @@ export const useSettingsStore = create<SettingsState>()(
       setLanguage: (language) => {
         i18n.changeLanguage(language);
         set({ language });
+      },
+
+      setTargetLanguage: (language) => {
+        set({ targetLanguage: language });
       },
     }),
     {
