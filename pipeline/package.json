@@ -8,6 +8,8 @@
     "discover": "tsx src/cli.ts discover",
     "enrich": "tsx src/cli.ts enrich",
     "translate": "tsx src/cli.ts translate",
+    "seed-tag-translations": "tsx src/cli.ts seed-tag-translations",
+    "tag": "tsx src/cli.ts tag",
     "lint": "biome check src/",
     "lint:fix": "biome check --write src/",
     "typecheck": "tsc --noEmit"

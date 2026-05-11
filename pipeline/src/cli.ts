@@ -1,6 +1,8 @@
 import { runDiscover } from "./jobs/discover.js";
 import { runEnrich } from "./jobs/enrich.js";
 import { runMine } from "./jobs/mine.js";
+import { runSeedTagTranslations } from "./jobs/seedTagTranslations.js";
+import { runTag } from "./jobs/tag.js";
 import { runTranslate } from "./jobs/translate.js";
 import { isLanguage } from "./types.js";
 
@@ -31,6 +33,8 @@ function usage(): never {
   console.error(
     "  pipeline translate --lang <en|es|de|fr> [--concurrency <n>]",
   );
+  console.error("  pipeline seed-tag-translations");
+  console.error("  pipeline tag       [--concurrency <n>]");
   process.exit(1);
 }
 
@@ -73,6 +77,14 @@ async function main() {
         targetLanguage: lang,
         concurrency: optionalNumber(flags.concurrency),
       });
+      return;
+    }
+    case "seed-tag-translations": {
+      await runSeedTagTranslations();
+      return;
+    }
+    case "tag": {
+      await runTag({ concurrency: optionalNumber(flags.concurrency) });
       return;
     }
     default:
