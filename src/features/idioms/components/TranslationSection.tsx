@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -8,11 +8,11 @@ import type { IdiomTranslation } from "@/features/idioms/types";
 import { Typography } from "@/shared/components/Typography";
 import { IdiomInfoCard } from "./IdiomInfoCard";
 
-interface TranslationContentProps {
+function TranslationContent({
+  translation,
+}: {
   translation: IdiomTranslation;
-}
-
-function TranslationContent({ translation }: TranslationContentProps) {
+}) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
 
@@ -46,10 +46,7 @@ function TranslationContent({ translation }: TranslationContentProps) {
         </Typography>
       </View>
       {translation.explanation && (
-        <Typography
-          variant="caption"
-          style={{ color: theme.colors.textMuted, lineHeight: 20 }}
-        >
+        <Typography variant="caption" style={styles.explanation}>
           {translation.explanation}
         </Typography>
       )}
@@ -62,59 +59,51 @@ export function TranslationSection({ idiomId }: { idiomId: string }) {
   const { theme } = useUnistyles();
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
 
-  const {
-    data: translations = [],
-    isLoading,
-    isError,
-  } = useIdiomTranslations(idiomId);
+  // Reset selection when idiom changes (relevant on web where the same component
+  // instance can receive a new idiomId without unmounting).
+  // biome-ignore lint/correctness/useExhaustiveDependencies: idiomId is a prop, not a setter — it IS a valid dep here
+  useEffect(() => {
+    setSelectedLang(null);
+  }, [idiomId]);
+
+  const { data: translations = [], isError } = useIdiomTranslations(idiomId);
 
   // Silently absent — failed fetch or no translations should not degrade the detail view.
-  if (isError || (!isLoading && translations.length === 0)) return null;
+  if (isError || translations.length === 0) return null;
 
   const selected =
     translations.find((tr) => tr.languageCode === selectedLang) ?? null;
 
   return (
     <IdiomInfoCard label={t("detail.translationLabel")}>
-      {isLoading ? (
-        <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-          {t("common.loading")}
-        </Typography>
-      ) : (
-        <>
-          <View style={styles.pills}>
-            {translations.map((tr) => {
-              const active = selectedLang === tr.languageCode;
-              return (
-                <Pressable
-                  key={tr.languageCode}
-                  style={[styles.pill, active && styles.pillActive]}
-                  onPress={() =>
-                    setSelectedLang(active ? null : tr.languageCode)
-                  }
-                  accessibilityRole="button"
-                  accessibilityLabel={t(
-                    LANG_KEY[tr.languageCode] ?? tr.languageCode,
-                  )}
-                >
-                  <Typography
-                    variant="caption"
-                    weight="bold"
-                    style={{
-                      color: active
-                        ? theme.colors.primary
-                        : theme.colors.textMuted,
-                    }}
-                  >
-                    {tr.languageCode.toUpperCase()}
-                  </Typography>
-                </Pressable>
-              );
-            })}
-          </View>
-          {selected && <TranslationContent translation={selected} />}
-        </>
-      )}
+      <View style={styles.pills}>
+        {translations.map((tr) => {
+          const active = selectedLang === tr.languageCode;
+          return (
+            <Pressable
+              key={tr.languageCode}
+              style={[styles.pill, active && styles.pillActive]}
+              onPress={() => setSelectedLang(active ? null : tr.languageCode)}
+              accessibilityRole="button"
+              accessibilityLabel={t(
+                LANG_KEY[tr.languageCode] ?? tr.languageCode,
+              )}
+              accessibilityState={{ selected: active }}
+            >
+              <Typography
+                variant="caption"
+                weight="bold"
+                style={{
+                  color: active ? theme.colors.primary : theme.colors.textMuted,
+                }}
+              >
+                {tr.languageCode.toUpperCase()}
+              </Typography>
+            </Pressable>
+          );
+        })}
+      </View>
+      {selected && <TranslationContent translation={selected} />}
     </IdiomInfoCard>
   );
 }
@@ -147,5 +136,9 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.accent,
     letterSpacing: 1.2,
     fontSize: theme.typography.sizes["2xs"],
+  },
+  explanation: {
+    color: theme.colors.textMuted,
+    lineHeight: theme.typography.sizes.xl,
   },
 }));
