@@ -73,10 +73,7 @@
   "lang.es": "Spanish",
   "lang.de": "German",
   "lang.fr": "French",
-  "settings.targetLanguage": "Translation language",
-  "settings.targetLanguageNone": "None",
-  "detail.translationLabel": "In {{lang}}",
-  "detail.translationReveal": "Tap to reveal",
+  "detail.translationLabel": "Translations",
   "detail.translationLiteral": "Literal",
   "detail.translationMeaning": "Meaning"
 }

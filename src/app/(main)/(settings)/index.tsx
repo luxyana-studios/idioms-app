@@ -13,24 +13,10 @@ const languages = [
   { code: "en", labelKey: "settings.languageEn" },
   { code: "es", labelKey: "settings.languageEs" },
 ];
-const targetLanguages = [
-  { code: null, labelKey: "settings.targetLanguageNone" },
-  { code: "en", labelKey: "lang.en" },
-  { code: "es", labelKey: "lang.es" },
-  { code: "de", labelKey: "lang.de" },
-  { code: "fr", labelKey: "lang.fr" },
-];
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
-  const {
-    themeMode,
-    language,
-    targetLanguage,
-    setThemeMode,
-    setLanguage,
-    setTargetLanguage,
-  } = useSettings();
+  const { themeMode, language, setThemeMode, setLanguage } = useSettings();
   const { signOut } = useAuth();
 
   const themeLabelKey = (mode: ThemeMode) => {
@@ -87,29 +73,6 @@ export default function SettingsScreen() {
         </View>
       </View>
 
-      <View style={styles.section}>
-        <Typography variant="label">{t("settings.targetLanguage")}</Typography>
-        <View style={styles.optionRowWrap}>
-          {targetLanguages.map((lang) => (
-            <Pressable
-              key={lang.code ?? "none"}
-              style={[
-                styles.option,
-                targetLanguage === lang.code && styles.optionActive,
-              ]}
-              onPress={() => setTargetLanguage(lang.code)}
-            >
-              <Typography
-                variant="body"
-                color={targetLanguage === lang.code ? "primary" : "text"}
-              >
-                {t(lang.labelKey)}
-              </Typography>
-            </Pressable>
-          ))}
-        </View>
-      </View>
-
       <View style={styles.logout}>
         <Button
           title={t("common.logout")}
@@ -128,11 +91,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   optionRow: {
     flexDirection: "row" as const,
-    gap: theme.spacing.sm,
-  },
-  optionRowWrap: {
-    flexDirection: "row" as const,
-    flexWrap: "wrap" as const,
     gap: theme.spacing.sm,
   },
   option: {
