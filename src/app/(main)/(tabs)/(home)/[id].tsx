@@ -6,6 +6,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { EquivalentsSection } from "@/features/idioms/components/EquivalentsSection";
 import { IdiomInfoCard } from "@/features/idioms/components/IdiomInfoCard";
 import { PronunciationButton } from "@/features/idioms/components/PronunciationButton";
+import { TranslationSection } from "@/features/idioms/components/TranslationSection";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { CategoryChip } from "@/shared/components/CategoryChip";
@@ -123,6 +124,7 @@ export default function DetailScreen() {
           </IdiomInfoCard>
         )}
 
+        <TranslationSection idiomId={idiom.id} />
         <EquivalentsSection idiomId={idiom.id} />
 
         <PronunciationButton />

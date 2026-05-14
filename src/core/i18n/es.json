@@ -72,5 +72,8 @@
   "lang.en": "Inglés",
   "lang.es": "Español",
   "lang.de": "Alemán",
-  "lang.fr": "Francés"
+  "lang.fr": "Francés",
+  "detail.translationLabel": "Traducciones",
+  "detail.translationLiteral": "Literal",
+  "detail.translationMeaning": "Significado"
 }
