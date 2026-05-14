@@ -5,10 +5,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { EquivalentsSection } from "@/features/idioms/components/EquivalentsSection";
 import { IdiomInfoCard } from "@/features/idioms/components/IdiomInfoCard";
-import { PronunciationButton } from "@/features/idioms/components/PronunciationButton";
 import { TranslationSection } from "@/features/idioms/components/TranslationSection";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
+import type { IdiomTag } from "@/features/idioms/types";
 import { CategoryChip } from "@/shared/components/CategoryChip";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { IconButton } from "@/shared/components/IconButton";
@@ -57,9 +57,7 @@ export default function DetailScreen() {
             accessibilityLabel={t("common.goBack")}
           />
         }
-        center={
-          <CategoryChip label={idiom.tags[0]?.label ?? idiom.languageCode} />
-        }
+        center={<CategoryChip label={idiom.languageCode.toUpperCase()} />}
         right={
           <IconButton
             icon={isSaved ? "heart" : "heart-outline"}
@@ -95,6 +93,22 @@ export default function DetailScreen() {
           "{idiom.idiomaticMeaning}"
         </Typography>
 
+        {idiom.tags.length > 0 && (
+          <View style={styles.tagsRow}>
+            {idiom.tags.map((tag: IdiomTag) => (
+              <CategoryChip
+                key={tag.key}
+                label={tag.label}
+                onPress={() =>
+                  router.push(
+                    `/(main)/(tabs)/(explore)?tag=${encodeURIComponent(tag.key)}`,
+                  )
+                }
+              />
+            ))}
+          </View>
+        )}
+
         {idiom.explanation && (
           <IdiomInfoCard label={t("detail.originLabel")}>
             <Typography
@@ -126,8 +140,6 @@ export default function DetailScreen() {
 
         <TranslationSection idiomId={idiom.id} />
         <EquivalentsSection idiomId={idiom.id} />
-
-        <PronunciationButton />
       </ScrollView>
     </View>
   );
@@ -161,5 +173,10 @@ const styles = StyleSheet.create((theme) => ({
     lineHeight: 28,
     fontStyle: "italic",
     marginBottom: theme.spacing.sm,
+  },
+  tagsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing.xs,
   },
 }));

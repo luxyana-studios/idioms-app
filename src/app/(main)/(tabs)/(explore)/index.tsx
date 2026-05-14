@@ -1,16 +1,10 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import type { DrawerNavigationProp } from "@react-navigation/drawer";
 import { BlurView } from "expo-blur";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Platform,
-  Pressable,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   StyleSheet,
@@ -19,17 +13,13 @@ import {
 } from "react-native-unistyles";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import type { IdiomTag } from "@/features/idioms/types";
+import { CategoryChip } from "@/shared/components/CategoryChip";
 import { GlowBackground } from "@/shared/components/GlowBackground";
+import { IconButton } from "@/shared/components/IconButton";
+import { ScreenHeader } from "@/shared/components/ScreenHeader";
 import { Typography } from "@/shared/components/Typography";
 
-const CATEGORIES = ["All", "English", "French", "German", "Slang"];
-
-const CATEGORY_LANG_CODES: Record<string, string[]> = {
-  English: ["en"],
-  French: ["fr"],
-  German: ["de"],
-  Spanish: ["es"],
-};
+const FILTER_ALL = "__all__";
 
 export default function ExploreScreen() {
   const { t } = useTranslation();
@@ -37,9 +27,28 @@ export default function ExploreScreen() {
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const navigation =
+    useNavigation<DrawerNavigationProp<Record<string, undefined>>>();
+  const { tag: tagParam } = useLocalSearchParams<{ tag?: string }>();
   const { data: idioms = [] } = useIdioms();
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeTag, setActiveTag] = useState(tagParam ?? FILTER_ALL);
+
+  useEffect(() => {
+    setActiveTag(tagParam ?? FILTER_ALL);
+  }, [tagParam]);
+
+  const allTags = useMemo(() => {
+    const tagMap = new Map<string, IdiomTag>();
+    for (const idiom of idioms) {
+      for (const tag of idiom.tags) {
+        if (!tagMap.has(tag.key)) {
+          tagMap.set(tag.key, tag);
+        }
+      }
+    }
+    return Array.from(tagMap.values());
+  }, [idioms]);
 
   const filtered = idioms.filter((idiom) => {
     const matchesSearch =
@@ -47,66 +56,59 @@ export default function ExploreScreen() {
       idiom.expression.toLowerCase().includes(search.toLowerCase()) ||
       idiom.idiomaticMeaning.toLowerCase().includes(search.toLowerCase());
 
-    const langCodes = CATEGORY_LANG_CODES[activeCategory];
-    const matchesCategory =
-      activeCategory === "All" ||
-      (langCodes
-        ? langCodes.includes(idiom.languageCode)
-        : idiom.tags.some(
-            (tag: IdiomTag) =>
-              tag.label.toLowerCase() === activeCategory.toLowerCase(),
-          ));
+    const matchesTag =
+      activeTag === FILTER_ALL ||
+      idiom.tags.some((tag) => tag.key === activeTag);
 
-    return matchesSearch && matchesCategory;
+    return matchesSearch && matchesTag;
   });
 
-  const searchBg = isDark ? "rgba(30,40,24,0.65)" : "rgba(255,255,255,0.70)";
-  const searchBorder = isDark
-    ? "rgba(168,196,128,0.22)"
-    : "rgba(145,71,49,0.20)";
-  const cardBg = isDark ? "rgba(26,36,21,0.70)" : "rgba(255,255,255,0.65)";
-
   return (
-    <View
-      style={[
-        styles.root,
-        { backgroundColor: theme.colors.background, paddingTop: insets.top },
-      ]}
-    >
+    <View style={[styles.root, { paddingTop: insets.top }]}>
       <GlowBackground subtle />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Typography
-          variant="title"
-          weight="extraBold"
-          style={{ color: theme.colors.text }}
-        >
-          {t("explore.title")}
-        </Typography>
-      </View>
+      <ScreenHeader
+        left={
+          <IconButton
+            icon="menu"
+            onPress={() => navigation.openDrawer()}
+            accessibilityLabel={t("common.openMenu")}
+          />
+        }
+        center={
+          <Typography
+            variant="heading"
+            weight="extraBold"
+            style={{ color: theme.colors.primary }}
+          >
+            {t("explore.title")}
+          </Typography>
+        }
+      />
 
       {/* Search bar */}
       <View
         style={[
           styles.searchBar,
-          { backgroundColor: searchBg, borderColor: searchBorder },
+          {
+            backgroundColor: theme.colors.glassSurface,
+            borderColor: theme.colors.border,
+          },
         ]}
       >
-        {Platform.OS !== "android" ? (
-          <BlurView
-            intensity={40}
-            tint={isDark ? "dark" : "light"}
-            style={StyleSheet.absoluteFillObject}
-          />
-        ) : null}
         <Ionicons
           name="search-outline"
           size={18}
           color={theme.colors.textMuted}
         />
         <TextInput
-          style={[styles.searchInput, { color: theme.colors.text }]}
+          style={[
+            styles.searchInput,
+            {
+              color: theme.colors.text,
+              fontFamily: theme.typography.fonts.sans,
+            },
+          ]}
           placeholder={t("explore.search")}
           placeholderTextColor={theme.colors.textMuted}
           value={search}
@@ -115,40 +117,63 @@ export default function ExploreScreen() {
           autoCorrect={false}
         />
         {search.length > 0 && (
-          <TouchableOpacity onPress={() => setSearch("")} hitSlop={8}>
+          <Pressable onPress={() => setSearch("")} hitSlop={8}>
             <Ionicons
               name="close-circle"
               size={18}
               color={theme.colors.textMuted}
             />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
 
-      {/* Category chips */}
+      {/* Tag filter chips */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.chipsScroll}
         contentContainerStyle={styles.chipsContent}
       >
-        {CATEGORIES.map((cat) => {
-          const isActive = cat === activeCategory;
+        <Pressable
+          onPress={() => setActiveTag(FILTER_ALL)}
+          style={[
+            styles.chip,
+            activeTag === FILTER_ALL
+              ? { backgroundColor: theme.colors.primary }
+              : {
+                  backgroundColor: theme.colors.chipBg,
+                  borderColor: theme.colors.chipBorder,
+                },
+          ]}
+        >
+          <Typography
+            variant="caption"
+            weight="bold"
+            style={{
+              color:
+                activeTag === FILTER_ALL
+                  ? theme.colors.primaryText
+                  : theme.colors.primary,
+              fontSize: 12,
+            }}
+          >
+            {t("explore.filterAll")}
+          </Typography>
+        </Pressable>
+
+        {allTags.map((tag) => {
+          const isActive = tag.key === activeTag;
           return (
-            <TouchableOpacity
-              key={cat}
-              onPress={() => setActiveCategory(cat)}
+            <Pressable
+              key={tag.key}
+              onPress={() => setActiveTag(tag.key)}
               style={[
                 styles.chip,
                 isActive
                   ? { backgroundColor: theme.colors.primary }
                   : {
-                      backgroundColor: isDark
-                        ? "rgba(168,196,128,0.10)"
-                        : "rgba(145,71,49,0.08)",
-                      borderColor: isDark
-                        ? "rgba(168,196,128,0.20)"
-                        : "rgba(145,71,49,0.18)",
+                      backgroundColor: theme.colors.chipBg,
+                      borderColor: theme.colors.chipBorder,
                     },
               ]}
             >
@@ -162,9 +187,9 @@ export default function ExploreScreen() {
                   fontSize: 12,
                 }}
               >
-                {cat}
+                {tag.label}
               </Typography>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
       </ScrollView>
@@ -207,7 +232,7 @@ export default function ExploreScreen() {
               style={({ pressed }) => [
                 styles.idiomCard,
                 {
-                  backgroundColor: cardBg,
+                  backgroundColor: theme.colors.card,
                   borderColor: theme.colors.cardBorder,
                   opacity: pressed ? 0.8 : 1,
                 },
@@ -218,16 +243,13 @@ export default function ExploreScreen() {
                   intensity={40}
                   tint={isDark ? "dark" : "light"}
                   style={[StyleSheet.absoluteFillObject, { borderRadius: 20 }]}
+                  pointerEvents="none"
                 />
               ) : null}
               <View
                 style={[
                   styles.langBox,
-                  {
-                    backgroundColor: isDark
-                      ? "rgba(168,196,128,0.12)"
-                      : "rgba(145,71,49,0.10)",
-                  },
+                  { backgroundColor: theme.colors.chipBg },
                 ]}
               >
                 <Typography
@@ -257,6 +279,13 @@ export default function ExploreScreen() {
                 >
                   {idiom.idiomaticMeaning}
                 </Typography>
+                {idiom.tags.length > 0 && (
+                  <View style={styles.tagRow}>
+                    {idiom.tags.slice(0, 2).map((tag) => (
+                      <CategoryChip key={tag.key} label={tag.label} />
+                    ))}
+                  </View>
+                )}
               </View>
               <Ionicons
                 name="chevron-forward"
@@ -274,10 +303,7 @@ export default function ExploreScreen() {
 const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
+    backgroundColor: theme.colors.background,
   },
   searchBar: {
     flexDirection: "row",
@@ -294,7 +320,6 @@ const styles = StyleSheet.create((theme) => ({
   searchInput: {
     flex: 1,
     fontSize: 15,
-    fontFamily: "Manrope_400Regular",
     padding: 0,
   },
   chipsScroll: {
@@ -342,7 +367,13 @@ const styles = StyleSheet.create((theme) => ({
   },
   idiomText: {
     flex: 1,
-    gap: 3,
+    gap: 4,
+  },
+  tagRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 2,
   },
   empty: {
     alignItems: "center",

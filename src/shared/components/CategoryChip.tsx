@@ -1,12 +1,28 @@
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { Typography } from "./Typography";
 
 interface CategoryChipProps {
   label: string;
+  onPress?: () => void;
 }
 
-export function CategoryChip({ label }: CategoryChipProps) {
+export function CategoryChip({ label, onPress }: CategoryChipProps) {
+  if (onPress) {
+    return (
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+      >
+        <Typography variant="caption" weight="extraBold" style={styles.label}>
+          {label}
+        </Typography>
+      </Pressable>
+    );
+  }
+
   return (
     <View style={styles.chip}>
       <Typography variant="caption" weight="extraBold" style={styles.label}>
@@ -24,6 +40,9 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     backgroundColor: theme.colors.chipBg,
     borderColor: theme.colors.chipBorder,
+  },
+  chipPressed: {
+    opacity: 0.7,
   },
   label: {
     color: theme.colors.primary,
