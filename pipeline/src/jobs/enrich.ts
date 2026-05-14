@@ -27,6 +27,7 @@ export async function runEnrich(
   console.log(`[enrich] run ${run.id} starting`, merged);
 
   let enriched = 0;
+  let rejected = 0;
   let enrichFailed = 0;
   let promoted = 0;
   let promoteFailed = 0;
@@ -41,9 +42,21 @@ export async function runEnrich(
           expression: row.expression,
           language: row.language,
         });
+        if (!result.is_idiom) {
+          await sql`update pipeline.expressions set status = 'rejected' where id = ${row.id}`;
+          rejected++;
+          console.log(
+            `[enrich] rejected non-idiom: "${row.expression}" (${row.language}) — ${result.idiom_rationale}`,
+          );
+          return;
+        }
         await upsertEnrichment({
           expressionId: row.id,
-          enrichment: result,
+          enrichment: {
+            idiomatic_meaning: result.idiomatic_meaning,
+            explanation: result.explanation,
+            examples: result.examples,
+          },
           runId: run.id,
         });
         await sql`update pipeline.expressions set status = 'enriched' where id = ${row.id}`;
@@ -57,7 +70,9 @@ export async function runEnrich(
       }
     });
 
-    console.log(`[enrich] enriched ${enriched}, failed ${enrichFailed}`);
+    console.log(
+      `[enrich] enriched ${enriched}, rejected ${rejected}, failed ${enrichFailed}`,
+    );
 
     const toPromote = await listPendingPromotion();
     console.log(`[enrich] ${toPromote.length} ready for promotion`);
@@ -88,6 +103,7 @@ export async function runEnrich(
         {
           runId: run.id,
           enriched,
+          rejected,
           enrichFailed,
           promoted,
           promoteFailed,

@@ -4,6 +4,7 @@ import { runMine } from "./jobs/mine.js";
 import { runSeedTagTranslations } from "./jobs/seedTagTranslations.js";
 import { runTag } from "./jobs/tag.js";
 import { runTranslate } from "./jobs/translate.js";
+import { runVerify } from "./jobs/verify.js";
 import { isLanguage } from "./types.js";
 
 function parseFlags(argv: string[]): Record<string, string> {
@@ -35,6 +36,9 @@ function usage(): never {
   );
   console.error("  pipeline seed-tag-translations");
   console.error("  pipeline tag       [--concurrency <n>]");
+  console.error(
+    "  pipeline verify    [--lang <en|es|de|fr>] [--source <ai_mined|all>] [--concurrency <n>] [--dry-run]",
+  );
   process.exit(1);
 }
 
@@ -85,6 +89,20 @@ async function main() {
     }
     case "tag": {
       await runTag({ concurrency: optionalNumber(flags.concurrency) });
+      return;
+    }
+    case "verify": {
+      const lang = flags.lang;
+      const source = flags.source;
+      if (source !== undefined && source !== "ai_mined" && source !== "all") {
+        usage();
+      }
+      await runVerify({
+        language: lang && isLanguage(lang) ? lang : undefined,
+        source: (source as "ai_mined" | "all" | undefined) ?? "ai_mined",
+        concurrency: optionalNumber(flags.concurrency),
+        dryRun: flags["dry-run"] === "true",
+      });
       return;
     }
     default:

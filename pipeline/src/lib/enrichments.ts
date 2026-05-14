@@ -1,10 +1,15 @@
-import type { Enrichment } from "../capabilities/enrichExpression.js";
 import type { ExpressionRow } from "../types.js";
 import { sql } from "./db.js";
 
+export type StoredEnrichment = {
+  idiomatic_meaning: string;
+  explanation: string;
+  examples: string[];
+};
+
 export async function upsertEnrichment(input: {
   expressionId: string;
-  enrichment: Enrichment;
+  enrichment: StoredEnrichment;
   runId: string;
 }): Promise<void> {
   await sql`
