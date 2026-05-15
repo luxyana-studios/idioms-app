@@ -59,17 +59,16 @@ export default function SavedScreen() {
             {t("saved.title")}
           </Typography>
         }
-        right={
-          savedIdioms.length > 0 ? (
-            <Typography
-              variant="caption"
-              style={{ color: theme.colors.textMuted }}
-            >
-              {t("saved.count", { count: savedIdioms.length })}
-            </Typography>
-          ) : undefined
-        }
       />
+
+      {savedIdioms.length > 0 && (
+        <Typography
+          variant="caption"
+          style={[styles.countLabel, { color: theme.colors.textMuted }]}
+        >
+          {t("saved.count", { count: savedIdioms.length })}
+        </Typography>
+      )}
 
       {savedIdioms.length === 0 ? (
         <View style={styles.empty}>
@@ -115,7 +114,7 @@ export default function SavedScreen() {
           style={styles.list}
           contentContainerStyle={[
             styles.listContent,
-            { paddingBottom: Math.max(insets.bottom, 8) + 80 },
+            { paddingBottom: Math.max(insets.bottom, 8) + 24 },
           ]}
           showsVerticalScrollIndicator={false}
         >
@@ -228,6 +227,10 @@ export default function SavedScreen() {
 const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
+  },
+  countLabel: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.sm,
   },
   empty: {
     flex: 1,

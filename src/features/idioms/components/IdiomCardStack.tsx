@@ -136,7 +136,7 @@ export function IdiomCardStack({
 
         {/* Category chip */}
         <View style={styles.cardTop}>
-          <CategoryChip label={idiom.tags[0]?.label ?? idiom.languageCode} />
+          <CategoryChip label={idiom.languageCode.toUpperCase()} />
         </View>
 
         {/* Phrase + definition */}

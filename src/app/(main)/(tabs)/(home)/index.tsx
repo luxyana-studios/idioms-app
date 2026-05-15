@@ -26,8 +26,7 @@ export default function HomeScreen() {
     useIdiomsStore();
 
   const current = idioms[currentIndex];
-  const scrollPaddingBottom =
-    80 + Math.max(insets.bottom, 8) + theme.spacing.xl;
+  const scrollPaddingBottom = Math.max(insets.bottom, 8) + theme.spacing.xl;
 
   if (isLoading || !current) {
     return (

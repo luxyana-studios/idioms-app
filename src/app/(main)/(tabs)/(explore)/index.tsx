@@ -34,8 +34,10 @@ export default function ExploreScreen() {
   const [search, setSearch] = useState("");
   const [activeTag, setActiveTag] = useState(tagParam ?? FILTER_ALL);
 
+  // Sync filter + clear stale search when navigating here from a tag chip
   useEffect(() => {
     setActiveTag(tagParam ?? FILTER_ALL);
+    if (tagParam) setSearch("");
   }, [tagParam]);
 
   const allTags = useMemo(() => {
@@ -62,6 +64,12 @@ export default function ExploreScreen() {
 
     return matchesSearch && matchesTag;
   });
+
+  function selectTag(key: string) {
+    setActiveTag(key);
+    // Keep URL in sync so web share/refresh reflects current filter
+    router.setParams({ tag: key === FILTER_ALL ? undefined : key });
+  }
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
@@ -117,7 +125,12 @@ export default function ExploreScreen() {
           autoCorrect={false}
         />
         {search.length > 0 && (
-          <Pressable onPress={() => setSearch("")} hitSlop={8}>
+          <Pressable
+            onPress={() => setSearch("")}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t("explore.clearSearch")}
+          >
             <Ionicons
               name="close-circle"
               size={18}
@@ -135,7 +148,9 @@ export default function ExploreScreen() {
         contentContainerStyle={styles.chipsContent}
       >
         <Pressable
-          onPress={() => setActiveTag(FILTER_ALL)}
+          onPress={() => selectTag(FILTER_ALL)}
+          accessibilityRole="radio"
+          accessibilityState={{ selected: activeTag === FILTER_ALL }}
           style={[
             styles.chip,
             activeTag === FILTER_ALL
@@ -166,7 +181,9 @@ export default function ExploreScreen() {
           return (
             <Pressable
               key={tag.key}
-              onPress={() => setActiveTag(tag.key)}
+              onPress={() => selectTag(tag.key)}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: isActive }}
               style={[
                 styles.chip,
                 isActive
@@ -206,7 +223,7 @@ export default function ExploreScreen() {
         style={styles.list}
         contentContainerStyle={[
           styles.listContent,
-          { paddingBottom: Math.max(insets.bottom, 8) + 80 },
+          { paddingBottom: Math.max(insets.bottom, 8) + 24 },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -281,7 +298,7 @@ export default function ExploreScreen() {
                 </Typography>
                 {idiom.tags.length > 0 && (
                   <View style={styles.tagRow}>
-                    {idiom.tags.slice(0, 2).map((tag) => (
+                    {idiom.tags.map((tag) => (
                       <CategoryChip key={tag.key} label={tag.label} />
                     ))}
                   </View>

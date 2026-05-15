@@ -53,7 +53,11 @@ export default function DetailScreen() {
         left={
           <IconButton
             icon="chevron-back"
-            onPress={() => router.back()}
+            onPress={() =>
+              router.canGoBack()
+                ? router.back()
+                : router.replace("/(main)/(tabs)/(home)")
+            }
             accessibilityLabel={t("common.goBack")}
           />
         }
@@ -73,7 +77,7 @@ export default function DetailScreen() {
         style={styles.scroll}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: Math.max(insets.bottom, 8) + 80 },
+          { paddingBottom: Math.max(insets.bottom, 8) + 24 },
         ]}
         showsVerticalScrollIndicator={false}
       >

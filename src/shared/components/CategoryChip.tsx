@@ -12,6 +12,7 @@ export function CategoryChip({ label, onPress }: CategoryChipProps) {
     return (
       <Pressable
         onPress={onPress}
+        hitSlop={8}
         style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
         accessibilityRole="button"
         accessibilityLabel={label}
