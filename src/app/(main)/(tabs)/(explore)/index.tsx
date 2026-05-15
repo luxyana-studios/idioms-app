@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import type { DrawerNavigationProp } from "@react-navigation/drawer";
+import { DrawerActions } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -19,24 +19,21 @@ import { IconButton } from "@/shared/components/IconButton";
 import { ScreenHeader } from "@/shared/components/ScreenHeader";
 import { Typography } from "@/shared/components/Typography";
 
-const FILTER_ALL = "__all__";
-
 export default function ExploreScreen() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const navigation =
-    useNavigation<DrawerNavigationProp<Record<string, undefined>>>();
+  const navigation = useNavigation();
   const { tag: tagParam } = useLocalSearchParams<{ tag?: string }>();
   const { data: idioms = [] } = useIdioms();
   const [search, setSearch] = useState("");
-  const [activeTag, setActiveTag] = useState(tagParam ?? FILTER_ALL);
+  const [activeTag, setActiveTag] = useState<string | null>(tagParam ?? null);
 
   // Sync filter + clear stale search when navigating here from a tag chip
   useEffect(() => {
-    setActiveTag(tagParam ?? FILTER_ALL);
+    setActiveTag(tagParam ?? null);
     if (tagParam) setSearch("");
   }, [tagParam]);
 
@@ -59,16 +56,15 @@ export default function ExploreScreen() {
       idiom.idiomaticMeaning.toLowerCase().includes(search.toLowerCase());
 
     const matchesTag =
-      activeTag === FILTER_ALL ||
-      idiom.tags.some((tag) => tag.key === activeTag);
+      activeTag === null || idiom.tags.some((tag) => tag.key === activeTag);
 
     return matchesSearch && matchesTag;
   });
 
-  function selectTag(key: string) {
+  function selectTag(key: string | null) {
     setActiveTag(key);
     // Keep URL in sync so web share/refresh reflects current filter
-    router.setParams({ tag: key === FILTER_ALL ? undefined : key });
+    router.setParams({ tag: key ?? undefined });
   }
 
   return (
@@ -79,7 +75,7 @@ export default function ExploreScreen() {
         left={
           <IconButton
             icon="menu"
-            onPress={() => navigation.openDrawer()}
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
             accessibilityLabel={t("common.openMenu")}
           />
         }
@@ -148,12 +144,12 @@ export default function ExploreScreen() {
         contentContainerStyle={styles.chipsContent}
       >
         <Pressable
-          onPress={() => selectTag(FILTER_ALL)}
+          onPress={() => selectTag(null)}
           accessibilityRole="radio"
-          accessibilityState={{ selected: activeTag === FILTER_ALL }}
+          accessibilityState={{ selected: activeTag === null }}
           style={[
             styles.chip,
-            activeTag === FILTER_ALL
+            activeTag === null
               ? { backgroundColor: theme.colors.primary }
               : {
                   backgroundColor: theme.colors.chipBg,
@@ -166,7 +162,7 @@ export default function ExploreScreen() {
             weight="bold"
             style={{
               color:
-                activeTag === FILTER_ALL
+                activeTag === null
                   ? theme.colors.primaryText
                   : theme.colors.primary,
               fontSize: 12,

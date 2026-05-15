@@ -134,7 +134,7 @@ export function IdiomCardStack({
           pointerEvents="none"
         />
 
-        {/* Category chip */}
+        {/* Language chip */}
         <View style={styles.cardTop}>
           <CategoryChip label={idiom.languageCode.toUpperCase()} />
         </View>

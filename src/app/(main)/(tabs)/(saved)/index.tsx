@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import type { DrawerNavigationProp } from "@react-navigation/drawer";
+import { DrawerActions } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRouter } from "expo-router";
@@ -24,8 +24,7 @@ export default function SavedScreen() {
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const navigation =
-    useNavigation<DrawerNavigationProp<Record<string, undefined>>>();
+  const navigation = useNavigation();
   const { data: idioms = [] } = useIdioms();
   const { savedIds, unsaveIdiom } = useIdiomsStore();
 
@@ -46,7 +45,7 @@ export default function SavedScreen() {
         left={
           <IconButton
             icon="menu"
-            onPress={() => navigation.openDrawer()}
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
             accessibilityLabel={t("common.openMenu")}
           />
         }

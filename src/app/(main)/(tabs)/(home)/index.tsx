@@ -1,5 +1,4 @@
-import type { DrawerNavigationProp } from "@react-navigation/drawer";
-import { useNavigation } from "@react-navigation/native";
+import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, ScrollView, View } from "react-native";
@@ -18,8 +17,7 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const router = useRouter();
-  const navigation =
-    useNavigation<DrawerNavigationProp<Record<string, undefined>>>();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { data: idioms = [], isLoading } = useIdioms();
   const { currentIndex, savedIds, saveIdiom, unsaveIdiom, nextIdiom } =
@@ -61,7 +59,7 @@ export default function HomeScreen() {
         left={
           <IconButton
             icon="menu"
-            onPress={() => navigation.openDrawer()}
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
             accessibilityLabel={t("common.openMenu")}
           />
         }
