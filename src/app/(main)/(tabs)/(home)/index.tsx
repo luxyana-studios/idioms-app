@@ -1,5 +1,4 @@
-import type { DrawerNavigationProp } from "@react-navigation/drawer";
-import { useNavigation } from "@react-navigation/native";
+import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, ScrollView, View } from "react-native";
@@ -10,7 +9,6 @@ import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { IconButton } from "@/shared/components/IconButton";
-import { RecommendationRow } from "@/shared/components/RecommendationRow";
 import { ScreenHeader } from "@/shared/components/ScreenHeader";
 import { SectionHeader } from "@/shared/components/SectionHeader";
 import { Typography } from "@/shared/components/Typography";
@@ -19,16 +17,14 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const router = useRouter();
-  const navigation =
-    useNavigation<DrawerNavigationProp<Record<string, undefined>>>();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { data: idioms = [], isLoading } = useIdioms();
   const { currentIndex, savedIds, saveIdiom, unsaveIdiom, nextIdiom } =
     useIdiomsStore();
 
   const current = idioms[currentIndex];
-  const scrollPaddingBottom =
-    80 + Math.max(insets.bottom, 8) + theme.spacing.xl;
+  const scrollPaddingBottom = Math.max(insets.bottom, 8) + theme.spacing.xl;
 
   if (isLoading || !current) {
     return (
@@ -63,7 +59,7 @@ export default function HomeScreen() {
         left={
           <IconButton
             icon="menu"
-            onPress={() => navigation.openDrawer()}
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
             accessibilityLabel={t("common.openMenu")}
           />
         }
@@ -103,21 +99,6 @@ export default function HomeScreen() {
           onDetails={() => router.push(`/(main)/(tabs)/(home)/${current.id}`)}
           onSave={handleSave}
         />
-        <View style={styles.recommendations}>
-          <RecommendationRow
-            icon="book"
-            title={t("home.originStories")}
-            subtitle={t("home.originStoriesSubtitle")}
-            onPress={() => router.push("/(main)/(tabs)/(library)")}
-          />
-          <RecommendationRow
-            icon="flash"
-            title={t("home.quickQuiz")}
-            subtitle={t("home.quickQuizSubtitle")}
-            onPress={() => router.push("/(main)/(tabs)/(library)")}
-            variant="accent"
-          />
-        </View>
       </ScrollView>
     </View>
   );
@@ -138,11 +119,5 @@ const styles = StyleSheet.create((theme) => ({
   scrollContent: {
     alignItems: "center",
     paddingTop: theme.spacing.md,
-  },
-  recommendations: {
-    width: "100%",
-    paddingHorizontal: theme.spacing.lg,
-    marginTop: theme.spacing.xl,
-    gap: theme.spacing.md,
   },
 }));

@@ -1,14 +1,6 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
-import { useTranslation } from "react-i18next";
-import {
-  Platform,
-  Pressable,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Platform, Pressable, useWindowDimensions, View } from "react-native";
 import {
   StyleSheet,
   UnistylesRuntime,
@@ -42,7 +34,6 @@ export function IdiomCardStack({
   onDetails,
   onSave,
 }: IdiomCardStackProps) {
-  const { t } = useTranslation();
   const { theme } = useUnistyles();
   const isDark = UnistylesRuntime.themeName === "dark";
   const { width: screenWidth } = useWindowDimensions();
@@ -143,21 +134,9 @@ export function IdiomCardStack({
           pointerEvents="none"
         />
 
-        {/* Category chip + audio */}
+        {/* Language chip */}
         <View style={styles.cardTop}>
-          <CategoryChip label={idiom.tags[0]?.label ?? idiom.languageCode} />
-          <TouchableOpacity
-            style={styles.audioBtn}
-            hitSlop={8}
-            disabled
-            accessibilityLabel={t("home.playPronunciation")}
-          >
-            <Ionicons
-              name="volume-medium"
-              size={18}
-              color={theme.colors.primary}
-            />
-          </TouchableOpacity>
+          <CategoryChip label={idiom.languageCode.toUpperCase()} />
         </View>
 
         {/* Phrase + definition */}
@@ -261,16 +240,6 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  audioBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: theme.radius.full,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    backgroundColor: theme.colors.glassBtn,
-    borderColor: theme.colors.glassBtnBorder,
   },
   cardContent: {
     flex: 1,

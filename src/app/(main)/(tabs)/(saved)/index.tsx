@@ -1,7 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { DrawerActions } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -13,6 +14,8 @@ import {
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { GlowBackground } from "@/shared/components/GlowBackground";
+import { IconButton } from "@/shared/components/IconButton";
+import { ScreenHeader } from "@/shared/components/ScreenHeader";
 import { Typography } from "@/shared/components/Typography";
 
 export default function SavedScreen() {
@@ -21,6 +24,7 @@ export default function SavedScreen() {
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const navigation = useNavigation();
   const { data: idioms = [] } = useIdioms();
   const { savedIds, unsaveIdiom } = useIdiomsStore();
 
@@ -37,23 +41,33 @@ export default function SavedScreen() {
     >
       <GlowBackground subtle />
 
-      <View style={styles.header}>
-        <Typography
-          variant="title"
-          weight="extraBold"
-          style={{ color: theme.colors.text }}
-        >
-          {t("saved.title")}
-        </Typography>
-        {savedIdioms.length > 0 && (
+      <ScreenHeader
+        left={
+          <IconButton
+            icon="menu"
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+            accessibilityLabel={t("common.openMenu")}
+          />
+        }
+        center={
           <Typography
-            variant="caption"
-            style={{ color: theme.colors.textMuted }}
+            variant="heading"
+            weight="extraBold"
+            style={{ color: theme.colors.primary }}
           >
-            {t("saved.count", { count: savedIdioms.length })}
+            {t("saved.title")}
           </Typography>
-        )}
-      </View>
+        }
+      />
+
+      {savedIdioms.length > 0 && (
+        <Typography
+          variant="caption"
+          style={[styles.countLabel, { color: theme.colors.textMuted }]}
+        >
+          {t("saved.count", { count: savedIdioms.length })}
+        </Typography>
+      )}
 
       {savedIdioms.length === 0 ? (
         <View style={styles.empty}>
@@ -99,7 +113,7 @@ export default function SavedScreen() {
           style={styles.list}
           contentContainerStyle={[
             styles.listContent,
-            { paddingBottom: Math.max(insets.bottom, 8) + 80 },
+            { paddingBottom: Math.max(insets.bottom, 8) + 24 },
           ]}
           showsVerticalScrollIndicator={false}
         >
@@ -213,12 +227,9 @@ const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    justifyContent: "space-between",
+  countLabel: {
     paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
   },
   empty: {
     flex: 1,

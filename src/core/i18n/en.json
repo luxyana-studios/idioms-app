@@ -28,6 +28,8 @@
   "explore.title": "Explore",
   "explore.search": "Search idioms, categories, or decks...",
   "explore.noResults": "No idioms match your search",
+  "explore.filterAll": "All",
+  "explore.clearSearch": "Clear search",
   "explore.resultsCount": "{{count}} idioms",
   "explore.newArrivals": "New Arrivals",
   "explore.viewAll": "View All",
