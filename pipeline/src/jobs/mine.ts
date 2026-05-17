@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { generateCandidates } from "../capabilities/generateCandidates.js";
 import { sql } from "../lib/db.js";
 import { readExistingKeys, upsertExpression } from "../lib/expressions.js";
-import { normalize } from "../lib/normalize.js";
+import { cleanExpression, normalize } from "../lib/normalize.js";
 import { finishRun, startRun } from "../lib/runs.js";
 import type { Language } from "../types.js";
 
@@ -32,7 +32,12 @@ export async function runMine(input: {
     let duplicate = 0;
     const accepted: string[] = [];
 
-    for (const expression of candidates) {
+    for (const raw of candidates) {
+      const expression = cleanExpression(raw);
+      if (expression.length === 0) {
+        duplicate++;
+        continue;
+      }
       const key = normalize(expression);
       if (seenKeys.has(key)) {
         duplicate++;

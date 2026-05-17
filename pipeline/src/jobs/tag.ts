@@ -44,10 +44,21 @@ export async function runTag(config: Partial<TagConfig> = {}): Promise<void> {
   const run = await startRun("tag", merged);
   console.log(`[tag] run ${run.id} starting`, merged);
 
+  const FACET_CAPS: Record<
+    "meaning" | "register" | "theme" | "occasion",
+    number
+  > = {
+    meaning: 2,
+    register: 1,
+    theme: 2,
+    occasion: 1,
+  };
+
   let tagged = 0;
   let skipped = 0;
   let failed = 0;
   let rejectedKeys = 0;
+  let truncated = 0;
 
   try {
     const canonical = await listCanonicalTagsWithEn();
@@ -96,11 +107,30 @@ export async function runTag(config: Partial<TagConfig> = {}): Promise<void> {
         return;
       }
 
+      const capped = {
+        meaning: meaning.valid.slice(0, FACET_CAPS.meaning),
+        register: register.valid.slice(0, FACET_CAPS.register),
+        theme: theme.valid.slice(0, FACET_CAPS.theme),
+        occasion: occasion.valid.slice(0, FACET_CAPS.occasion),
+      };
+
+      if (
+        capped.meaning.length < meaning.valid.length ||
+        capped.register.length < register.valid.length ||
+        capped.theme.length < theme.valid.length ||
+        capped.occasion.length < occasion.valid.length
+      ) {
+        truncated++;
+        console.warn(
+          `[tag] truncated facets for "${idiom.expression}" (${idiom.language_code}): meaning ${meaning.valid.length}→${capped.meaning.length}, register ${register.valid.length}→${capped.register.length}, theme ${theme.valid.length}→${capped.theme.length}, occasion ${occasion.valid.length}→${capped.occasion.length}`,
+        );
+      }
+
       const allKeys = [
-        ...meaning.valid,
-        ...register.valid,
-        ...theme.valid,
-        ...occasion.valid,
+        ...capped.meaning,
+        ...capped.register,
+        ...capped.theme,
+        ...capped.occasion,
       ];
       for (const key of allKeys) {
         const tag = byKey.get(key);
@@ -111,7 +141,7 @@ export async function runTag(config: Partial<TagConfig> = {}): Promise<void> {
     });
 
     console.log(
-      `[tag] tagged=${tagged}, skipped(missing-required)=${skipped}, failed=${failed}, rejected-keys=${rejectedKeys}`,
+      `[tag] tagged=${tagged}, skipped(missing-required)=${skipped}, failed=${failed}, rejected-keys=${rejectedKeys}, truncated=${truncated}`,
     );
 
     const outDir = join(process.cwd(), "out", "runs", run.id);
@@ -126,6 +156,7 @@ export async function runTag(config: Partial<TagConfig> = {}): Promise<void> {
           skipped,
           failed,
           rejectedKeys,
+          truncated,
         },
         null,
         2,

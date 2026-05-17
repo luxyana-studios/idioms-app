@@ -18,7 +18,7 @@ export type ExpressionRow = {
   language: Language;
   expression: string;
   expression_key: string;
-  status: "seed" | "discovered" | "enriched" | "promoted";
+  status: "seed" | "discovered" | "enriched" | "promoted" | "rejected";
 };
 
 export type RunRow = {

@@ -10,12 +10,12 @@ import { sql } from "../lib/db.js";
 import {
   countByLanguage,
   findByKey,
-  listAll,
   listDiscoveredFromRun,
+  listForDiscovery,
   upsertExpression,
 } from "../lib/expressions.js";
 import { upsertLink } from "../lib/links.js";
-import { normalize } from "../lib/normalize.js";
+import { cleanExpression, normalize } from "../lib/normalize.js";
 import { finishRun, startRun } from "../lib/runs.js";
 import { type ExpressionRow, LANGUAGES, type Language } from "../types.js";
 
@@ -63,13 +63,13 @@ async function processExpression(
   ref: ExpressionRow,
   runId: string,
   config: DiscoveryConfig,
+  capacity: Map<Language, number>,
 ): Promise<{ linksAdded: number }> {
   const otherLangs = LANGUAGES.filter((l) => l !== ref.language) as Language[];
   let linksAdded = 0;
 
   for (const targetLang of otherLangs) {
-    const cap = await countByLanguage(targetLang);
-    if (cap >= config.perLanguageCap) continue;
+    if ((capacity.get(targetLang) ?? 0) <= 0) continue;
 
     let suggestions: EquivalentSuggestion[];
     try {
@@ -88,17 +88,24 @@ async function processExpression(
     }
 
     for (const s of suggestions) {
-      const key = normalize(s.expression);
+      const expression = cleanExpression(s.expression);
+      if (expression.length === 0) continue;
+
+      const key = normalize(expression);
       let target = await findByKey(targetLang, key);
 
       if (!target) {
+        if ((capacity.get(targetLang) ?? 0) <= 0) continue;
         const result = await upsertExpression({
           language: targetLang,
-          expression: s.expression,
+          expression,
           runId,
           status: "discovered",
         });
         target = result.row;
+        if (result.isNew) {
+          capacity.set(targetLang, (capacity.get(targetLang) ?? 0) - 1);
+        }
       }
 
       const linkResult = await upsertLink({
@@ -115,8 +122,19 @@ async function processExpression(
   return { linksAdded };
 }
 
+async function snapshotCapacity(
+  perLanguageCap: number,
+): Promise<Map<Language, number>> {
+  const capacity = new Map<Language, number>();
+  for (const lang of LANGUAGES as readonly Language[]) {
+    const count = await countByLanguage(lang);
+    capacity.set(lang, Math.max(0, perLanguageCap - count));
+  }
+  return capacity;
+}
+
 async function seedNode(_state: State): Promise<Partial<State>> {
-  const all = await listAll();
+  const all = await listForDiscovery();
   console.log(`[discover] seed: ${all.length} expressions to process`);
   return { pending: all, iteration: 0 };
 }
@@ -127,10 +145,11 @@ async function processRoundNode(state: State): Promise<Partial<State>> {
     `[discover] round ${round}: processing ${state.pending.length} expressions`,
   );
 
+  const capacity = await snapshotCapacity(state.config.perLanguageCap);
   const results = await mapWithConcurrency(
     state.pending,
     state.config.expressionConcurrency,
-    (ref) => processExpression(ref, state.runId, state.config),
+    (ref) => processExpression(ref, state.runId, state.config, capacity),
   );
   const linksAdded = results.reduce((s, r) => s + r.linksAdded, 0);
 

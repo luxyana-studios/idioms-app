@@ -77,7 +77,7 @@ export async function runEnrich(
     const toPromote = await listPendingPromotion();
     console.log(`[enrich] ${toPromote.length} ready for promotion`);
 
-    for (const row of toPromote) {
+    await mapWithConcurrency(toPromote, merged.concurrency, async (row) => {
       try {
         await promoteIdiom(row);
         promoted++;
@@ -88,7 +88,7 @@ export async function runEnrich(
           err instanceof Error ? err.message : err,
         );
       }
-    }
+    });
 
     const linkResult = await promotePendingLinks();
     console.log(

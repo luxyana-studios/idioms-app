@@ -61,7 +61,7 @@ export async function runVerify(
     language: input.language,
     source: input.source ?? "ai_mined",
     concurrency: input.concurrency ?? 4,
-    dryRun: input.dryRun ?? false,
+    dryRun: input.dryRun ?? true,
   };
 
   if (merged.language && !isLanguage(merged.language)) {
@@ -124,7 +124,15 @@ export async function runVerify(
       );
 
       if (!merged.dryRun) {
-        await sql`delete from public.idioms where id = ${row.id}`;
+        await sql.begin(async (tx) => {
+          await tx`
+            update pipeline.expressions
+               set status = 'rejected',
+                   public_idiom_id = null
+             where public_idiom_id = ${row.id}
+          `;
+          await tx`delete from public.idioms where id = ${row.id}`;
+        });
       }
     });
 

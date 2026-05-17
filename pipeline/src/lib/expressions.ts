@@ -58,10 +58,11 @@ export async function findByKey(
   return row ?? null;
 }
 
-export async function listAll(): Promise<ExpressionRow[]> {
+export async function listForDiscovery(): Promise<ExpressionRow[]> {
   return await sql<ExpressionRow[]>`
     select id, language, expression, expression_key, status
       from pipeline.expressions
+     where status in ('seed', 'discovered', 'enriched', 'promoted')
      order by language, expression_key
   `;
 }

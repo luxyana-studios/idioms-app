@@ -37,8 +37,9 @@ function usage(): never {
   console.error("  pipeline seed-tag-translations");
   console.error("  pipeline tag       [--concurrency <n>]");
   console.error(
-    "  pipeline verify    [--lang <en|es|de|fr>] [--source <ai_mined|all>] [--concurrency <n>] [--dry-run]",
+    "  pipeline verify    [--lang <en|es|de|fr>] [--source <ai_mined|all>] [--concurrency <n>] [--commit]",
   );
+  console.error("                    (defaults to dry-run; --commit deletes)");
   process.exit(1);
 }
 
@@ -101,7 +102,7 @@ async function main() {
         language: lang && isLanguage(lang) ? lang : undefined,
         source: (source as "ai_mined" | "all" | undefined) ?? "ai_mined",
         concurrency: optionalNumber(flags.concurrency),
-        dryRun: flags["dry-run"] === "true",
+        dryRun: flags.commit !== "true",
       });
       return;
     }
