@@ -24,8 +24,10 @@ const resolveTags = (
   });
 
 const fetchIdioms = async (uiLanguage: string): Promise<Idiom[]> => {
-  const { data, error } = await supabase.from("idioms").select(
-    `
+  const { data, error } = await supabase
+    .from("idioms")
+    .select(
+      `
       id,
       expression,
       language_code,
@@ -43,7 +45,9 @@ const fetchIdioms = async (uiLanguage: string): Promise<Idiom[]> => {
         )
       )
     `,
-  );
+    )
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
 
   if (error) throw error;
 
