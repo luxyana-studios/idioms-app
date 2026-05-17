@@ -14,6 +14,7 @@ Uses Expo SDK 54 with development builds (NOT Expo Go).
 | Roadmap & build order | [docs/product/roadmap.md](docs/product/roadmap.md) |
 | Data model | [docs/architecture/data-model.md](docs/architecture/data-model.md) |
 | ADR: Cross-platform nav | [docs/decisions/001-cross-platform-nav.md](docs/decisions/001-cross-platform-nav.md) |
+| Data mining pipeline | [pipeline/CLAUDE.md](pipeline/CLAUDE.md), [pipeline/README.md](pipeline/README.md) |
 
 ## Key Conventions (Product)
 
