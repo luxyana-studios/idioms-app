@@ -5,6 +5,10 @@ import { ActivityIndicator, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { IdiomCardStack } from "@/features/idioms/components/IdiomCardStack";
+import {
+  useLikedIdiomIds,
+  useToggleIdiomLike,
+} from "@/features/idioms/hooks/useIdiomLikes";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { GlowBackground } from "@/shared/components/GlowBackground";
@@ -20,8 +24,9 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { data: idioms = [], isLoading } = useIdioms();
-  const { currentIndex, savedIds, saveIdiom, unsaveIdiom, nextIdiom } =
-    useIdiomsStore();
+  const { data: likedIds = [] } = useLikedIdiomIds();
+  const toggleIdiomLike = useToggleIdiomLike();
+  const { currentIndex, nextIdiom } = useIdiomsStore();
 
   const current = idioms[currentIndex];
   const scrollPaddingBottom = Math.max(insets.bottom, 8) + theme.spacing.xl;
@@ -43,12 +48,14 @@ export default function HomeScreen() {
     );
   }
 
-  const isSaved = savedIds.includes(current.id);
+  const isLiked = likedIds.includes(current.id);
+  const isLikePending =
+    toggleIdiomLike.isPending &&
+    toggleIdiomLike.variables?.idiomId === current.id;
   const progress = (currentIndex + 1) / idioms.length;
 
-  const handleSave = () => {
-    if (isSaved) unsaveIdiom(current.id);
-    else saveIdiom(current.id);
+  const handleToggleLike = () => {
+    toggleIdiomLike.mutate({ idiomId: current.id, isLiked });
     nextIdiom(idioms.length);
   };
 
@@ -93,11 +100,12 @@ export default function HomeScreen() {
           progress={progress}
           currentIndex={currentIndex}
           totalCount={idioms.length}
-          isSaved={isSaved}
+          isLiked={isLiked}
+          isLikePending={isLikePending}
           onPress={() => router.push(`/(main)/(tabs)/(home)/${current.id}`)}
           onSkip={() => nextIdiom(idioms.length)}
           onDetails={() => router.push(`/(main)/(tabs)/(home)/${current.id}`)}
-          onSave={handleSave}
+          onToggleLike={handleToggleLike}
         />
       </ScrollView>
     </View>
