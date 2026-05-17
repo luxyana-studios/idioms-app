@@ -59,7 +59,7 @@
     "lefthook": "^2.1.6",
     "react-test-renderer": "19.2.6",
     "supabase": "^2.98.2",
-    "typescript": "~5.9.2"
+    "typescript": "~6.0.3"
   },
   "private": true,
   "overrides": {
