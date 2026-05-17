@@ -15,6 +15,12 @@ jest.mock("react-native-unistyles", () => ({
 
 jest.mock("@/core/i18n", () => ({
   __esModule: true,
+  normalizeLanguageTag: jest.fn((language?: string | null) => {
+    const baseLanguage = language?.split("-")[0]?.toLowerCase();
+    return ["en", "es", "fr", "de"].includes(baseLanguage ?? "")
+      ? baseLanguage
+      : "en";
+  }),
   default: {
     language: "en",
     changeLanguage: jest.fn(),
@@ -62,6 +68,19 @@ describe("useSettingsStore", () => {
     it("setLanguage updates the language", () => {
       useSettingsStore.getState().setLanguage("es");
       expect(useSettingsStore.getState().language).toBe("es");
+      expect(i18n.changeLanguage).toHaveBeenCalledWith("es");
+    });
+
+    it("setLanguage normalizes region-specific locale codes", () => {
+      useSettingsStore.getState().setLanguage("fr-CA");
+      expect(useSettingsStore.getState().language).toBe("fr");
+      expect(i18n.changeLanguage).toHaveBeenCalledWith("fr");
+    });
+
+    it("setLanguage falls back to English for unsupported locales", () => {
+      useSettingsStore.getState().setLanguage("it");
+      expect(useSettingsStore.getState().language).toBe("en");
+      expect(i18n.changeLanguage).toHaveBeenCalledWith("en");
     });
   });
 
@@ -103,6 +122,18 @@ describe("useSettingsStore", () => {
       await rehydrateWith({ themeMode: "dark", language: "es" });
       expect(useSettingsStore.getState().language).toBe("es");
       expect(i18n.changeLanguage).toHaveBeenCalledWith("es");
+    });
+
+    it("normalizes persisted region-specific locales", async () => {
+      await rehydrateWith({ themeMode: "dark", language: "de-AT" });
+      expect(useSettingsStore.getState().language).toBe("de");
+      expect(i18n.changeLanguage).toHaveBeenCalledWith("de");
+    });
+
+    it("falls back to English for unsupported persisted locales", async () => {
+      await rehydrateWith({ themeMode: "dark", language: "it" });
+      expect(useSettingsStore.getState().language).toBe("en");
+      expect(i18n.changeLanguage).toHaveBeenCalledWith("en");
     });
   });
 });

@@ -45,11 +45,11 @@ function TranslationContent({
           {translation.idiomaticMeaning}
         </Typography>
       </View>
-      {translation.explanation && (
+      {translation.explanation ? (
         <Typography variant="caption" style={styles.explanation}>
           {translation.explanation}
         </Typography>
-      )}
+      ) : null}
     </View>
   );
 }

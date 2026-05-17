@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { SUPPORTED_UI_LANGUAGES, type SupportedUiLanguage } from "@/core/i18n";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useSettings } from "@/features/settings/hooks/useSettings";
 import type { ThemeMode } from "@/features/settings/stores/settings.store";
@@ -9,10 +10,6 @@ import { ScreenContainer } from "@/shared/components/ScreenContainer";
 import { Typography } from "@/shared/components/Typography";
 
 const themeModes: ThemeMode[] = ["system", "light", "dark"];
-const languages = [
-  { code: "en", labelKey: "settings.languageEn" },
-  { code: "es", labelKey: "settings.languageEs" },
-];
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
@@ -53,20 +50,20 @@ export default function SettingsScreen() {
       <View style={styles.section}>
         <Typography variant="label">{t("settings.language")}</Typography>
         <View style={styles.optionRow}>
-          {languages.map((lang) => (
+          {SUPPORTED_UI_LANGUAGES.map((languageCode: SupportedUiLanguage) => (
             <Pressable
-              key={lang.code}
+              key={languageCode}
               style={[
                 styles.option,
-                language === lang.code && styles.optionActive,
+                language === languageCode && styles.optionActive,
               ]}
-              onPress={() => setLanguage(lang.code)}
+              onPress={() => setLanguage(languageCode)}
             >
               <Typography
                 variant="body"
-                color={language === lang.code ? "primary" : "text"}
+                color={language === languageCode ? "primary" : "text"}
               >
-                {t(lang.labelKey)}
+                {t(`lang.${languageCode}`)}
               </Typography>
             </Pressable>
           ))}
@@ -91,6 +88,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   optionRow: {
     flexDirection: "row" as const,
+    flexWrap: "wrap" as const,
     gap: theme.spacing.sm,
   },
   option: {
