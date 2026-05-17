@@ -53,6 +53,29 @@ jobs:
 
       - run: npm run test:ci
 
+  pipeline:
+    name: Pipeline Typecheck & Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: pipeline/package-lock.json
+
+      - run: npm ci
+        working-directory: pipeline
+
+      - run: npm run typecheck
+        working-directory: pipeline
+
+      - run: npm run lint
+        working-directory: pipeline
+
   audit:
     name: Security Audit
     runs-on: ubuntu-latest
