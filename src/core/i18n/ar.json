@@ -65,5 +65,8 @@
   "lang.pt": "Português",
   "common.ok": "موافق",
   "settings.restartTitle": "إعادة التشغيل مطلوبة",
-  "settings.restartMessage": "يجب إعادة تشغيل التطبيق لتطبيق اتجاه التخطيط الجديد."
+  "settings.restartMessage": "يجب إعادة تشغيل التطبيق لتطبيق اتجاه التخطيط الجديد.",
+  "common.like": "إعجاب",
+  "common.unlike": "إلغاء الإعجاب",
+  "likes.count": "{{count}} إعجاب"
 }

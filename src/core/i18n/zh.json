@@ -60,5 +60,8 @@
   "lang.pt": "Português",
   "common.ok": "确定",
   "settings.restartTitle": "需要重启",
-  "settings.restartMessage": "应用需要重新启动以应用新的布局方向。"
+  "settings.restartMessage": "应用需要重新启动以应用新的布局方向。",
+  "common.like": "点赞",
+  "common.unlike": "取消点赞",
+  "likes.count": "{{count}} 个赞"
 }

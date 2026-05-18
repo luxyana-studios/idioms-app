@@ -61,5 +61,8 @@
   "detail.translationMeaning": "Significado",
   "common.ok": "OK",
   "settings.restartTitle": "Reinício necessário",
-  "settings.restartMessage": "O aplicativo precisa ser reiniciado para aplicar a nova direção do layout."
+  "settings.restartMessage": "O aplicativo precisa ser reiniciado para aplicar a nova direção do layout.",
+  "common.like": "Curtir",
+  "common.unlike": "Descurtir",
+  "likes.count": "{{count}} curtidas"
 }

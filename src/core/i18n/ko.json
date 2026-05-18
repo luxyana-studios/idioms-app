@@ -60,5 +60,8 @@
   "lang.pt": "Português",
   "common.ok": "확인",
   "settings.restartTitle": "재시작 필요",
-  "settings.restartMessage": "새 레이아웃 방향을 적용하려면 앱을 재시작해야 합니다."
+  "settings.restartMessage": "새 레이아웃 방향을 적용하려면 앱을 재시작해야 합니다.",
+  "common.like": "좋아요",
+  "common.unlike": "좋아요 취소",
+  "likes.count": "좋아요 {{count}}개"
 }

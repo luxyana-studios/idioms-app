@@ -60,5 +60,8 @@
   "lang.pt": "Português",
   "common.ok": "OK",
   "settings.restartTitle": "再起動が必要です",
-  "settings.restartMessage": "新しいレイアウト方向を適用するにはアプリの再起動が必要です。"
+  "settings.restartMessage": "新しいレイアウト方向を適用するにはアプリの再起動が必要です。",
+  "common.like": "いいね",
+  "common.unlike": "いいねを取り消す",
+  "likes.count": "{{count}} いいね"
 }

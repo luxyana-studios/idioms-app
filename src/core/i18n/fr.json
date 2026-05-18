@@ -61,5 +61,8 @@
   "lang.pt": "Português",
   "common.ok": "OK",
   "settings.restartTitle": "Redémarrage nécessaire",
-  "settings.restartMessage": "L'application doit être redémarrée pour appliquer la nouvelle direction de mise en page."
+  "settings.restartMessage": "L'application doit être redémarrée pour appliquer la nouvelle direction de mise en page.",
+  "common.like": "J'aime",
+  "common.unlike": "Je n'aime plus",
+  "likes.count": "{{count}} j'aime"
 }
