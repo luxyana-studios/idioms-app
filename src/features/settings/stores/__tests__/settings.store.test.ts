@@ -26,17 +26,17 @@ jest.mock("@/core/i18n", () => ({
   normalizeLanguageTag: jest.fn((language?: string | null) => {
     const baseLanguage = language?.split("-")[0]?.toLowerCase();
     return [
+      "ar",
+      "zh",
       "en",
-      "es",
       "fr",
       "de",
-      "it",
-      "zh",
       "hi",
-      "ar",
+      "it",
       "ja",
       "ko",
       "pt",
+      "es",
     ].includes(baseLanguage ?? "")
       ? baseLanguage
       : "en";

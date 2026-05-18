@@ -13,18 +13,20 @@ import ko from "./ko.json";
 import pt from "./pt.json";
 import zh from "./zh.json";
 
+// Ordered alphabetically by Roman/English language name so the settings
+// picker reads as a familiar A→Z list regardless of current UI language.
 export const SUPPORTED_UI_LANGUAGES = [
-  "en",
-  "es",
-  "fr",
-  "de",
-  "it",
-  "zh",
-  "hi",
-  "ar",
-  "ja",
-  "ko",
-  "pt",
+  "ar", // Arabic
+  "zh", // Chinese
+  "en", // English
+  "fr", // French
+  "de", // German
+  "hi", // Hindi
+  "it", // Italian
+  "ja", // Japanese
+  "ko", // Korean
+  "pt", // Portuguese
+  "es", // Spanish
 ] as const;
 
 export type SupportedUiLanguage = (typeof SUPPORTED_UI_LANGUAGES)[number];
