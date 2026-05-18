@@ -1,4 +1,3 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -9,6 +8,7 @@ import {
   useUnistyles,
 } from "react-native-unistyles";
 import { LANG_KEY } from "@/features/idioms/constants";
+import { DirectionalIcon } from "@/shared/components/DirectionalIcon";
 import { Typography } from "@/shared/components/Typography";
 
 interface LanguageCardProps {
@@ -66,7 +66,7 @@ export function LanguageCard({ code, count }: LanguageCardProps) {
           {t("byLanguage.idiomCount", { count })}
         </Typography>
       </View>
-      <Ionicons
+      <DirectionalIcon
         name="chevron-forward"
         size={18}
         color={theme.colors.textMuted}

@@ -43,6 +43,7 @@ export const lightTheme = {
     shadow: "#000",
     primaryIconBg: "rgba(255,255,255,0.20)",
     primaryGlow: "rgba(145,71,49,0.09)",
+    scrim: "rgba(0,0,0,0.4)",
     // Backward-compat aliases
     secondary: "#596244",
     secondaryContainer: "#dee7c0",
@@ -98,6 +99,7 @@ export const darkTheme = {
     shadow: "#000",
     primaryIconBg: "rgba(255,255,255,0.20)",
     primaryGlow: "rgba(236,190,142,0.09)",
+    scrim: "rgba(0,0,0,0.55)",
     // Backward-compat aliases
     secondary: "#a8c480",
     secondaryContainer: "#2e4024",

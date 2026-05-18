@@ -2,6 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import { TouchableOpacity, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { DirectionalIcon } from "@/shared/components/DirectionalIcon";
 
 interface CardActionRowProps {
   isLiked: boolean;
@@ -44,7 +45,7 @@ export function CardActionRow({
         accessibilityRole="button"
         accessibilityLabel={t("home.idiomDetails")}
       >
-        <Ionicons
+        <DirectionalIcon
           name="chevron-forward"
           size={18}
           color={theme.colors.textSecondary}

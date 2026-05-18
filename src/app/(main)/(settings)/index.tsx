@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { SUPPORTED_UI_LANGUAGES, type SupportedUiLanguage } from "@/core/i18n";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { LanguagePickerModal } from "@/features/settings/components/LanguagePickerModal";
 import { useSettings } from "@/features/settings/hooks/useSettings";
 import type { ThemeMode } from "@/features/settings/stores/settings.store";
 import { Button } from "@/shared/components/Button";
+import { DirectionalIcon } from "@/shared/components/DirectionalIcon";
 import { ScreenContainer } from "@/shared/components/ScreenContainer";
 import { Typography } from "@/shared/components/Typography";
 
@@ -13,8 +15,10 @@ const themeModes: ThemeMode[] = ["system", "light", "dark"];
 
 export default function SettingsScreen() {
   const { t } = useTranslation();
-  const { themeMode, language, setThemeMode, setLanguage } = useSettings();
+  const { theme } = useUnistyles();
+  const { themeMode, language, setThemeMode } = useSettings();
   const { signOut } = useAuth();
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const themeLabelKey = (mode: ThemeMode) => {
     const map: Record<ThemeMode, string> = {
@@ -49,25 +53,19 @@ export default function SettingsScreen() {
 
       <View style={styles.section}>
         <Typography variant="label">{t("settings.language")}</Typography>
-        <View style={styles.optionRow}>
-          {SUPPORTED_UI_LANGUAGES.map((languageCode: SupportedUiLanguage) => (
-            <Pressable
-              key={languageCode}
-              style={[
-                styles.option,
-                language === languageCode && styles.optionActive,
-              ]}
-              onPress={() => setLanguage(languageCode)}
-            >
-              <Typography
-                variant="body"
-                color={language === languageCode ? "primary" : "text"}
-              >
-                {t(`lang.${languageCode}`)}
-              </Typography>
-            </Pressable>
-          ))}
-        </View>
+        <Pressable
+          style={styles.languageRow}
+          onPress={() => setPickerOpen(true)}
+          accessibilityRole="button"
+          accessibilityLabel={t("settings.language")}
+        >
+          <Typography variant="body">{t(`lang.${language}`)}</Typography>
+          <DirectionalIcon
+            name="chevron-forward"
+            size={18}
+            color={theme.colors.textMuted}
+          />
+        </Pressable>
       </View>
 
       <View style={styles.logout}>
@@ -77,6 +75,11 @@ export default function SettingsScreen() {
           onPress={signOut}
         />
       </View>
+
+      <LanguagePickerModal
+        visible={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+      />
     </ScreenContainer>
   );
 }
@@ -101,6 +104,17 @@ const styles = StyleSheet.create((theme) => ({
   optionActive: {
     borderColor: theme.colors.primary,
     backgroundColor: `${theme.colors.primary}15`,
+  },
+  languageRow: {
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
+    justifyContent: "space-between" as const,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    minHeight: 44,
   },
   logout: {
     marginTop: "auto" as const,
