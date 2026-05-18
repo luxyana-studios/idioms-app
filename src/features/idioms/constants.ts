@@ -8,4 +8,5 @@ export const LANG_KEY: Record<string, string> = {
   hi: "lang.hi",
   ar: "lang.ar",
   ja: "lang.ja",
+  ko: "lang.ko",
 };

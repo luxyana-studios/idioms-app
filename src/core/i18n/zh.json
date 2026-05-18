@@ -55,5 +55,6 @@
   "lang.ja": "日本語",
   "detail.translationLabel": "翻译",
   "detail.translationLiteral": "直译",
-  "detail.translationMeaning": "含义"
+  "detail.translationMeaning": "含义",
+  "lang.ko": "한국어"
 }

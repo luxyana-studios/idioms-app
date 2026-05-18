@@ -17,9 +17,18 @@ jest.mock("@/core/i18n", () => ({
   __esModule: true,
   normalizeLanguageTag: jest.fn((language?: string | null) => {
     const baseLanguage = language?.split("-")[0]?.toLowerCase();
-    return ["en", "es", "fr", "de", "it", "zh", "hi", "ar", "ja"].includes(
-      baseLanguage ?? "",
-    )
+    return [
+      "en",
+      "es",
+      "fr",
+      "de",
+      "it",
+      "zh",
+      "hi",
+      "ar",
+      "ja",
+      "ko",
+    ].includes(baseLanguage ?? "")
       ? baseLanguage
       : "en";
   }),
@@ -80,7 +89,7 @@ describe("useSettingsStore", () => {
     });
 
     it("setLanguage falls back to English for unsupported locales", () => {
-      useSettingsStore.getState().setLanguage("ko");
+      useSettingsStore.getState().setLanguage("pt");
       expect(useSettingsStore.getState().language).toBe("en");
       expect(i18n.changeLanguage).toHaveBeenCalledWith("en");
     });
@@ -133,7 +142,7 @@ describe("useSettingsStore", () => {
     });
 
     it("falls back to English for unsupported persisted locales", async () => {
-      await rehydrateWith({ themeMode: "dark", language: "ko" });
+      await rehydrateWith({ themeMode: "dark", language: "pt" });
       expect(useSettingsStore.getState().language).toBe("en");
       expect(i18n.changeLanguage).toHaveBeenCalledWith("en");
     });
