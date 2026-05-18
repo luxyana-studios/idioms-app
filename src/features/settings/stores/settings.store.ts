@@ -1,3 +1,4 @@
+import { I18nManager } from "react-native";
 import { UnistylesRuntime } from "react-native-unistyles";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
@@ -6,6 +7,7 @@ import i18n, {
   type SupportedUiLanguage,
 } from "@/core/i18n";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
+import { isRtlLang } from "@/core/theme/rtl";
 
 export type ThemeMode = "system" | "light" | "dark";
 
@@ -13,7 +15,12 @@ interface SettingsState {
   themeMode: ThemeMode;
   language: SupportedUiLanguage;
   setThemeMode: (mode: ThemeMode) => void;
-  setLanguage: (language: string) => void;
+  /**
+   * Apply a new UI language. Updates i18n and the native RTL flag.
+   * Returns `true` if the writing direction changed (LTR ↔ RTL) and the app
+   * needs to be restarted for the layout to flip; `false` otherwise.
+   */
+  setLanguage: (language: string) => boolean;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -36,6 +43,14 @@ export const useSettingsStore = create<SettingsState>()(
         const safeLanguage = normalizeLanguageTag(language);
         i18n.changeLanguage(safeLanguage);
         set({ language: safeLanguage });
+
+        const targetRtl = isRtlLang(safeLanguage);
+        if (I18nManager.isRTL !== targetRtl) {
+          I18nManager.allowRTL(targetRtl);
+          I18nManager.forceRTL(targetRtl);
+          return true;
+        }
+        return false;
       },
     }),
     {

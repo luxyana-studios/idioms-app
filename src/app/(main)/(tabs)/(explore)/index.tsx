@@ -15,6 +15,7 @@ import { useUiFonts } from "@/core/theme/fonts";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import type { IdiomTag } from "@/features/idioms/types";
 import { CategoryChip } from "@/shared/components/CategoryChip";
+import { DirectionalIcon } from "@/shared/components/DirectionalIcon";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { IconButton } from "@/shared/components/IconButton";
 import { ScreenHeader } from "@/shared/components/ScreenHeader";
@@ -303,7 +304,7 @@ export default function ExploreScreen() {
                   </View>
                 )}
               </View>
-              <Ionicons
+              <DirectionalIcon
                 name="chevron-forward"
                 size={16}
                 color={theme.colors.textMuted}

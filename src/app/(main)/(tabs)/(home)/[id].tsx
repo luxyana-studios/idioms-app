@@ -61,6 +61,7 @@ export default function DetailScreen() {
         left={
           <IconButton
             icon="chevron-back"
+            directional
             onPress={() =>
               router.canGoBack()
                 ? router.back()

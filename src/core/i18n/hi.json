@@ -58,5 +58,8 @@
   "detail.translationLiteral": "शाब्दिक",
   "detail.translationMeaning": "अर्थ",
   "lang.ko": "한국어",
-  "lang.pt": "Português"
+  "lang.pt": "Português",
+  "common.ok": "ठीक है",
+  "settings.restartTitle": "पुनरारंभ आवश्यक",
+  "settings.restartMessage": "नई लेआउट दिशा लागू करने के लिए ऐप को पुनरारंभ करना होगा।"
 }

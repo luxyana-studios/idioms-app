@@ -57,5 +57,8 @@
   "detail.translationLiteral": "直訳",
   "detail.translationMeaning": "意味",
   "lang.ko": "한국어",
-  "lang.pt": "Português"
+  "lang.pt": "Português",
+  "common.ok": "OK",
+  "settings.restartTitle": "再起動が必要です",
+  "settings.restartMessage": "新しいレイアウト方向を適用するにはアプリの再起動が必要です。"
 }

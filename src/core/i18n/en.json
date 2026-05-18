@@ -61,5 +61,8 @@
   "lang.ar": "العربية",
   "lang.ja": "日本語",
   "lang.ko": "한국어",
-  "lang.pt": "Português"
+  "lang.pt": "Português",
+  "common.ok": "OK",
+  "settings.restartTitle": "Restart required",
+  "settings.restartMessage": "The app needs to restart to apply the new layout direction."
 }

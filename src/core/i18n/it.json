@@ -58,5 +58,8 @@
   "detail.translationLiteral": "Letterale",
   "detail.translationMeaning": "Significato",
   "lang.ko": "한국어",
-  "lang.pt": "Português"
+  "lang.pt": "Português",
+  "common.ok": "OK",
+  "settings.restartTitle": "Riavvio richiesto",
+  "settings.restartMessage": "L'app deve essere riavviata per applicare la nuova direzione del layout."
 }

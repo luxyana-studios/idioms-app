@@ -58,5 +58,8 @@
   "lang.ar": "العربية",
   "lang.ja": "日本語",
   "lang.ko": "한국어",
-  "lang.pt": "Português"
+  "lang.pt": "Português",
+  "common.ok": "OK",
+  "settings.restartTitle": "Neustart erforderlich",
+  "settings.restartMessage": "Die App muss neu gestartet werden, um die neue Layout-Richtung zu übernehmen."
 }

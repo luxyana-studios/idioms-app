@@ -58,5 +58,8 @@
   "lang.ar": "العربية",
   "lang.ja": "日本語",
   "lang.ko": "한국어",
-  "lang.pt": "Português"
+  "lang.pt": "Português",
+  "common.ok": "OK",
+  "settings.restartTitle": "Redémarrage nécessaire",
+  "settings.restartMessage": "L'application doit être redémarrée pour appliquer la nouvelle direction de mise en page."
 }

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Pressable, View } from "react-native";
+import { Alert, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { SUPPORTED_UI_LANGUAGES, type SupportedUiLanguage } from "@/core/i18n";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -57,7 +57,16 @@ export default function SettingsScreen() {
                 styles.option,
                 language === languageCode && styles.optionActive,
               ]}
-              onPress={() => setLanguage(languageCode)}
+              onPress={() => {
+                const restartNeeded = setLanguage(languageCode);
+                if (restartNeeded) {
+                  Alert.alert(
+                    t("settings.restartTitle"),
+                    t("settings.restartMessage"),
+                    [{ text: t("common.ok") }],
+                  );
+                }
+              }}
             >
               <Typography
                 variant="body"

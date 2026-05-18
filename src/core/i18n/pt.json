@@ -58,5 +58,8 @@
   "lang.pt": "Português",
   "detail.translationLabel": "Traduções",
   "detail.translationLiteral": "Literal",
-  "detail.translationMeaning": "Significado"
+  "detail.translationMeaning": "Significado",
+  "common.ok": "OK",
+  "settings.restartTitle": "Reinício necessário",
+  "settings.restartMessage": "O aplicativo precisa ser reiniciado para aplicar a nova direção do layout."
 }

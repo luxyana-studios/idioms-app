@@ -57,5 +57,8 @@
   "detail.translationLiteral": "直译",
   "detail.translationMeaning": "含义",
   "lang.ko": "한국어",
-  "lang.pt": "Português"
+  "lang.pt": "Português",
+  "common.ok": "确定",
+  "settings.restartTitle": "需要重启",
+  "settings.restartMessage": "应用需要重新启动以应用新的布局方向。"
 }

@@ -1,6 +1,11 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { ComponentProps } from "react";
-import { type StyleProp, TouchableOpacity, type ViewStyle } from "react-native";
+import {
+  I18nManager,
+  type StyleProp,
+  TouchableOpacity,
+  type ViewStyle,
+} from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
@@ -15,6 +20,8 @@ interface IconButtonProps {
   accessibilityLabel?: string;
   hitSlop?: number;
   style?: StyleProp<ViewStyle>;
+  /** Set true for chevrons/arrows/etc. so the glyph mirrors in RTL layouts. */
+  directional?: boolean;
 }
 
 export function IconButton({
@@ -27,6 +34,7 @@ export function IconButton({
   accessibilityLabel,
   hitSlop = 8,
   style,
+  directional = false,
 }: IconButtonProps) {
   const { theme } = useUnistyles();
 
@@ -55,6 +63,11 @@ export function IconButton({
         size={iconSize}
         color={
           variant === "glass" ? theme.colors.primary : theme.colors.primaryText
+        }
+        style={
+          directional && I18nManager.isRTL
+            ? { transform: [{ scaleX: -1 }] }
+            : undefined
         }
       />
     </TouchableOpacity>
