@@ -45,11 +45,16 @@
   "detail.equivalents": "Auch in anderen Sprachen",
   "byLanguage.idiomCount_one": "{{count}} Redewendung",
   "byLanguage.idiomCount_other": "{{count}} Redewendungen",
-  "lang.en": "Englisch",
-  "lang.es": "Spanisch",
+  "lang.en": "English",
+  "lang.es": "Español",
   "lang.de": "Deutsch",
-  "lang.fr": "Französisch",
+  "lang.fr": "Français",
   "detail.translationLabel": "Übersetzungen",
   "detail.translationLiteral": "Wörtlich",
-  "detail.translationMeaning": "Bedeutung"
+  "detail.translationMeaning": "Bedeutung",
+  "lang.it": "Italiano",
+  "lang.zh": "中文",
+  "lang.hi": "हिन्दी",
+  "lang.ar": "العربية",
+  "lang.ja": "日本語"
 }

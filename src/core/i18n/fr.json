@@ -45,11 +45,16 @@
   "detail.equivalents": "Aussi dans d'autres langues",
   "byLanguage.idiomCount_one": "{{count}} expression",
   "byLanguage.idiomCount_other": "{{count}} expressions",
-  "lang.en": "Anglais",
-  "lang.es": "Espagnol",
-  "lang.de": "Allemand",
+  "lang.en": "English",
+  "lang.es": "Español",
+  "lang.de": "Deutsch",
   "lang.fr": "Français",
   "detail.translationLabel": "Traductions",
   "detail.translationLiteral": "Littéral",
-  "detail.translationMeaning": "Sens"
+  "detail.translationMeaning": "Sens",
+  "lang.it": "Italiano",
+  "lang.zh": "中文",
+  "lang.hi": "हिन्दी",
+  "lang.ar": "العربية",
+  "lang.ja": "日本語"
 }

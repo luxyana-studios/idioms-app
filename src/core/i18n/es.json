@@ -48,11 +48,16 @@
   "detail.equivalents": "También en otros idiomas",
   "byLanguage.idiomCount_one": "{{count}} modismo",
   "byLanguage.idiomCount_other": "{{count}} modismos",
-  "lang.en": "Inglés",
+  "lang.en": "English",
   "lang.es": "Español",
-  "lang.de": "Alemán",
-  "lang.fr": "Francés",
+  "lang.de": "Deutsch",
+  "lang.fr": "Français",
   "detail.translationLabel": "Traducciones",
   "detail.translationLiteral": "Literal",
-  "detail.translationMeaning": "Significado"
+  "detail.translationMeaning": "Significado",
+  "lang.it": "Italiano",
+  "lang.zh": "中文",
+  "lang.hi": "हिन्दी",
+  "lang.ar": "العربية",
+  "lang.ja": "日本語"
 }

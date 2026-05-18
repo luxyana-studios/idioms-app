@@ -49,10 +49,15 @@
   "byLanguage.idiomCount_one": "{{count}} idiom",
   "byLanguage.idiomCount_other": "{{count}} idioms",
   "lang.en": "English",
-  "lang.es": "Spanish",
-  "lang.de": "German",
-  "lang.fr": "French",
+  "lang.es": "Español",
+  "lang.de": "Deutsch",
+  "lang.fr": "Français",
   "detail.translationLabel": "Translations",
   "detail.translationLiteral": "Literal",
-  "detail.translationMeaning": "Meaning"
+  "detail.translationMeaning": "Meaning",
+  "lang.it": "Italiano",
+  "lang.zh": "中文",
+  "lang.hi": "हिन्दी",
+  "lang.ar": "العربية",
+  "lang.ja": "日本語"
 }

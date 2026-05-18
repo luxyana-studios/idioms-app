@@ -1,12 +1,27 @@
 import { getLocales } from "expo-localization";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import ar from "./ar.json";
 import de from "./de.json";
 import en from "./en.json";
 import es from "./es.json";
 import fr from "./fr.json";
+import hi from "./hi.json";
+import it from "./it.json";
+import ja from "./ja.json";
+import zh from "./zh.json";
 
-export const SUPPORTED_UI_LANGUAGES = ["en", "es", "fr", "de"] as const;
+export const SUPPORTED_UI_LANGUAGES = [
+  "en",
+  "es",
+  "fr",
+  "de",
+  "it",
+  "zh",
+  "hi",
+  "ar",
+  "ja",
+] as const;
 
 export type SupportedUiLanguage = (typeof SUPPORTED_UI_LANGUAGES)[number];
 
@@ -30,6 +45,11 @@ const resources = {
   es: { translation: es },
   fr: { translation: fr },
   de: { translation: de },
+  it: { translation: it },
+  zh: { translation: zh },
+  hi: { translation: hi },
+  ar: { translation: ar },
+  ja: { translation: ja },
 } as const;
 
 const deviceLanguage = normalizeLanguageTag(getLocales()[0]?.languageCode);
