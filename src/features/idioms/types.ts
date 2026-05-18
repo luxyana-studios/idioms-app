@@ -14,6 +14,7 @@ export interface Idiom {
   expression: string;
   languageCode: string;
   idiomaticMeaning: string;
+  likesCount: number;
   explanation?: string;
   examples?: string[];
   tags: IdiomTag[];

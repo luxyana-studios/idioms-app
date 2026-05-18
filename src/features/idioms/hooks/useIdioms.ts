@@ -24,12 +24,15 @@ const resolveTags = (
   });
 
 const fetchIdioms = async (uiLanguage: string): Promise<Idiom[]> => {
-  const { data, error } = await supabase.from("idioms").select(
-    `
+  const { data, error } = await supabase
+    .from("idioms")
+    .select(
+      `
       id,
       expression,
       language_code,
       idiomatic_meaning,
+      likes_count,
       explanation,
       examples,
       source,
@@ -42,7 +45,9 @@ const fetchIdioms = async (uiLanguage: string): Promise<Idiom[]> => {
         )
       )
     `,
-  );
+    )
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
 
   if (error) throw error;
 
@@ -51,6 +56,7 @@ const fetchIdioms = async (uiLanguage: string): Promise<Idiom[]> => {
     expression: row.expression,
     languageCode: row.language_code,
     idiomaticMeaning: row.idiomatic_meaning,
+    likesCount: row.likes_count,
     explanation: row.explanation ?? undefined,
     examples: row.examples ?? undefined,
     tags: resolveTags(row.idiom_tags, uiLanguage),

@@ -27,10 +27,10 @@ jest.mock("@expo/vector-icons/Ionicons", () => "Ionicons");
 
 describe("CardActionRow", () => {
   const defaults = {
-    isSaved: false,
+    isLiked: false,
     onSkip: jest.fn(),
     onDetails: jest.fn(),
-    onSave: jest.fn(),
+    onToggleLike: jest.fn(),
   };
 
   it("renders three action buttons", () => {
@@ -38,14 +38,14 @@ describe("CardActionRow", () => {
     expect(screen.getAllByRole("button")).toHaveLength(3);
   });
 
-  it("shows unsaved accessibility label when isSaved is false", () => {
-    render(<CardActionRow {...defaults} isSaved={false} />);
-    expect(screen.getByLabelText("common.save")).toBeTruthy();
+  it("shows like accessibility label when isLiked is false", () => {
+    render(<CardActionRow {...defaults} isLiked={false} />);
+    expect(screen.getByLabelText("common.like")).toBeTruthy();
   });
 
-  it("shows saved accessibility label when isSaved is true", () => {
-    render(<CardActionRow {...defaults} isSaved />);
-    expect(screen.getByLabelText("home.saved")).toBeTruthy();
+  it("shows unlike accessibility label when isLiked is true", () => {
+    render(<CardActionRow {...defaults} isLiked />);
+    expect(screen.getByLabelText("common.unlike")).toBeTruthy();
   });
 
   it("calls onSkip when skip button is pressed", () => {
@@ -62,10 +62,26 @@ describe("CardActionRow", () => {
     expect(onDetails).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onSave when save button is pressed", () => {
-    const onSave = jest.fn();
-    render(<CardActionRow {...defaults} onSave={onSave} />);
-    fireEvent.press(screen.getByLabelText("common.save"));
-    expect(onSave).toHaveBeenCalledTimes(1);
+  it("calls onToggleLike when like button is pressed", () => {
+    const onToggleLike = jest.fn();
+    render(<CardActionRow {...defaults} onToggleLike={onToggleLike} />);
+    fireEvent.press(screen.getByLabelText("common.like"));
+    expect(onToggleLike).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls onToggleLike when liked-state button is pressed (unlike path)", () => {
+    const onToggleLike = jest.fn();
+    render(<CardActionRow {...defaults} isLiked onToggleLike={onToggleLike} />);
+    fireEvent.press(screen.getByLabelText("common.unlike"));
+    expect(onToggleLike).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not call onToggleLike when disabled", () => {
+    const onToggleLike = jest.fn();
+    render(
+      <CardActionRow {...defaults} disabled onToggleLike={onToggleLike} />,
+    );
+    fireEvent.press(screen.getByLabelText("common.like"));
+    expect(onToggleLike).not.toHaveBeenCalled();
   });
 });
