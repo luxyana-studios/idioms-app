@@ -68,4 +68,20 @@ describe("CardActionRow", () => {
     fireEvent.press(screen.getByLabelText("common.like"));
     expect(onToggleLike).toHaveBeenCalledTimes(1);
   });
+
+  it("calls onToggleLike when liked-state button is pressed (unlike path)", () => {
+    const onToggleLike = jest.fn();
+    render(<CardActionRow {...defaults} isLiked onToggleLike={onToggleLike} />);
+    fireEvent.press(screen.getByLabelText("common.unlike"));
+    expect(onToggleLike).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not call onToggleLike when disabled", () => {
+    const onToggleLike = jest.fn();
+    render(
+      <CardActionRow {...defaults} disabled onToggleLike={onToggleLike} />,
+    );
+    fireEvent.press(screen.getByLabelText("common.like"));
+    expect(onToggleLike).not.toHaveBeenCalled();
+  });
 });

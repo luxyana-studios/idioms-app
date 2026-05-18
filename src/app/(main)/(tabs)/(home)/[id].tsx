@@ -25,11 +25,11 @@ export default function DetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { data: idioms = [] } = useIdioms();
-  const { data: likedIds = [] } = useLikedIdiomIds();
+  const { data: likedIds } = useLikedIdiomIds();
   const toggleIdiomLike = useToggleIdiomLike();
 
   const idiom = idioms.find((i) => i.id === id);
-  const isLiked = idiom ? likedIds.includes(idiom.id) : false;
+  const isLiked = !!idiom && (likedIds?.has(idiom.id) ?? false);
   const isLikePending =
     !!idiom &&
     toggleIdiomLike.isPending &&

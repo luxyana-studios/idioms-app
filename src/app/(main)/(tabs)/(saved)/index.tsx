@@ -35,10 +35,12 @@ export default function SavedScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const { data: idioms = [], isLoading: idiomsLoading } = useIdioms();
-  const { data: likedIds = [], isLoading: likesLoading } = useLikedIdiomIds();
+  const { data: likedIds, isLoading: likesLoading } = useLikedIdiomIds();
   const toggleIdiomLike = useToggleIdiomLike();
 
-  const savedIdioms = idioms.filter((idiom) => likedIds.includes(idiom.id));
+  const savedIdioms = likedIds
+    ? idioms.filter((idiom) => likedIds.has(idiom.id))
+    : [];
 
   const cardBg = isDark ? "rgba(26,36,21,0.72)" : "rgba(255,255,255,0.68)";
 
@@ -255,7 +257,7 @@ export default function SavedScreen() {
 
                 <Typography
                   variant="caption"
-                  style={{ color: theme.colors.textMuted, marginTop: 10 }}
+                  style={[styles.likeCount, { color: theme.colors.textMuted }]}
                 >
                   {t("likes.count", { count: idiom.likesCount })}
                 </Typography>
@@ -338,5 +340,8 @@ const styles = StyleSheet.create((theme) => ({
   meaning: {
     lineHeight: 22,
     fontSize: 14,
+  },
+  likeCount: {
+    marginTop: theme.spacing.sm,
   },
 }));

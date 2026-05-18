@@ -1,5 +1,6 @@
 alter table public.idioms
-  add column likes_count integer not null default 0;
+  add column likes_count integer not null default 0
+    check (likes_count >= 0);
 
 create table public.idiom_likes (
   id         uuid primary key default gen_random_uuid(),

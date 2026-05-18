@@ -1,5 +1,6 @@
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -10,7 +11,6 @@ import {
   useToggleIdiomLike,
 } from "@/features/idioms/hooks/useIdiomLikes";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
-import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { IconButton } from "@/shared/components/IconButton";
 import { ScreenHeader } from "@/shared/components/ScreenHeader";
@@ -24,9 +24,11 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { data: idioms = [], isLoading } = useIdioms();
-  const { data: likedIds = [] } = useLikedIdiomIds();
+  const { data: likedIds } = useLikedIdiomIds();
   const toggleIdiomLike = useToggleIdiomLike();
-  const { currentIndex, nextIdiom } = useIdiomsStore();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const nextIdiom = (total: number) =>
+    setCurrentIndex((i) => (total > 0 ? (i + 1) % total : 0));
 
   const current = idioms[currentIndex];
   const scrollPaddingBottom = Math.max(insets.bottom, 8) + theme.spacing.xl;
@@ -48,13 +50,16 @@ export default function HomeScreen() {
     );
   }
 
-  const isLiked = likedIds.includes(current.id);
+  const isLiked = likedIds?.has(current.id) ?? false;
   const isLikePending =
     toggleIdiomLike.isPending &&
     toggleIdiomLike.variables?.idiomId === current.id;
   const progress = (currentIndex + 1) / idioms.length;
 
   const handleToggleLike = () => {
+    // Like + advance is one atomic gesture: the deck moves on even if the
+    // mutation later fails. On error, onError flips the heart back, but the
+    // user has already moved past the card.
     toggleIdiomLike.mutate({ idiomId: current.id, isLiked });
     nextIdiom(idioms.length);
   };

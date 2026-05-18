@@ -9,11 +9,11 @@ interface ToggleIdiomLikeInput {
 }
 
 interface ToggleIdiomLikeContext {
-  previousLikedIds?: string[];
+  previousLikedIds?: Set<string>;
   previousIdioms?: Array<[readonly unknown[], Idiom[] | undefined]>;
 }
 
-const updateIdiomsLikesCount = (
+const adjustLikesCount = (
   idioms: Idiom[] | undefined,
   idiomId: string,
   delta: number,
@@ -24,12 +24,23 @@ const updateIdiomsLikesCount = (
       : idiom,
   );
 
+const toggleInSet = (
+  current: Set<string>,
+  idiomId: string,
+  isLiked: boolean,
+) => {
+  const next = new Set(current);
+  if (isLiked) next.delete(idiomId);
+  else next.add(idiomId);
+  return next;
+};
+
 export const useLikedIdiomIds = () => {
   const { user, initialized } = useAuth();
 
   return useQuery({
     queryKey: ["idiom-likes", user?.id],
-    enabled: initialized && !!user && !!process.env.EXPO_PUBLIC_SUPABASE_URL,
+    enabled: initialized && !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("idiom_likes")
@@ -38,7 +49,7 @@ export const useLikedIdiomIds = () => {
 
       if (error) throw error;
 
-      return (data ?? []).map((row) => row.idiom_id);
+      return new Set((data ?? []).map((row) => row.idiom_id));
     },
   });
 };
@@ -50,10 +61,6 @@ export const useToggleIdiomLike = () => {
   return useMutation<void, Error, ToggleIdiomLikeInput, ToggleIdiomLikeContext>(
     {
       mutationFn: async ({ idiomId, isLiked }) => {
-        if (!process.env.EXPO_PUBLIC_SUPABASE_URL) {
-          return;
-        }
-
         if (!user) {
           throw new Error("You must be signed in to like an idiom.");
         }
@@ -82,7 +89,7 @@ export const useToggleIdiomLike = () => {
           queryClient.cancelQueries({ queryKey: ["idioms"] }),
         ]);
 
-        const previousLikedIds = queryClient.getQueryData<string[]>([
+        const previousLikedIds = queryClient.getQueryData<Set<string>>([
           "idiom-likes",
           user?.id,
         ]);
@@ -90,18 +97,14 @@ export const useToggleIdiomLike = () => {
           queryKey: ["idioms"],
         });
 
-        queryClient.setQueryData<string[]>(
+        queryClient.setQueryData<Set<string>>(
           ["idiom-likes", user?.id],
-          (current = []) =>
-            isLiked
-              ? current.filter((likedId) => likedId !== idiomId)
-              : [idiomId, ...current.filter((likedId) => likedId !== idiomId)],
+          (current = new Set()) => toggleInSet(current, idiomId, isLiked),
         );
 
         queryClient.setQueriesData<Idiom[]>(
           { queryKey: ["idioms"] },
-          (current) =>
-            updateIdiomsLikesCount(current, idiomId, isLiked ? -1 : 1),
+          (current) => adjustLikesCount(current, idiomId, isLiked ? -1 : 1),
         );
 
         return { previousLikedIds, previousIdioms };
