@@ -11,6 +11,7 @@ import {
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
+import { useUiFonts } from "@/core/theme/fonts";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import type { IdiomTag } from "@/features/idioms/types";
 import { CategoryChip } from "@/shared/components/CategoryChip";
@@ -22,6 +23,7 @@ import { Typography } from "@/shared/components/Typography";
 export default function ExploreScreen() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
+  const fonts = useUiFonts();
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -110,7 +112,8 @@ export default function ExploreScreen() {
             styles.searchInput,
             {
               color: theme.colors.text,
-              fontFamily: theme.typography.fonts.sans,
+              fontFamily: fonts.family("regular"),
+              fontWeight: fonts.weight("regular"),
             },
           ]}
           placeholder={t("explore.search")}
