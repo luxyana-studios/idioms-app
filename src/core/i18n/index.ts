@@ -10,6 +10,7 @@ import hi from "./hi.json";
 import it from "./it.json";
 import ja from "./ja.json";
 import ko from "./ko.json";
+import pt from "./pt.json";
 import zh from "./zh.json";
 
 export const SUPPORTED_UI_LANGUAGES = [
@@ -23,6 +24,7 @@ export const SUPPORTED_UI_LANGUAGES = [
   "ar",
   "ja",
   "ko",
+  "pt",
 ] as const;
 
 export type SupportedUiLanguage = (typeof SUPPORTED_UI_LANGUAGES)[number];
@@ -53,6 +55,7 @@ const resources = {
   ar: { translation: ar },
   ja: { translation: ja },
   ko: { translation: ko },
+  pt: { translation: pt },
 } as const;
 
 const deviceLanguage = normalizeLanguageTag(getLocales()[0]?.languageCode);
