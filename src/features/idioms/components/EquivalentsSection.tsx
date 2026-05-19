@@ -1,4 +1,3 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
@@ -6,6 +5,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { LANG_KEY } from "@/features/idioms/constants";
 import { useIdiomEquivalents } from "@/features/idioms/hooks/useIdiomEquivalents";
 import type { IdiomEquivalent } from "@/features/idioms/types";
+import { DirectionalIcon } from "@/shared/components/DirectionalIcon";
 import { Typography } from "@/shared/components/Typography";
 import { IdiomInfoCard } from "./IdiomInfoCard";
 
@@ -47,7 +47,7 @@ function EquivalentCard({ equiv }: { equiv: IdiomEquivalent }) {
           {equiv.idiomaticMeaning}
         </Typography>
       </View>
-      <Ionicons
+      <DirectionalIcon
         name="chevron-forward"
         size={14}
         color={theme.colors.textMuted}

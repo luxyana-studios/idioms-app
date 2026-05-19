@@ -1,4 +1,3 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { Platform, Pressable, View } from "react-native";
@@ -8,6 +7,7 @@ import {
   useUnistyles,
 } from "react-native-unistyles";
 import type { Idiom } from "@/features/idioms/types";
+import { DirectionalIcon } from "@/shared/components/DirectionalIcon";
 import { Typography } from "@/shared/components/Typography";
 
 interface LanguageIdiomCardProps {
@@ -65,7 +65,7 @@ export function LanguageIdiomCard({ idiom }: LanguageIdiomCardProps) {
           {idiom.idiomaticMeaning}
         </Typography>
       </View>
-      <Ionicons
+      <DirectionalIcon
         name="chevron-forward"
         size={16}
         color={theme.colors.textMuted}

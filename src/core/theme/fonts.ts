@@ -9,6 +9,14 @@ import {
   useFonts,
 } from "@expo-google-fonts/manrope";
 
+export {
+  getUiFontFamily,
+  getUiFontWeight,
+  isLatinScriptLang,
+  type UiFontWeight,
+  useUiFonts,
+} from "./scriptFonts";
+
 export function useLoadFonts() {
   const [fontsLoaded, fontError] = useFonts({
     Manrope_300Light,

@@ -5,6 +5,8 @@ export const spacing = {
   lg: 24,
   xl: 32,
   "2xl": 48,
+  // Minimum interactive touch target (Apple HIG / Material).
+  touchTarget: 44,
 } as const;
 
 export const radius = {
