@@ -42,12 +42,18 @@ export function LanguagePickerModal({
         style={styles.backdrop}
         onPress={onClose}
         accessibilityRole="button"
-        accessibilityLabel={t("common.goBack")}
+        accessibilityLabel={t("common.close")}
       >
-        <Pressable
-          style={[styles.sheet, { paddingBottom: insets.bottom + 16 }]}
-          // Stop bubbling so taps inside the sheet don't dismiss it.
-          onPress={(e) => e.stopPropagation()}
+        <View
+          style={[
+            styles.sheet,
+            { paddingBottom: insets.bottom + theme.spacing.md },
+          ]}
+          // Claim the touch responder on this view so a tap inside the sheet
+          // never propagates up to the backdrop Pressable that dismisses it.
+          // (RN Web does emulate DOM event bubbling for taps, which the inner
+          // Pressable alone wouldn't otherwise block.)
+          onStartShouldSetResponder={() => true}
         >
           <View style={styles.handle} />
           <Typography variant="heading" style={styles.title}>
@@ -85,7 +91,7 @@ export function LanguagePickerModal({
               );
             })}
           </ScrollView>
-        </Pressable>
+        </View>
       </Pressable>
     </Modal>
   );
@@ -106,8 +112,8 @@ const styles = StyleSheet.create((theme) => ({
     maxHeight: "80%" as const,
   },
   handle: {
-    width: 40,
-    height: 4,
+    width: theme.spacing["2xl"],
+    height: theme.spacing.xs,
     backgroundColor: theme.colors.border,
     borderRadius: theme.radius.sm,
     alignSelf: "center" as const,
@@ -124,7 +130,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center" as const,
     justifyContent: "space-between" as const,
     paddingVertical: theme.spacing.md,
-    minHeight: 44,
+    minHeight: theme.spacing.touchTarget,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },

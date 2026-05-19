@@ -114,7 +114,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    minHeight: 44,
+    minHeight: theme.spacing.touchTarget,
   },
   logout: {
     marginTop: "auto" as const,
