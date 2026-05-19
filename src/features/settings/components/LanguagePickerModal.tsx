@@ -38,22 +38,22 @@ export function LanguagePickerModal({
       transparent
       onRequestClose={onClose}
     >
-      <Pressable
-        style={styles.backdrop}
-        onPress={onClose}
-        accessibilityRole="button"
-        accessibilityLabel={t("common.close")}
-      >
+      <View style={styles.root}>
+        {/* Backdrop sits BEHIND the sheet as a sibling, not as a parent.
+            Keeping them un-nested avoids rendering <button><button>…</button></button>
+            on RN Web — both Pressables emit <button> via accessibilityRole="button".
+            Layering is via absolute positioning + sibling z-order in DOM. */}
+        <Pressable
+          style={styles.backdrop}
+          onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.close")}
+        />
         <View
           style={[
             styles.sheet,
             { paddingBottom: insets.bottom + theme.spacing.md },
           ]}
-          // Claim the touch responder on this view so a tap inside the sheet
-          // never propagates up to the backdrop Pressable that dismisses it.
-          // (RN Web does emulate DOM event bubbling for taps, which the inner
-          // Pressable alone wouldn't otherwise block.)
-          onStartShouldSetResponder={() => true}
         >
           <View style={styles.handle} />
           <Typography variant="heading" style={styles.title}>
@@ -92,16 +92,19 @@ export function LanguagePickerModal({
             })}
           </ScrollView>
         </View>
-      </Pressable>
+      </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  backdrop: {
+  root: {
     flex: 1,
-    backgroundColor: theme.colors.scrim,
     justifyContent: "flex-end" as const,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: theme.colors.scrim,
   },
   sheet: {
     backgroundColor: theme.colors.surface,
