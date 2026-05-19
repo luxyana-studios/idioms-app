@@ -64,5 +64,6 @@
   "settings.restartMessage": "L'application doit être redémarrée pour appliquer la nouvelle direction de mise en page.",
   "common.like": "J'aime",
   "common.unlike": "Je n'aime plus",
-  "likes.count": "{{count}} j'aime"
+  "likes.count": "{{count}} j'aime",
+  "common.close": "Fermer"
 }

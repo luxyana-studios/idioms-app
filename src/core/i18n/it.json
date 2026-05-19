@@ -64,5 +64,6 @@
   "settings.restartMessage": "L'app deve essere riavviata per applicare la nuova direzione del layout.",
   "common.like": "Mi piace",
   "common.unlike": "Non mi piace più",
-  "likes.count": "{{count}} mi piace"
+  "likes.count": "{{count}} mi piace",
+  "common.close": "Chiudi"
 }

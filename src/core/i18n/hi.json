@@ -64,5 +64,6 @@
   "settings.restartMessage": "नई लेआउट दिशा लागू करने के लिए ऐप को पुनरारंभ करना होगा।",
   "common.like": "लाइक",
   "common.unlike": "लाइक हटाएँ",
-  "likes.count": "{{count}} लाइक"
+  "likes.count": "{{count}} लाइक",
+  "common.close": "बंद करें"
 }

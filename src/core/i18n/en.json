@@ -64,5 +64,6 @@
   "lang.pt": "Português",
   "common.ok": "OK",
   "settings.restartTitle": "Restart required",
-  "settings.restartMessage": "The app needs to restart to apply the new layout direction."
+  "settings.restartMessage": "The app needs to restart to apply the new layout direction.",
+  "common.close": "Close"
 }

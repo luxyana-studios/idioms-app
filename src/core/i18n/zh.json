@@ -63,5 +63,6 @@
   "settings.restartMessage": "应用需要重新启动以应用新的布局方向。",
   "common.like": "点赞",
   "common.unlike": "取消点赞",
-  "likes.count": "{{count}} 个赞"
+  "likes.count": "{{count}} 个赞",
+  "common.close": "关闭"
 }

@@ -64,5 +64,6 @@
   "lang.pt": "Português",
   "common.ok": "OK",
   "settings.restartTitle": "Reinicio necesario",
-  "settings.restartMessage": "La aplicación debe reiniciarse para aplicar la nueva dirección del diseño."
+  "settings.restartMessage": "La aplicación debe reiniciarse para aplicar la nueva dirección del diseño.",
+  "common.close": "Cerrar"
 }

@@ -21,31 +21,25 @@ jest.mock("react-native-unistyles", () => ({
   },
 }));
 
-jest.mock("@/core/i18n", () => ({
-  __esModule: true,
-  normalizeLanguageTag: jest.fn((language?: string | null) => {
-    const baseLanguage = language?.split("-")[0]?.toLowerCase();
-    return [
-      "ar",
-      "zh",
-      "en",
-      "fr",
-      "de",
-      "hi",
-      "it",
-      "ja",
-      "ko",
-      "pt",
-      "es",
-    ].includes(baseLanguage ?? "")
-      ? baseLanguage
-      : "en";
-  }),
-  default: {
-    language: "en",
-    changeLanguage: jest.fn(),
-  },
-}));
+jest.mock("@/core/i18n", () => {
+  // Re-import inside the factory so jest.mock hoisting still resolves the
+  // dep. Uses the same codes module as the real @/core/i18n.
+  const { SUPPORTED_UI_LANGUAGES: codes } = require("@/core/i18n/codes");
+  return {
+    __esModule: true,
+    SUPPORTED_UI_LANGUAGES: codes,
+    normalizeLanguageTag: jest.fn((language?: string | null) => {
+      const baseLanguage = language?.split("-")[0]?.toLowerCase();
+      return (codes as readonly string[]).includes(baseLanguage ?? "")
+        ? baseLanguage
+        : "en";
+    }),
+    default: {
+      language: "en",
+      changeLanguage: jest.fn(),
+    },
+  };
+});
 
 jest.mock("@/core/storage/mmkv", () => ({
   zustandMMKVStorage: {

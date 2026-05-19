@@ -64,5 +64,6 @@
   "settings.restartMessage": "Die App muss neu gestartet werden, um die neue Layout-Richtung zu übernehmen.",
   "common.like": "Gefällt mir",
   "common.unlike": "Gefällt mir nicht mehr",
-  "likes.count": "{{count}} Likes"
+  "likes.count": "{{count}} Likes",
+  "common.close": "Schließen"
 }

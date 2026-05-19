@@ -64,5 +64,6 @@
   "settings.restartMessage": "O aplicativo precisa ser reiniciado para aplicar a nova direção do layout.",
   "common.like": "Curtir",
   "common.unlike": "Descurtir",
-  "likes.count": "{{count}} curtidas"
+  "likes.count": "{{count}} curtidas",
+  "common.close": "Fechar"
 }

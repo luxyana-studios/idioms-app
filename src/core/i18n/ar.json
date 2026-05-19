@@ -68,5 +68,6 @@
   "settings.restartMessage": "يجب إعادة تشغيل التطبيق لتطبيق اتجاه التخطيط الجديد.",
   "common.like": "إعجاب",
   "common.unlike": "إلغاء الإعجاب",
-  "likes.count": "{{count}} إعجاب"
+  "likes.count": "{{count}} إعجاب",
+  "common.close": "إغلاق"
 }
