@@ -11,7 +11,8 @@ interface IconButtonProps {
   iconSize?: number;
   containerSize?: number;
   borderRadius?: number;
-  variant?: "glass" | "primary";
+  variant?: "glass" | "primary" | "bare";
+  iconColor?: string;
   accessibilityLabel?: string;
   hitSlop?: number;
   style?: StyleProp<ViewStyle>;
@@ -24,11 +25,20 @@ export function IconButton({
   containerSize = 40,
   borderRadius = 12,
   variant = "glass",
+  iconColor,
   accessibilityLabel,
   hitSlop = 8,
   style,
 }: IconButtonProps) {
   const { theme } = useUnistyles();
+
+  const resolvedIconColor =
+    iconColor ??
+    (variant === "primary"
+      ? theme.colors.primaryText
+      : variant === "bare"
+        ? theme.colors.textSecondary
+        : theme.colors.primary);
 
   return (
     <TouchableOpacity
@@ -39,9 +49,14 @@ export function IconButton({
           height: containerSize,
           borderRadius,
           backgroundColor:
-            variant === "glass" ? theme.colors.glassBtn : theme.colors.primary,
+            variant === "glass"
+              ? theme.colors.glassBtn
+              : variant === "primary"
+                ? theme.colors.primary
+                : "transparent",
           borderColor:
             variant === "glass" ? theme.colors.glassBtnBorder : "transparent",
+          borderWidth: variant === "glass" ? 1 : 0,
         },
         style,
       ]}
@@ -50,13 +65,7 @@ export function IconButton({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
     >
-      <Ionicons
-        name={icon}
-        size={iconSize}
-        color={
-          variant === "glass" ? theme.colors.primary : theme.colors.primaryText
-        }
-      />
+      <Ionicons name={icon} size={iconSize} color={resolvedIconColor} />
     </TouchableOpacity>
   );
 }
@@ -65,6 +74,5 @@ const styles = StyleSheet.create({
   btn: {
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
   },
 });

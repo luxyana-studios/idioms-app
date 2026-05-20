@@ -75,5 +75,11 @@
   "lang.fr": "Französisch",
   "detail.translationLabel": "Übersetzungen",
   "detail.translationLiteral": "Wörtlich",
-  "detail.translationMeaning": "Bedeutung"
+  "detail.translationMeaning": "Bedeutung",
+  "home.saveIdiom": "Redewendung speichern",
+  "home.skipIdiom": "Redewendung überspringen",
+  "home.expandIdiom": "Redewendung erweitern",
+  "home.holdToTranslate": "Gedrückt halten zum Übersetzen",
+  "home.translation": "Übersetzung",
+  "home.idiomCount": "{{current}} von {{total}}"
 }

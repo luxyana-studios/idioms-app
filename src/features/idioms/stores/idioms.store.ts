@@ -4,10 +4,13 @@ import { zustandMMKVStorage } from "@/core/storage/mmkv";
 
 interface IdiomsState {
   savedIds: string[];
+  deferredIds: string[];
   currentIndex: number;
   saveIdiom: (id: string) => void;
   unsaveIdiom: (id: string) => void;
+  deferIdiom: (id: string) => void;
   nextIdiom: (total: number) => void;
+  setCurrentIndex: (index: number) => void;
   isSaved: (id: string) => boolean;
 }
 
@@ -15,6 +18,7 @@ export const useIdiomsStore = create<IdiomsState>()(
   persist(
     (set, get) => ({
       savedIds: [],
+      deferredIds: [],
       currentIndex: 0,
 
       saveIdiom: (id) =>
@@ -29,10 +33,17 @@ export const useIdiomsStore = create<IdiomsState>()(
           savedIds: state.savedIds.filter((s) => s !== id),
         })),
 
+      deferIdiom: (id) =>
+        set((state) => ({
+          deferredIds: [...state.deferredIds.filter((d) => d !== id), id],
+        })),
+
       nextIdiom: (total) =>
         set((state) => ({
           currentIndex: total > 0 ? (state.currentIndex + 1) % total : 0,
         })),
+
+      setCurrentIndex: (index) => set({ currentIndex: index }),
 
       isSaved: (id) => get().savedIds.includes(id),
     }),

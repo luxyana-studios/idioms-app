@@ -77,5 +77,11 @@
   "lang.fr": "French",
   "detail.translationLabel": "Translations",
   "detail.translationLiteral": "Literal",
-  "detail.translationMeaning": "Meaning"
+  "detail.translationMeaning": "Meaning",
+  "home.saveIdiom": "Save idiom",
+  "home.skipIdiom": "Skip idiom",
+  "home.expandIdiom": "Expand idiom",
+  "home.holdToTranslate": "Hold to translate",
+  "home.translation": "Translation",
+  "home.idiomCount": "{{current}} of {{total}}"
 }

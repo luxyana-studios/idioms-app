@@ -77,5 +77,11 @@
   "lang.fr": "Francés",
   "detail.translationLabel": "Traducciones",
   "detail.translationLiteral": "Literal",
-  "detail.translationMeaning": "Significado"
+  "detail.translationMeaning": "Significado",
+  "home.saveIdiom": "Guardar modismo",
+  "home.skipIdiom": "Omitir modismo",
+  "home.expandIdiom": "Expandir modismo",
+  "home.holdToTranslate": "Mantén pulsado para traducir",
+  "home.translation": "Traducción",
+  "home.idiomCount": "{{current}} de {{total}}"
 }

@@ -241,7 +241,12 @@ export default function ExploreScreen() {
           filtered.map((idiom) => (
             <Pressable
               key={idiom.id}
-              onPress={() => router.push(`/(main)/(tabs)/(home)/${idiom.id}`)}
+              onPress={() => {
+                const idx = idioms.findIndex((i) => i.id === idiom.id);
+                router.push(
+                  `/(main)/(tabs)/(home)?scrollTo=${idx >= 0 ? idx : 0}`,
+                );
+              }}
               style={({ pressed }) => [
                 styles.idiomCard,
                 {

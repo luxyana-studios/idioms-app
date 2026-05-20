@@ -43,6 +43,16 @@ export const lightTheme = {
     shadow: "#000",
     primaryIconBg: "rgba(255,255,255,0.20)",
     primaryGlow: "rgba(145,71,49,0.09)",
+    // Feed UX tokens
+    feedSwipeLikeGlow: "rgba(89,98,68,0.18)",
+    feedSwipeSkipGlow: "rgba(145,71,49,0.14)",
+    feedProgressLine: "rgba(145,71,49,0.20)",
+    feedProgressLineActive: "#914731",
+    translationOverlayBg: "rgba(28,28,25,0.82)",
+    translationOverlayText: "#fcf9f4",
+    feedCardScrimStart: "rgba(252,249,244,0)",
+    feedCardScrimEnd: "rgba(252,249,244,0.97)",
+    feedTrayBg: "rgba(252,249,244,0.92)",
     // Backward-compat aliases
     secondary: "#596244",
     secondaryContainer: "#dee7c0",
@@ -98,6 +108,16 @@ export const darkTheme = {
     shadow: "#000",
     primaryIconBg: "rgba(255,255,255,0.20)",
     primaryGlow: "rgba(236,190,142,0.09)",
+    // Feed UX tokens
+    feedSwipeLikeGlow: "rgba(168,196,128,0.22)",
+    feedSwipeSkipGlow: "rgba(236,190,142,0.18)",
+    feedProgressLine: "rgba(236,190,142,0.18)",
+    feedProgressLineActive: "#ecbe8e",
+    translationOverlayBg: "rgba(13,20,9,0.92)",
+    translationOverlayText: "#e4ead6",
+    feedCardScrimStart: "rgba(19,26,15,0)",
+    feedCardScrimEnd: "rgba(19,26,15,0.97)",
+    feedTrayBg: "rgba(19,26,15,0.93)",
     // Backward-compat aliases
     secondary: "#a8c480",
     secondaryContainer: "#2e4024",
