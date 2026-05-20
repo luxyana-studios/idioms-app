@@ -19,7 +19,7 @@ jest.mock("@/core/storage/mmkv", () => ({
 
 describe("useIdiomsStore", () => {
   beforeEach(() => {
-    useIdiomsStore.setState({ savedIds: [], currentIndex: 0 });
+    useIdiomsStore.setState({ savedIds: [], deferredIds: [], currentIndex: 0 });
   });
 
   describe("initial state", () => {

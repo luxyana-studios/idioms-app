@@ -110,7 +110,7 @@ export function TranslationOverlay({
             variant="body"
             style={{ color: theme.colors.translationOverlayText, opacity: 0.6 }}
           >
-            {t("common.loading")}
+            {t("home.noTranslation")}
           </Typography>
         )}
       </GlassView>

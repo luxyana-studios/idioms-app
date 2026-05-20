@@ -83,5 +83,6 @@
   "home.expandIdiom": "Expandir modismo",
   "home.holdToTranslate": "Mantén pulsado para traducir",
   "home.translation": "Traducción",
-  "home.idiomCount": "{{current}} de {{total}}"
+  "home.idiomCount": "{{current}} de {{total}}",
+  "home.noTranslation": "Traducción no disponible"
 }

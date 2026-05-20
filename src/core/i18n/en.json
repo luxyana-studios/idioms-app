@@ -83,5 +83,6 @@
   "home.expandIdiom": "Expand idiom",
   "home.holdToTranslate": "Hold to translate",
   "home.translation": "Translation",
-  "home.idiomCount": "{{current}} of {{total}}"
+  "home.idiomCount": "{{current}} of {{total}}",
+  "home.noTranslation": "No translation available"
 }

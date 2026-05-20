@@ -32,7 +32,6 @@ export function useFeedGesture({ onSave, onSkip }: UseFeedGestureOpts) {
     .activeOffsetX([-12, 12])
     .failOffsetY([-8, 8])
     .onUpdate((e) => {
-      "worklet";
       translateX.value = e.translationX;
       rotateZ.value = (e.translationX / screenWidth) * MAX_TILT_DEG;
       const absX = Math.abs(e.translationX);
@@ -43,14 +42,12 @@ export function useFeedGesture({ onSave, onSkip }: UseFeedGestureOpts) {
       glowIsLike.value = e.translationX > 0;
     })
     .onEnd((e) => {
-      "worklet";
       if (Math.abs(e.translationX) > SWIPE_THRESHOLD) {
         const direction = e.translationX > 0 ? 1 : -1;
         translateX.value = withTiming(
           direction * screenWidth * 1.5,
           { duration: FLY_OFF_DURATION },
           () => {
-            "worklet";
             if (direction > 0) {
               runOnJS(onSave)();
             } else {

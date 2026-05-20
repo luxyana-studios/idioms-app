@@ -23,7 +23,7 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { height: screenHeight } = useWindowDimensions();
-  const { scrollTo } = useLocalSearchParams<{ scrollTo?: string }>();
+  const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
   const {
     idioms,
@@ -41,16 +41,20 @@ export default function HomeScreen() {
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 });
 
   useEffect(() => {
-    if (!scrollTo || idioms.length === 0 || scrollTo === lastScrollTo.current) {
+    if (
+      !scrollToId ||
+      idioms.length === 0 ||
+      scrollToId === lastScrollTo.current
+    ) {
       return;
     }
-    lastScrollTo.current = scrollTo;
-    const idx = parseInt(scrollTo, 10);
-    if (!Number.isNaN(idx) && idx >= 0 && idx < idioms.length) {
+    lastScrollTo.current = scrollToId;
+    const idx = idioms.findIndex((i) => i.id === scrollToId);
+    if (idx >= 0) {
       flatListRef.current?.scrollToIndex({ index: idx, animated: false });
       setCurrentIndex(idx);
     }
-  }, [scrollTo, idioms.length, setCurrentIndex]);
+  }, [scrollToId, idioms, setCurrentIndex]);
 
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
