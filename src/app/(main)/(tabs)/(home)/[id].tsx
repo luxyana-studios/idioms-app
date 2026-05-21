@@ -6,8 +6,11 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { EquivalentsSection } from "@/features/idioms/components/EquivalentsSection";
 import { IdiomInfoCard } from "@/features/idioms/components/IdiomInfoCard";
 import { TranslationSection } from "@/features/idioms/components/TranslationSection";
+import {
+  useLikedIdiomIds,
+  useToggleIdiomLike,
+} from "@/features/idioms/hooks/useIdiomLikes";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
-import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import type { IdiomTag } from "@/features/idioms/types";
 import { CategoryChip } from "@/shared/components/CategoryChip";
 import { GlowBackground } from "@/shared/components/GlowBackground";
@@ -22,10 +25,15 @@ export default function DetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { data: idioms = [] } = useIdioms();
-  const { savedIds, saveIdiom, unsaveIdiom } = useIdiomsStore();
+  const { data: likedIds } = useLikedIdiomIds();
+  const toggleIdiomLike = useToggleIdiomLike();
 
   const idiom = idioms.find((i) => i.id === id);
-  const isSaved = idiom ? savedIds.includes(idiom.id) : false;
+  const isLiked = !!idiom && (likedIds?.has(idiom.id) ?? false);
+  const isLikePending =
+    !!idiom &&
+    toggleIdiomLike.isPending &&
+    toggleIdiomLike.variables?.idiomId === idiom.id;
 
   if (!idiom) {
     return (
@@ -53,6 +61,7 @@ export default function DetailScreen() {
         left={
           <IconButton
             icon="chevron-back"
+            directional
             onPress={() =>
               router.canGoBack()
                 ? router.back()
@@ -64,12 +73,13 @@ export default function DetailScreen() {
         center={<CategoryChip label={idiom.languageCode.toUpperCase()} />}
         right={
           <IconButton
-            icon={isSaved ? "heart" : "heart-outline"}
-            onPress={() =>
-              isSaved ? unsaveIdiom(idiom.id) : saveIdiom(idiom.id)
-            }
-            variant={isSaved ? "primary" : "glass"}
-            accessibilityLabel={t(isSaved ? "home.saved" : "common.save")}
+            icon={isLiked ? "heart" : "heart-outline"}
+            onPress={() => {
+              if (isLikePending) return;
+              toggleIdiomLike.mutate({ idiomId: idiom.id, isLiked });
+            }}
+            variant={isLiked ? "primary" : "glass"}
+            accessibilityLabel={t(isLiked ? "common.unlike" : "common.like")}
           />
         }
       />
@@ -95,6 +105,10 @@ export default function DetailScreen() {
           style={[styles.meaning, { color: theme.colors.textSecondary }]}
         >
           "{idiom.idiomaticMeaning}"
+        </Typography>
+
+        <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
+          {t("likes.count", { count: idiom.likesCount })}
         </Typography>
 
         {idiom.tags.length > 0 && (

@@ -2,19 +2,22 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import { TouchableOpacity, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { DirectionalIcon } from "@/shared/components/DirectionalIcon";
 
 interface CardActionRowProps {
-  isSaved: boolean;
+  isLiked: boolean;
   onSkip: () => void;
   onDetails: () => void;
-  onSave: () => void;
+  onToggleLike: () => void;
+  disabled?: boolean;
 }
 
 export function CardActionRow({
-  isSaved,
+  isLiked,
   onSkip,
   onDetails,
-  onSave,
+  onToggleLike,
+  disabled,
 }: CardActionRowProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
@@ -42,7 +45,7 @@ export function CardActionRow({
         accessibilityRole="button"
         accessibilityLabel={t("home.idiomDetails")}
       >
-        <Ionicons
+        <DirectionalIcon
           name="chevron-forward"
           size={18}
           color={theme.colors.textSecondary}
@@ -52,7 +55,7 @@ export function CardActionRow({
       <TouchableOpacity
         style={[
           styles.btnLg,
-          isSaved
+          isLiked
             ? {
                 backgroundColor: theme.colors.primary,
                 shadowColor: theme.colors.primary,
@@ -66,15 +69,16 @@ export function CardActionRow({
                 borderColor: theme.colors.primary,
               },
         ]}
-        onPress={onSave}
+        onPress={onToggleLike}
+        disabled={disabled}
         hitSlop={8}
         accessibilityRole="button"
-        accessibilityLabel={t(isSaved ? "home.saved" : "common.save")}
+        accessibilityLabel={t(isLiked ? "common.unlike" : "common.like")}
       >
         <Ionicons
-          name={isSaved ? "heart" : "heart-outline"}
+          name={isLiked ? "heart" : "heart-outline"}
           size={24}
-          color={isSaved ? theme.colors.primaryText : theme.colors.primary}
+          color={isLiked ? theme.colors.primaryText : theme.colors.primary}
         />
       </TouchableOpacity>
     </View>

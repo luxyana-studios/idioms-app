@@ -2,6 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import type { ComponentProps } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { DirectionalIcon } from "./DirectionalIcon";
 import { Typography } from "./Typography";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
@@ -82,7 +83,7 @@ export function RecommendationRow({
             {subtitle}
           </Typography>
         </View>
-        <Ionicons
+        <DirectionalIcon
           name="chevron-forward"
           size={16}
           color={isAccent ? theme.colors.primaryText : theme.colors.textMuted}

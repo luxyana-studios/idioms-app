@@ -19,55 +19,28 @@ jest.mock("@/core/storage/mmkv", () => ({
 
 describe("useIdiomsStore", () => {
   beforeEach(() => {
-    useIdiomsStore.setState({ savedIds: [], deferredIds: [], currentIndex: 0 });
+    useIdiomsStore.setState({ deferredIds: [], currentIndex: 0 });
   });
 
   describe("initial state", () => {
-    it("starts with empty savedIds and currentIndex 0", () => {
+    it("starts with empty deferredIds and currentIndex 0", () => {
       const state = useIdiomsStore.getState();
-      expect(state.savedIds).toEqual([]);
+      expect(state.deferredIds).toEqual([]);
       expect(state.currentIndex).toBe(0);
     });
   });
 
-  describe("saveIdiom", () => {
-    it("adds an id to savedIds", () => {
-      useIdiomsStore.getState().saveIdiom("abc");
-      expect(useIdiomsStore.getState().savedIds).toContain("abc");
+  describe("deferIdiom", () => {
+    it("adds an id to deferredIds", () => {
+      useIdiomsStore.getState().deferIdiom("abc");
+      expect(useIdiomsStore.getState().deferredIds).toContain("abc");
     });
 
-    it("does not duplicate an already-saved id", () => {
-      useIdiomsStore.getState().saveIdiom("abc");
-      useIdiomsStore.getState().saveIdiom("abc");
-      expect(
-        useIdiomsStore.getState().savedIds.filter((id) => id === "abc"),
-      ).toHaveLength(1);
-    });
-  });
-
-  describe("unsaveIdiom", () => {
-    it("removes an id from savedIds", () => {
-      useIdiomsStore.setState({ savedIds: ["abc", "def"] });
-      useIdiomsStore.getState().unsaveIdiom("abc");
-      expect(useIdiomsStore.getState().savedIds).not.toContain("abc");
-      expect(useIdiomsStore.getState().savedIds).toContain("def");
-    });
-
-    it("is a no-op for an id that is not saved", () => {
-      useIdiomsStore.setState({ savedIds: ["abc"] });
-      useIdiomsStore.getState().unsaveIdiom("xyz");
-      expect(useIdiomsStore.getState().savedIds).toEqual(["abc"]);
-    });
-  });
-
-  describe("isSaved", () => {
-    it("returns true for a saved id", () => {
-      useIdiomsStore.setState({ savedIds: ["abc"] });
-      expect(useIdiomsStore.getState().isSaved("abc")).toBe(true);
-    });
-
-    it("returns false for an unsaved id", () => {
-      expect(useIdiomsStore.getState().isSaved("xyz")).toBe(false);
+    it("moves an already-deferred id to the end", () => {
+      useIdiomsStore.getState().deferIdiom("abc");
+      useIdiomsStore.getState().deferIdiom("def");
+      useIdiomsStore.getState().deferIdiom("abc");
+      expect(useIdiomsStore.getState().deferredIds).toEqual(["def", "abc"]);
     });
   });
 
@@ -99,17 +72,17 @@ describe("useIdiomsStore", () => {
   });
 
   describe("persistence", () => {
-    it("partialize only persists savedIds, not currentIndex", () => {
+    it("partialize only persists deferredIds, not currentIndex", () => {
       const partialize = (state: ReturnType<typeof useIdiomsStore.getState>) =>
-        ({ savedIds: state.savedIds }) as ReturnType<
+        ({ deferredIds: state.deferredIds }) as ReturnType<
           typeof useIdiomsStore.getState
         >;
       const partial = partialize({
         ...useIdiomsStore.getState(),
-        savedIds: ["abc"],
+        deferredIds: ["abc"],
         currentIndex: 3,
       });
-      expect(partial.savedIds).toEqual(["abc"]);
+      expect(partial.deferredIds).toEqual(["abc"]);
       expect(
         (partial as unknown as Record<string, unknown>).currentIndex,
       ).toBeUndefined();

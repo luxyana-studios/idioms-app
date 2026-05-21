@@ -1,5 +1,6 @@
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTranslation } from "react-i18next";
 import { Platform, Pressable, useWindowDimensions, View } from "react-native";
 import {
   StyleSheet,
@@ -16,11 +17,12 @@ interface IdiomCardStackProps {
   progress: number;
   currentIndex: number;
   totalCount: number;
-  isSaved: boolean;
+  isLiked: boolean;
+  isLikePending?: boolean;
   onPress: () => void;
   onSkip: () => void;
   onDetails: () => void;
-  onSave: () => void;
+  onToggleLike: () => void;
 }
 
 export function IdiomCardStack({
@@ -28,12 +30,14 @@ export function IdiomCardStack({
   progress,
   currentIndex,
   totalCount,
-  isSaved,
+  isLiked,
+  isLikePending,
   onPress,
   onSkip,
   onDetails,
-  onSave,
+  onToggleLike,
 }: IdiomCardStackProps) {
+  const { t } = useTranslation();
   const { theme } = useUnistyles();
   const isDark = UnistylesRuntime.themeName === "dark";
   const { width: screenWidth } = useWindowDimensions();
@@ -188,6 +192,12 @@ export function IdiomCardStack({
             >
               {currentIndex + 1} / {totalCount}
             </Typography>
+            <Typography
+              variant="caption"
+              style={[styles.statText, { color: theme.colors.textMuted }]}
+            >
+              {t("likes.count", { count: idiom.likesCount })}
+            </Typography>
           </View>
         </View>
       </Pressable>
@@ -195,10 +205,11 @@ export function IdiomCardStack({
       {/* Action buttons */}
       <View style={[styles.actions, { top: CARD_HEIGHT + 20 }]}>
         <CardActionRow
-          isSaved={isSaved}
+          isLiked={isLiked}
+          disabled={isLikePending}
           onSkip={onSkip}
           onDetails={onDetails}
-          onSave={onSave}
+          onToggleLike={onToggleLike}
         />
       </View>
     </View>

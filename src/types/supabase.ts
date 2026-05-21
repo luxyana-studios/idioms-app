@@ -76,6 +76,35 @@ export type Database = {
           },
         ];
       };
+      idiom_likes: {
+        Row: {
+          created_at: string;
+          id: string;
+          idiom_id: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          idiom_id: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          idiom_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "idiom_likes_idiom_id_fkey";
+            columns: ["idiom_id"];
+            isOneToOne: false;
+            referencedRelation: "idioms";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       idiom_tags: {
         Row: {
           created_at: string;
@@ -166,6 +195,7 @@ export type Database = {
           id: string;
           idiomatic_meaning: string;
           language_code: string;
+          likes_count: number;
           source: string;
           status: string;
           updated_at: string;
@@ -179,6 +209,7 @@ export type Database = {
           id?: string;
           idiomatic_meaning: string;
           language_code: string;
+          likes_count?: number;
           source?: string;
           status?: string;
           updated_at?: string;
@@ -192,6 +223,7 @@ export type Database = {
           id?: string;
           idiomatic_meaning?: string;
           language_code?: string;
+          likes_count?: number;
           source?: string;
           status?: string;
           updated_at?: string;

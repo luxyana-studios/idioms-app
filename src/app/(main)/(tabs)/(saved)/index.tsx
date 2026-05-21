@@ -4,15 +4,24 @@ import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   StyleSheet,
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
+import {
+  useLikedIdiomIds,
+  useToggleIdiomLike,
+} from "@/features/idioms/hooks/useIdiomLikes";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
-import { useIdiomsStore } from "@/features/idioms/stores/idioms.store";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { IconButton } from "@/shared/components/IconButton";
 import { ScreenHeader } from "@/shared/components/ScreenHeader";
@@ -25,12 +34,34 @@ export default function SavedScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const navigation = useNavigation();
-  const { data: idioms = [] } = useIdioms();
-  const { savedIds, unsaveIdiom } = useIdiomsStore();
+  const { data: idioms = [], isLoading: idiomsLoading } = useIdioms();
+  const { data: likedIds, isLoading: likesLoading } = useLikedIdiomIds();
+  const toggleIdiomLike = useToggleIdiomLike();
 
-  const savedIdioms = idioms.filter((idiom) => savedIds.includes(idiom.id));
+  const savedIdioms = likedIds
+    ? idioms.filter((idiom) => likedIds.has(idiom.id))
+    : [];
 
   const cardBg = isDark ? "rgba(26,36,21,0.72)" : "rgba(255,255,255,0.68)";
+
+  if (idiomsLoading || likesLoading) {
+    return (
+      <View
+        style={[
+          styles.root,
+          {
+            backgroundColor: theme.colors.background,
+            paddingTop: insets.top,
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        ]}
+      >
+        <GlowBackground subtle />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <View
@@ -183,7 +214,16 @@ export default function SavedScreen() {
                     </Typography>
                   </View>
                   <TouchableOpacity
-                    onPress={() => unsaveIdiom(idiom.id)}
+                    onPress={() =>
+                      toggleIdiomLike.mutate({
+                        idiomId: idiom.id,
+                        isLiked: true,
+                      })
+                    }
+                    disabled={
+                      toggleIdiomLike.isPending &&
+                      toggleIdiomLike.variables?.idiomId === idiom.id
+                    }
                     hitSlop={10}
                     style={styles.unsaveBtn}
                   >
@@ -213,6 +253,13 @@ export default function SavedScreen() {
                   ]}
                 >
                   {idiom.idiomaticMeaning}
+                </Typography>
+
+                <Typography
+                  variant="caption"
+                  style={[styles.likeCount, { color: theme.colors.textMuted }]}
+                >
+                  {t("likes.count", { count: idiom.likesCount })}
                 </Typography>
               </View>
             </TouchableOpacity>
@@ -293,5 +340,8 @@ const styles = StyleSheet.create((theme) => ({
   meaning: {
     lineHeight: 22,
     fontSize: 14,
+  },
+  likeCount: {
+    marginTop: theme.spacing.sm,
   },
 }));

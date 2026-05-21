@@ -136,6 +136,13 @@ jest.mock("react-native-svg", () => ({
 jest.mock("expo-linear-gradient", () => ({
   LinearGradient: ({ children }: { children: React.ReactNode }) => children,
 }));
+jest.mock("@/core/theme/fonts", () => ({
+  useUiFonts: () => ({
+    family: () => "System",
+    weight: () => "400",
+  }),
+  useLoadFonts: () => [true, null],
+}));
 
 const mockIdiom: Idiom = {
   id: "test-1",
@@ -147,6 +154,7 @@ const mockIdiom: Idiom = {
   tags: [{ key: "death", facet: "theme", label: "Death" }],
   source: "human",
   status: "published",
+  likesCount: 0,
 };
 
 const defaultProps = {

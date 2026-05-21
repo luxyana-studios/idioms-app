@@ -43,6 +43,7 @@ export const lightTheme = {
     shadow: "#000",
     primaryIconBg: "rgba(255,255,255,0.20)",
     primaryGlow: "rgba(145,71,49,0.09)",
+    scrim: "rgba(0,0,0,0.4)",
     // Feed UX tokens
     feedSwipeLikeGlow: "rgba(89,98,68,0.18)",
     feedSwipeSkipGlow: "rgba(145,71,49,0.14)",
@@ -108,6 +109,7 @@ export const darkTheme = {
     shadow: "#000",
     primaryIconBg: "rgba(255,255,255,0.20)",
     primaryGlow: "rgba(236,190,142,0.09)",
+    scrim: "rgba(0,0,0,0.55)",
     // Feed UX tokens
     feedSwipeLikeGlow: "rgba(168,196,128,0.22)",
     feedSwipeSkipGlow: "rgba(236,190,142,0.18)",

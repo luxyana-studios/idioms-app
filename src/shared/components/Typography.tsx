@@ -1,11 +1,24 @@
 import { Text, type TextProps } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { type UiFontWeight, useUiFonts } from "@/core/theme/fonts";
 
 interface TypographyProps extends TextProps {
   variant?: "display" | "title" | "heading" | "body" | "label" | "caption";
   color?: "text" | "textSecondary" | "primary" | "error";
-  weight?: "light" | "regular" | "medium" | "semibold" | "bold" | "extraBold";
+  weight?: UiFontWeight;
 }
+
+const VARIANT_WEIGHT: Record<
+  NonNullable<TypographyProps["variant"]>,
+  UiFontWeight
+> = {
+  display: "extraBold",
+  title: "bold",
+  heading: "semibold",
+  body: "regular",
+  label: "bold",
+  caption: "regular",
+};
 
 export function Typography({
   variant = "body",
@@ -15,17 +28,11 @@ export function Typography({
   ...props
 }: TypographyProps) {
   const { theme } = useUnistyles();
+  const fonts = useUiFonts();
 
-  const fontFamily = weight
-    ? {
-        light: theme.typography.fonts.sansLight,
-        regular: theme.typography.fonts.sans,
-        medium: theme.typography.fonts.sansMedium,
-        semibold: theme.typography.fonts.sansSemibold,
-        bold: theme.typography.fonts.sansBold,
-        extraBold: theme.typography.fonts.sansExtraBold,
-      }[weight]
-    : undefined;
+  const effectiveWeight = weight ?? VARIANT_WEIGHT[variant];
+  const fontFamily = fonts.family(effectiveWeight);
+  const fontWeight = fonts.weight(effectiveWeight);
 
   return (
     <Text
@@ -33,7 +40,7 @@ export function Typography({
         styles.base,
         styles[variant],
         color && { color: theme.colors[color] },
-        fontFamily && { fontFamily },
+        { fontFamily, fontWeight },
         style,
       ]}
       {...props}
@@ -44,36 +51,29 @@ export function Typography({
 const styles = StyleSheet.create((theme) => ({
   base: {
     color: theme.colors.text,
-    fontFamily: theme.typography.fonts.sans,
   },
   display: {
     fontSize: theme.typography.sizes["4xl"],
-    fontFamily: theme.typography.fonts.sansExtraBold,
     letterSpacing: -1,
     lineHeight: theme.typography.sizes["4xl"] * 1.1,
   },
   title: {
     fontSize: theme.typography.sizes["3xl"],
-    fontFamily: theme.typography.fonts.sansBold,
     letterSpacing: -0.5,
   },
   heading: {
     fontSize: theme.typography.sizes.xl,
-    fontFamily: theme.typography.fonts.sansSemibold,
   },
   body: {
     fontSize: theme.typography.sizes.md,
-    fontFamily: theme.typography.fonts.sans,
     lineHeight: theme.typography.sizes.md * 1.6,
   },
   label: {
     fontSize: theme.typography.sizes.sm,
-    fontFamily: theme.typography.fonts.sansBold,
     letterSpacing: 1,
   },
   caption: {
     fontSize: theme.typography.sizes.xs,
-    fontFamily: theme.typography.fonts.sans,
     color: theme.colors.textSecondary,
     letterSpacing: 0.5,
   },

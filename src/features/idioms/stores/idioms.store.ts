@@ -3,35 +3,18 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
 
 interface IdiomsState {
-  savedIds: string[];
   deferredIds: string[];
   currentIndex: number;
-  saveIdiom: (id: string) => void;
-  unsaveIdiom: (id: string) => void;
   deferIdiom: (id: string) => void;
   nextIdiom: (total: number) => void;
   setCurrentIndex: (index: number) => void;
-  isSaved: (id: string) => boolean;
 }
 
 export const useIdiomsStore = create<IdiomsState>()(
   persist(
-    (set, get) => ({
-      savedIds: [],
+    (set) => ({
       deferredIds: [],
       currentIndex: 0,
-
-      saveIdiom: (id) =>
-        set((state) => ({
-          savedIds: state.savedIds.includes(id)
-            ? state.savedIds
-            : [...state.savedIds, id],
-        })),
-
-      unsaveIdiom: (id) =>
-        set((state) => ({
-          savedIds: state.savedIds.filter((s) => s !== id),
-        })),
 
       deferIdiom: (id) =>
         set((state) => ({
@@ -44,13 +27,12 @@ export const useIdiomsStore = create<IdiomsState>()(
         })),
 
       setCurrentIndex: (index) => set({ currentIndex: index }),
-
-      isSaved: (id) => get().savedIds.includes(id),
     }),
     {
       name: "idioms-store",
       storage: createJSONStorage(() => zustandMMKVStorage),
-      partialize: (state) => ({ savedIds: state.savedIds }) as IdiomsState,
+      partialize: (state) =>
+        ({ deferredIds: state.deferredIds }) as IdiomsState,
     },
   ),
 );

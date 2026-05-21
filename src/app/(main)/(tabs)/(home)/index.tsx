@@ -13,6 +13,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { FeedCard } from "@/features/idioms/components/FeedCard";
 import { useFeedList } from "@/features/idioms/hooks/useFeedList";
+import {
+  useLikedIdiomIds,
+  useToggleIdiomLike,
+} from "@/features/idioms/hooks/useIdiomLikes";
 import type { Idiom } from "@/features/idioms/types";
 import { IconButton } from "@/shared/components/IconButton";
 
@@ -25,16 +29,10 @@ export default function HomeScreen() {
   const { height: screenHeight } = useWindowDimensions();
   const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
-  const {
-    idioms,
-    isLoading,
-    currentIndex,
-    savedIds,
-    saveIdiom,
-    unsaveIdiom,
-    deferIdiom,
-    setCurrentIndex,
-  } = useFeedList();
+  const { idioms, isLoading, deferIdiom, currentIndex, setCurrentIndex } =
+    useFeedList();
+  const { data: likedIds } = useLikedIdiomIds();
+  const toggleIdiomLike = useToggleIdiomLike();
 
   const flatListRef = useRef<FlatList<Idiom>>(null);
   const lastScrollTo = useRef<string | null>(null);
@@ -95,23 +93,22 @@ export default function HomeScreen() {
         ref={flatListRef}
         data={idioms}
         keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <FeedCard
-            idiom={item}
-            currentIndex={index}
-            totalCount={idioms.length}
-            isSaved={savedIds.includes(item.id)}
-            onSave={() => {
-              if (savedIds.includes(item.id)) {
-                unsaveIdiom(item.id);
-              } else {
-                saveIdiom(item.id);
+        renderItem={({ item, index }) => {
+          const isLiked = likedIds?.has(item.id) ?? false;
+          return (
+            <FeedCard
+              idiom={item}
+              currentIndex={index}
+              totalCount={idioms.length}
+              isSaved={isLiked}
+              onSave={() =>
+                toggleIdiomLike.mutate({ idiomId: item.id, isLiked })
               }
-            }}
-            onSkip={() => handleSkip(item.id)}
-            onExpand={() => router.push(`/(main)/(tabs)/(home)/${item.id}`)}
-          />
-        )}
+              onSkip={() => handleSkip(item.id)}
+              onExpand={() => router.push(`/(main)/(tabs)/(home)/${item.id}`)}
+            />
+          );
+        }}
         pagingEnabled
         snapToInterval={screenHeight}
         snapToAlignment="start"
