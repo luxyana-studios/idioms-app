@@ -78,19 +78,24 @@ export function FeedCard({
     >
       <GestureDetector gesture={panGesture}>
         <Animated.View style={[{ flex: 1 }, animatedCardStyle]}>
-          <Pressable
-            style={styles.fill}
-            onPress={onExpand}
-            onLongPress={() => setShowTranslation(true)}
-            delayLongPress={400}
-            accessibilityRole="none"
-            accessibilityLabel={idiom.expression}
-            accessibilityHint={t("home.holdToTranslate")}
-          >
+          <View style={styles.fill}>
             <GlowBackground />
 
             {/* Swipe direction glow tint */}
             <Animated.View pointerEvents="none" style={likeGlowStyle} />
+
+            {/* Tap overlay: handles expand/translate for the card body.
+                Absolute fill at zIndex 0 — tray (zIndex 2) sits above it so
+                its buttons receive touches without creating nested <button> on web. */}
+            <Pressable
+              style={styles.tapOverlay}
+              onPress={onExpand}
+              onLongPress={() => setShowTranslation(true)}
+              delayLongPress={400}
+              accessibilityRole="button"
+              accessibilityLabel={idiom.expression}
+              accessibilityHint={t("home.holdToTranslate")}
+            />
 
             {/* Top strip: progress bar sits between the floating header buttons */}
             <View
@@ -103,7 +108,7 @@ export function FeedCard({
             </View>
 
             {/* Hero: expression text anchored to lower-third */}
-            <View style={styles.heroArea}>
+            <View style={styles.heroArea} pointerEvents="none">
               <Typography
                 variant="display"
                 weight="extraBold"
@@ -201,7 +206,7 @@ export function FeedCard({
                 onDismiss={() => setShowTranslation(false)}
               />
             )}
-          </Pressable>
+          </View>
         </Animated.View>
       </GestureDetector>
     </Animated.View>
@@ -211,6 +216,14 @@ export function FeedCard({
 const styles = StyleSheet.create((theme) => ({
   fill: {
     flex: 1,
+  },
+  tapOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 0,
   },
   topStrip: {
     position: "absolute",
