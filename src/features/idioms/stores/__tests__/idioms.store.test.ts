@@ -44,26 +44,6 @@ describe("useIdiomsStore", () => {
     });
   });
 
-  describe("nextIdiom", () => {
-    it("increments currentIndex", () => {
-      useIdiomsStore.setState({ currentIndex: 0 });
-      useIdiomsStore.getState().nextIdiom(5);
-      expect(useIdiomsStore.getState().currentIndex).toBe(1);
-    });
-
-    it("wraps around when at the last item", () => {
-      useIdiomsStore.setState({ currentIndex: 4 });
-      useIdiomsStore.getState().nextIdiom(5);
-      expect(useIdiomsStore.getState().currentIndex).toBe(0);
-    });
-
-    it("sets currentIndex to 0 when total is 0", () => {
-      useIdiomsStore.setState({ currentIndex: 2 });
-      useIdiomsStore.getState().nextIdiom(0);
-      expect(useIdiomsStore.getState().currentIndex).toBe(0);
-    });
-  });
-
   describe("setCurrentIndex", () => {
     it("sets currentIndex to the given value", () => {
       useIdiomsStore.getState().setCurrentIndex(7);

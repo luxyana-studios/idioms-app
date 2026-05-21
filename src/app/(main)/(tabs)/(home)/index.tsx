@@ -19,6 +19,7 @@ import {
 } from "@/features/idioms/hooks/useIdiomLikes";
 import type { Idiom } from "@/features/idioms/types";
 import { IconButton } from "@/shared/components/IconButton";
+import { Typography } from "@/shared/components/Typography";
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -63,11 +64,24 @@ export default function HomeScreen() {
     [setCurrentIndex],
   );
 
-  const handleSkip = useCallback(
-    (idiomId: string) => {
-      deferIdiom(idiomId);
+  const handleSave = useCallback(
+    (idiomId: string, isLikedVal: boolean, index: number) => {
+      toggleIdiomLike.mutate({ idiomId, isLiked: isLikedVal });
+      const nextIdx = Math.min(index + 1, idioms.length - 1);
+      flatListRef.current?.scrollToIndex({ index: nextIdx, animated: true });
+      setCurrentIndex(nextIdx);
     },
-    [deferIdiom],
+    [toggleIdiomLike, idioms.length, setCurrentIndex],
+  );
+
+  const handleSkip = useCallback(
+    (idiomId: string, index: number) => {
+      deferIdiom(idiomId);
+      const nextIdx = Math.min(index + 1, idioms.length - 1);
+      flatListRef.current?.scrollToIndex({ index: nextIdx, animated: true });
+      setCurrentIndex(nextIdx);
+    },
+    [deferIdiom, idioms.length, setCurrentIndex],
   );
 
   const getItemLayout = useCallback(
@@ -79,10 +93,20 @@ export default function HomeScreen() {
     [screenHeight],
   );
 
-  if (isLoading || idioms.length === 0) {
+  if (isLoading) {
     return (
       <View style={[styles.root, styles.centered]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
+  if (idioms.length === 0) {
+    return (
+      <View style={[styles.root, styles.centered]}>
+        <Typography variant="body" style={{ color: theme.colors.textMuted }}>
+          {t("home.emptyFeed")}
+        </Typography>
       </View>
     );
   }
@@ -101,10 +125,8 @@ export default function HomeScreen() {
               currentIndex={index}
               totalCount={idioms.length}
               isSaved={isLiked}
-              onSave={() =>
-                toggleIdiomLike.mutate({ idiomId: item.id, isLiked })
-              }
-              onSkip={() => handleSkip(item.id)}
+              onSave={() => handleSave(item.id, isLiked, index)}
+              onSkip={() => handleSkip(item.id, index)}
               onExpand={() => router.push(`/(main)/(tabs)/(home)/${item.id}`)}
             />
           );
