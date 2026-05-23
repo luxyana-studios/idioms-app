@@ -152,7 +152,9 @@ export default function SavedScreen() {
             <TouchableOpacity
               key={idiom.id}
               activeOpacity={0.85}
-              onPress={() => router.push(`/(main)/(tabs)/(home)/${idiom.id}`)}
+              onPress={() =>
+                router.push(`/(main)/(tabs)/(home)?scrollToId=${idiom.id}`)
+              }
             >
               <View
                 style={[
