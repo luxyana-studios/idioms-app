@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, useWindowDimensions, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
@@ -25,8 +25,9 @@ interface FeedCardProps {
   currentIndex: number;
   totalCount: number;
   isSaved: boolean;
-  onSave: () => void;
-  onSkip: () => void;
+  onLike: () => void;
+  onNext: () => void;
+  onPrev: () => void;
   onExpand: () => void;
 }
 
@@ -35,8 +36,9 @@ export function FeedCard({
   currentIndex,
   totalCount,
   isSaved,
-  onSave,
-  onSkip,
+  onLike,
+  onNext,
+  onPrev,
   onExpand,
 }: FeedCardProps) {
   const { t } = useTranslation();
@@ -46,7 +48,18 @@ export function FeedCard({
   const [showTranslation, setShowTranslation] = useState(false);
 
   const { panGesture, animatedCardStyle, glowOpacity, isLikeDirection } =
-    useFeedGesture({ onSave, onSkip });
+    useFeedGesture({ onNext, onPrev });
+
+  const lastTapRef = useRef(0);
+  const handleTap = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      onLike();
+      lastTapRef.current = 0;
+    } else {
+      lastTapRef.current = now;
+    }
+  }, [onLike]);
 
   const entryY = useSharedValue(screenHeight * 0.06);
   useEffect(() => {
@@ -89,7 +102,7 @@ export function FeedCard({
                 its buttons receive touches without creating nested <button> on web. */}
             <Pressable
               style={styles.tapOverlay}
-              onPress={onExpand}
+              onPress={handleTap}
               onLongPress={() => setShowTranslation(true)}
               delayLongPress={400}
               accessibilityRole="button"
@@ -167,16 +180,6 @@ export function FeedCard({
               {/* Actions */}
               <View style={styles.actions}>
                 <IconButton
-                  icon="close"
-                  onPress={onSkip}
-                  variant="bare"
-                  iconColor={theme.colors.textMuted}
-                  iconSize={28}
-                  containerSize={52}
-                  borderRadius={theme.radius.full}
-                  accessibilityLabel={t("home.skipIdiom")}
-                />
-                <IconButton
                   icon="chevron-forward"
                   onPress={onExpand}
                   variant="bare"
@@ -187,7 +190,7 @@ export function FeedCard({
                 />
                 <IconButton
                   icon={isSaved ? "heart" : "heart-outline"}
-                  onPress={onSave}
+                  onPress={onLike}
                   variant="primary"
                   iconSize={26}
                   containerSize={60}

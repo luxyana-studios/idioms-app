@@ -162,8 +162,9 @@ const defaultProps = {
   currentIndex: 0,
   totalCount: 10,
   isSaved: false,
-  onSave: jest.fn(),
-  onSkip: jest.fn(),
+  onLike: jest.fn(),
+  onNext: jest.fn(),
+  onPrev: jest.fn(),
   onExpand: jest.fn(),
 };
 
@@ -180,22 +181,24 @@ describe("FeedCard", () => {
     expect(getByText("To die")).toBeTruthy();
   });
 
-  it("calls onSkip when skip button is pressed", () => {
-    const onSkip = jest.fn();
+  it("calls onLike on double-tap of card body", () => {
+    const onLike = jest.fn();
     const { getByLabelText } = render(
-      <FeedCard {...defaultProps} onSkip={onSkip} />,
+      <FeedCard {...defaultProps} onLike={onLike} />,
     );
-    fireEvent.press(getByLabelText("home.skipIdiom"));
-    expect(onSkip).toHaveBeenCalledTimes(1);
+    const overlay = getByLabelText("Kick the bucket");
+    fireEvent.press(overlay); // first tap
+    fireEvent.press(overlay); // second tap within 300 ms
+    expect(onLike).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onSave when save button is pressed", () => {
-    const onSave = jest.fn();
+  it("calls onLike when save button is pressed", () => {
+    const onLike = jest.fn();
     const { getByLabelText } = render(
-      <FeedCard {...defaultProps} onSave={onSave} />,
+      <FeedCard {...defaultProps} onLike={onLike} />,
     );
     fireEvent.press(getByLabelText("home.saveIdiom"));
-    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(onLike).toHaveBeenCalledTimes(1);
   });
 
   it("calls onExpand when expand button is pressed", () => {

@@ -16,11 +16,11 @@ const FLY_OFF_DURATION = 220;
 const MAX_TILT_DEG = 4;
 
 interface UseFeedGestureOpts {
-  onSave: () => void;
-  onSkip: () => void;
+  onNext: () => void;
+  onPrev: () => void;
 }
 
-export function useFeedGesture({ onSave, onSkip }: UseFeedGestureOpts) {
+export function useFeedGesture({ onNext, onPrev }: UseFeedGestureOpts) {
   const { width: screenWidth } = useWindowDimensions();
 
   const translateX = useSharedValue(0);
@@ -48,10 +48,12 @@ export function useFeedGesture({ onSave, onSkip }: UseFeedGestureOpts) {
           direction * screenWidth * 1.5,
           { duration: FLY_OFF_DURATION },
           () => {
+            // swipe right (direction > 0) = go to previous card
+            // swipe left (direction < 0) = go to next card
             if (direction > 0) {
-              runOnJS(onSave)();
+              runOnJS(onPrev)();
             } else {
-              runOnJS(onSkip)();
+              runOnJS(onNext)();
             }
             translateX.value = 0;
             rotateZ.value = 0;

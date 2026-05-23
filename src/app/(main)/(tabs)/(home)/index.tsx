@@ -30,8 +30,7 @@ export default function HomeScreen() {
   const { height: screenHeight } = useWindowDimensions();
   const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
-  const { idioms, isLoading, deferIdiom, currentIndex, setCurrentIndex } =
-    useFeedList();
+  const { idioms, isLoading, currentIndex, setCurrentIndex } = useFeedList();
   const { data: likedIds } = useLikedIdiomIds();
   const toggleIdiomLike = useToggleIdiomLike();
 
@@ -64,24 +63,29 @@ export default function HomeScreen() {
     [setCurrentIndex],
   );
 
-  const handleSave = useCallback(
-    (idiomId: string, isLikedVal: boolean, index: number) => {
-      toggleIdiomLike.mutate({ idiomId, isLiked: isLikedVal });
-      const nextIdx = Math.min(index + 1, idioms.length - 1);
-      flatListRef.current?.scrollToIndex({ index: nextIdx, animated: true });
-      setCurrentIndex(nextIdx);
+  const handleLike = useCallback(
+    (idiomId: string, isLiked: boolean) => {
+      toggleIdiomLike.mutate({ idiomId, isLiked });
     },
-    [toggleIdiomLike, idioms.length, setCurrentIndex],
+    [toggleIdiomLike],
   );
 
-  const handleSkip = useCallback(
-    (idiomId: string, index: number) => {
-      deferIdiom(idiomId);
+  const handleNext = useCallback(
+    (index: number) => {
       const nextIdx = Math.min(index + 1, idioms.length - 1);
       flatListRef.current?.scrollToIndex({ index: nextIdx, animated: true });
       setCurrentIndex(nextIdx);
     },
-    [deferIdiom, idioms.length, setCurrentIndex],
+    [idioms.length, setCurrentIndex],
+  );
+
+  const handlePrev = useCallback(
+    (index: number) => {
+      const prevIdx = Math.max(index - 1, 0);
+      flatListRef.current?.scrollToIndex({ index: prevIdx, animated: true });
+      setCurrentIndex(prevIdx);
+    },
+    [setCurrentIndex],
   );
 
   const getItemLayout = useCallback(
@@ -125,8 +129,9 @@ export default function HomeScreen() {
               currentIndex={index}
               totalCount={idioms.length}
               isSaved={isLiked}
-              onSave={() => handleSave(item.id, isLiked, index)}
-              onSkip={() => handleSkip(item.id, index)}
+              onLike={() => handleLike(item.id, isLiked)}
+              onNext={() => handleNext(index)}
+              onPrev={() => handlePrev(index)}
               onExpand={() => router.push(`/(main)/(tabs)/(home)/${item.id}`)}
             />
           );
