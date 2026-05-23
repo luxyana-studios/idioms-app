@@ -32,6 +32,7 @@ export default function HomeScreen() {
 
   const { idioms, isLoading, currentIndex, setCurrentIndex } = useFeedList();
   const { data: likedIds } = useLikedIdiomIds();
+  const likedIdsSet = likedIds ?? new Set<string>();
   const toggleIdiomLike = useToggleIdiomLike();
 
   const flatListRef = useRef<FlatList<Idiom>>(null);
@@ -70,26 +71,6 @@ export default function HomeScreen() {
     [toggleIdiomLike],
   );
 
-  const handleNext = useCallback(
-    (index: number) => {
-      const nextIdx = Math.min(index + 1, idioms.length - 1);
-      // animated: false — the swipe gesture already handles the visual; a
-      // simultaneous vertical scroll animation would look like the card goes down
-      flatListRef.current?.scrollToIndex({ index: nextIdx, animated: false });
-      setCurrentIndex(nextIdx);
-    },
-    [idioms.length, setCurrentIndex],
-  );
-
-  const handlePrev = useCallback(
-    (index: number) => {
-      const prevIdx = Math.max(index - 1, 0);
-      flatListRef.current?.scrollToIndex({ index: prevIdx, animated: false });
-      setCurrentIndex(prevIdx);
-    },
-    [setCurrentIndex],
-  );
-
   const getItemLayout = useCallback(
     (_: ArrayLike<Idiom> | null | undefined, index: number) => ({
       length: screenHeight,
@@ -123,21 +104,18 @@ export default function HomeScreen() {
         ref={flatListRef}
         data={idioms}
         keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => {
-          const isLiked = likedIds?.has(item.id) ?? false;
-          return (
-            <FeedCard
-              idiom={item}
-              currentIndex={index}
-              totalCount={idioms.length}
-              isSaved={isLiked}
-              onLike={() => handleLike(item.id, isLiked)}
-              onNext={() => handleNext(index)}
-              onPrev={() => handlePrev(index)}
-              onExpand={() => router.push(`/(main)/(tabs)/(home)/${item.id}`)}
-            />
-          );
-        }}
+        renderItem={({ item, index }) => (
+          <FeedCard
+            idiom={item}
+            currentIndex={index}
+            totalCount={idioms.length}
+            likedIds={likedIdsSet}
+            onLike={handleLike}
+            onExpand={(idiomId) =>
+              router.push(`/(main)/(tabs)/(home)/${idiomId}`)
+            }
+          />
+        )}
         pagingEnabled
         snapToInterval={screenHeight}
         snapToAlignment="start"

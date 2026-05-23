@@ -161,10 +161,8 @@ const defaultProps = {
   idiom: mockIdiom,
   currentIndex: 0,
   totalCount: 10,
-  isSaved: false,
+  likedIds: new Set<string>(),
   onLike: jest.fn(),
-  onNext: jest.fn(),
-  onPrev: jest.fn(),
   onExpand: jest.fn(),
 };
 
@@ -227,8 +225,10 @@ describe("FeedCard", () => {
     expect(onExpand).toHaveBeenCalledTimes(1);
   });
 
-  it("shows saved label when isSaved is true", () => {
-    const { getByLabelText } = render(<FeedCard {...defaultProps} isSaved />);
+  it("shows saved label when idiom is in likedIds", () => {
+    const { getByLabelText } = render(
+      <FeedCard {...defaultProps} likedIds={new Set(["test-1"])} />,
+    );
     expect(getByLabelText("home.saved")).toBeTruthy();
   });
 });

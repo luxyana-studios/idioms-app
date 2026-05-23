@@ -72,5 +72,6 @@
   "home.holdToTranslate": "Maintenir pour traduire",
   "home.translation": "Traduction",
   "home.idiomCount": "{{current}} sur {{total}}",
-  "home.noTranslation": "Traduction non disponible"
+  "home.noTranslation": "Traduction non disponible",
+  "home.emptyFeed": "Aucune expression disponible"
 }

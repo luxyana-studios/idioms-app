@@ -72,5 +72,6 @@
   "home.holdToTranslate": "Gedrückt halten zum Übersetzen",
   "home.translation": "Übersetzung",
   "home.idiomCount": "{{current}} von {{total}}",
-  "home.noTranslation": "Keine Übersetzung verfügbar"
+  "home.noTranslation": "Keine Übersetzung verfügbar",
+  "home.emptyFeed": "Keine Redewendungen verfügbar"
 }

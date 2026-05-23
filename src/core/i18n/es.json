@@ -72,5 +72,6 @@
   "home.holdToTranslate": "Mantén pulsado para traducir",
   "home.translation": "Traducción",
   "home.idiomCount": "{{current}} de {{total}}",
-  "home.noTranslation": "Traducción no disponible"
+  "home.noTranslation": "Traducción no disponible",
+  "home.emptyFeed": "No hay modismos disponibles"
 }

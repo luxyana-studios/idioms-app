@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, useWindowDimensions, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
@@ -11,12 +11,13 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { Idiom } from "@/features/idioms/types";
+import type { Idiom, IdiomTag } from "@/features/idioms/types";
 import { CategoryChip } from "@/shared/components/CategoryChip";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { IconButton } from "@/shared/components/IconButton";
 import { Typography } from "@/shared/components/Typography";
 import { useFeedGesture } from "../hooks/useFeedGesture";
+import { useIdiomEquivalents } from "../hooks/useIdiomEquivalents";
 import { FeedProgressBar } from "./FeedProgressBar";
 import { TranslationOverlay } from "./TranslationOverlay";
 
@@ -24,21 +25,25 @@ interface FeedCardProps {
   idiom: Idiom;
   currentIndex: number;
   totalCount: number;
-  isSaved: boolean;
-  onLike: () => void;
-  onNext: () => void;
-  onPrev: () => void;
-  onExpand: () => void;
+  likedIds: Set<string>;
+  onLike: (idiomId: string, isLiked: boolean) => void;
+  onExpand: (idiomId: string) => void;
 }
+
+type Variant = {
+  id: string;
+  expression: string;
+  languageCode: string;
+  idiomaticMeaning: string;
+  tags: IdiomTag[];
+};
 
 export function FeedCard({
   idiom,
   currentIndex,
   totalCount,
-  isSaved,
+  likedIds,
   onLike,
-  onNext,
-  onPrev,
   onExpand,
 }: FeedCardProps) {
   const { t } = useTranslation();
@@ -47,31 +52,78 @@ export function FeedCard({
   const insets = useSafeAreaInsets();
   const [showTranslation, setShowTranslation] = useState(false);
 
-  const { panGesture, animatedCardStyle, glowOpacity, isLikeDirection } =
-    useFeedGesture({ onNext, onPrev });
+  // Language variants: original idiom + its equivalents in other languages
+  const { data: equivalents = [] } = useIdiomEquivalents(idiom.id);
+  const variants = useMemo<Variant[]>(
+    () => [
+      {
+        id: idiom.id,
+        expression: idiom.expression,
+        languageCode: idiom.languageCode,
+        idiomaticMeaning: idiom.idiomaticMeaning,
+        tags: idiom.tags,
+      },
+      ...equivalents.map((eq) => ({
+        id: eq.equivalentId,
+        expression: eq.expression,
+        languageCode: eq.languageCode,
+        idiomaticMeaning: eq.idiomaticMeaning,
+        tags: [] as IdiomTag[],
+      })),
+    ],
+    [idiom, equivalents],
+  );
 
+  const [variantIndex, setVariantIndex] = useState(0);
+
+  // Reset to the original language when the feed scrolls to a new idiom
+  // biome-ignore lint/correctness/useExhaustiveDependencies: idiom.id is the trigger; setVariantIndex is stable
+  useEffect(() => {
+    setVariantIndex(0);
+  }, [idiom.id]);
+
+  const currentVariant = variants[variantIndex] ?? variants[0];
+  const isCurrentSaved = likedIds.has(currentVariant.id);
+
+  const handleNext = useCallback(() => {
+    setVariantIndex((i) => Math.min(i + 1, variants.length - 1));
+  }, [variants.length]);
+
+  const handlePrev = useCallback(() => {
+    setVariantIndex((i) => Math.max(i - 1, 0));
+  }, []);
+
+  const { panGesture, animatedCardStyle, glowOpacity, isLikeDirection } =
+    useFeedGesture({ onNext: handleNext, onPrev: handlePrev });
+
+  // Single tap → expand after 300 ms; double-tap cancels that and likes instead
   const lastTapRef = useRef(0);
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+    },
+    [],
+  );
+
   const handleTap = useCallback(() => {
     const now = Date.now();
     if (now - lastTapRef.current < 300) {
-      // Double-tap: cancel pending single-tap expand, fire like instead
       if (tapTimerRef.current) {
         clearTimeout(tapTimerRef.current);
         tapTimerRef.current = null;
       }
-      onLike();
+      onLike(currentVariant.id, isCurrentSaved);
       lastTapRef.current = 0;
     } else {
       lastTapRef.current = now;
-      // Single-tap: expand after 300 ms unless a second tap arrives first
       tapTimerRef.current = setTimeout(() => {
         tapTimerRef.current = null;
         lastTapRef.current = 0;
-        onExpand();
+        onExpand(currentVariant.id);
       }, 300);
     }
-  }, [onLike, onExpand]);
+  }, [onLike, onExpand, currentVariant.id, isCurrentSaved]);
 
   const entryY = useSharedValue(screenHeight * 0.06);
   useEffect(() => {
@@ -106,23 +158,20 @@ export function FeedCard({
           <View style={styles.fill}>
             <GlowBackground />
 
-            {/* Swipe direction glow tint */}
             <Animated.View pointerEvents="none" style={likeGlowStyle} />
 
-            {/* Tap overlay: handles expand/translate for the card body.
-                Absolute fill at zIndex 0 — tray (zIndex 2) sits above it so
-                its buttons receive touches without creating nested <button> on web. */}
+            {/* Tap overlay — below tray (zIndex 0) to avoid nested <button> on web */}
             <Pressable
               style={styles.tapOverlay}
               onPress={handleTap}
               onLongPress={() => setShowTranslation(true)}
               delayLongPress={400}
               accessibilityRole="button"
-              accessibilityLabel={idiom.expression}
+              accessibilityLabel={currentVariant.expression}
               accessibilityHint={t("home.holdToTranslate")}
             />
 
-            {/* Top strip: progress bar sits between the floating header buttons */}
+            {/* Progress bar — sits between the two floating header buttons */}
             <View
               style={[
                 styles.topStrip,
@@ -132,7 +181,7 @@ export function FeedCard({
               <FeedProgressBar current={currentIndex} total={totalCount} />
             </View>
 
-            {/* Hero: expression text anchored to lower-third */}
+            {/* Expression */}
             <View style={styles.heroArea} pointerEvents="none">
               <Typography
                 variant="display"
@@ -147,11 +196,10 @@ export function FeedCard({
                 ]}
                 numberOfLines={4}
               >
-                {idiom.expression}
+                {currentVariant.expression}
               </Typography>
             </View>
 
-            {/* Gradient scrim: transparent → tray bg, sits behind tray */}
             <LinearGradient
               colors={[
                 theme.colors.feedCardScrimStart,
@@ -161,7 +209,6 @@ export function FeedCard({
               pointerEvents="none"
             />
 
-            {/* Tray: edge-to-edge, no border, floats over scrim */}
             <View
               style={[
                 styles.tray,
@@ -171,50 +218,70 @@ export function FeedCard({
                 },
               ]}
             >
-              {/* Meaning */}
+              {/* Language variant dots — visible only when equivalents are loaded */}
+              {variants.length > 1 && (
+                <View style={styles.variantDots}>
+                  {variants.map((variant, i) => (
+                    <View
+                      key={variant.id}
+                      style={[
+                        styles.dot,
+                        {
+                          backgroundColor:
+                            i === variantIndex
+                              ? theme.colors.feedProgressLineActive
+                              : theme.colors.feedProgressLine,
+                        },
+                      ]}
+                    />
+                  ))}
+                </View>
+              )}
+
               <Typography
                 variant="body"
                 weight="medium"
                 style={[styles.meaning, { color: theme.colors.textSecondary }]}
                 numberOfLines={3}
               >
-                {idiom.idiomaticMeaning}
+                {currentVariant.idiomaticMeaning}
               </Typography>
 
-              {/* Language + tags row */}
-              <View style={styles.tagsRow}>
-                <CategoryChip label={idiom.languageCode.toUpperCase()} />
-                {idiom.tags.slice(0, 2).map((tag) => (
-                  <CategoryChip key={tag.key} label={tag.label} />
-                ))}
-              </View>
-
-              {/* Actions */}
-              <View style={styles.actions}>
-                <IconButton
-                  icon="chevron-forward"
-                  onPress={onExpand}
-                  variant="bare"
-                  iconSize={22}
-                  containerSize={48}
-                  borderRadius={theme.radius.full}
-                  accessibilityLabel={t("home.expandIdiom")}
-                />
-                <IconButton
-                  icon={isSaved ? "heart" : "heart-outline"}
-                  onPress={onLike}
-                  variant="primary"
-                  iconSize={26}
-                  containerSize={60}
-                  borderRadius={theme.radius.full}
-                  accessibilityLabel={t(
-                    isSaved ? "home.saved" : "home.saveIdiom",
-                  )}
-                />
+              {/* Chips left, action buttons right */}
+              <View style={styles.tagsActions}>
+                <View style={styles.tagsRow}>
+                  <CategoryChip
+                    label={currentVariant.languageCode.toUpperCase()}
+                  />
+                  {currentVariant.tags.slice(0, 2).map((tag) => (
+                    <CategoryChip key={tag.key} label={tag.label} />
+                  ))}
+                </View>
+                <View style={styles.actions}>
+                  <IconButton
+                    icon="chevron-forward"
+                    onPress={() => onExpand(currentVariant.id)}
+                    variant="bare"
+                    iconSize={22}
+                    containerSize={44}
+                    borderRadius={theme.radius.full}
+                    accessibilityLabel={t("home.expandIdiom")}
+                  />
+                  <IconButton
+                    icon={isCurrentSaved ? "heart" : "heart-outline"}
+                    onPress={() => onLike(currentVariant.id, isCurrentSaved)}
+                    variant="primary"
+                    iconSize={26}
+                    containerSize={52}
+                    borderRadius={theme.radius.full}
+                    accessibilityLabel={t(
+                      isCurrentSaved ? "home.saved" : "home.saveIdiom",
+                    )}
+                  />
+                </View>
               </View>
             </View>
 
-            {/* Translation overlay */}
             {showTranslation && (
               <TranslationOverlay
                 idiom={idiom}
@@ -247,7 +314,6 @@ const styles = StyleSheet.create((theme) => ({
     right: 0,
     flexDirection: "row",
     alignItems: "center",
-    // leaves room for floating header buttons (~40px button + 24px padding each side)
     paddingHorizontal: 72,
     zIndex: 10,
   },
@@ -276,20 +342,34 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.md,
     zIndex: 2,
   },
+  variantDots: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: theme.spacing.xs,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: theme.radius.full,
+  },
   meaning: {
     lineHeight: 22,
     letterSpacing: 0.1,
   },
+  tagsActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+  },
   tagsRow: {
+    flex: 1,
     flexDirection: "row",
     gap: theme.spacing.xs,
     flexWrap: "wrap",
   },
   actions: {
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
-    gap: theme.spacing.xl,
-    paddingTop: theme.spacing.xs,
+    gap: theme.spacing.xs,
   },
 }));
