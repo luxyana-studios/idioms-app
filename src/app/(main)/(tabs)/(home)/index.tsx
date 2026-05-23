@@ -31,6 +31,8 @@ export default function HomeScreen() {
   const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
   const { idioms, isLoading, currentIndex, setCurrentIndex } = useFeedList();
+  // isError intentionally not handled — likes failing silently is acceptable;
+  // the feed still shows and hearts render as unsaved until the query recovers.
   const { data: likedIds } = useLikedIdiomIds();
   const likedIdsSet = likedIds ?? new Set<string>();
   const toggleIdiomLike = useToggleIdiomLike();

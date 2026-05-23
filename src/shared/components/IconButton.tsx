@@ -61,9 +61,9 @@ export function IconButton({
               ? theme.colors.glassBtn
               : variant === "primary"
                 ? theme.colors.primary
-                : "transparent",
+                : undefined,
           borderColor:
-            variant === "glass" ? theme.colors.glassBtnBorder : "transparent",
+            variant === "glass" ? theme.colors.glassBtnBorder : undefined,
           borderWidth: variant === "glass" ? 1 : 0,
         },
         style,

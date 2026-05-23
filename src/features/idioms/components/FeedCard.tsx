@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, useWindowDimensions, View } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
@@ -11,13 +11,14 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { Idiom, IdiomTag } from "@/features/idioms/types";
+import type { Idiom } from "@/features/idioms/types";
 import { CategoryChip } from "@/shared/components/CategoryChip";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { IconButton } from "@/shared/components/IconButton";
 import { Typography } from "@/shared/components/Typography";
+import { useDoubleTap } from "../hooks/useDoubleTap";
 import { useFeedGesture } from "../hooks/useFeedGesture";
-import { useIdiomEquivalents } from "../hooks/useIdiomEquivalents";
+import { useVariantCarousel } from "../hooks/useVariantCarousel";
 import { FeedProgressBar } from "./FeedProgressBar";
 import { TranslationOverlay } from "./TranslationOverlay";
 
@@ -29,14 +30,6 @@ interface FeedCardProps {
   onLike: (idiomId: string, isLiked: boolean) => void;
   onExpand: (idiomId: string) => void;
 }
-
-type Variant = {
-  id: string;
-  expression: string;
-  languageCode: string;
-  idiomaticMeaning: string;
-  tags: IdiomTag[];
-};
 
 export function FeedCard({
   idiom,
@@ -52,78 +45,17 @@ export function FeedCard({
   const insets = useSafeAreaInsets();
   const [showTranslation, setShowTranslation] = useState(false);
 
-  // Language variants: original idiom + its equivalents in other languages
-  const { data: equivalents = [] } = useIdiomEquivalents(idiom.id);
-  const variants = useMemo<Variant[]>(
-    () => [
-      {
-        id: idiom.id,
-        expression: idiom.expression,
-        languageCode: idiom.languageCode,
-        idiomaticMeaning: idiom.idiomaticMeaning,
-        tags: idiom.tags,
-      },
-      ...equivalents.map((eq) => ({
-        id: eq.equivalentId,
-        expression: eq.expression,
-        languageCode: eq.languageCode,
-        idiomaticMeaning: eq.idiomaticMeaning,
-        tags: [] as IdiomTag[],
-      })),
-    ],
-    [idiom, equivalents],
-  );
-
-  const [variantIndex, setVariantIndex] = useState(0);
-
-  // Reset to the original language when the feed scrolls to a new idiom
-  // biome-ignore lint/correctness/useExhaustiveDependencies: idiom.id is the trigger; setVariantIndex is stable
-  useEffect(() => {
-    setVariantIndex(0);
-  }, [idiom.id]);
-
-  const currentVariant = variants[variantIndex] ?? variants[0];
+  const { variants, variantIndex, currentVariant, handleNext, handlePrev } =
+    useVariantCarousel(idiom);
   const isCurrentSaved = likedIds.has(currentVariant.id);
-
-  const handleNext = useCallback(() => {
-    setVariantIndex((i) => Math.min(i + 1, variants.length - 1));
-  }, [variants.length]);
-
-  const handlePrev = useCallback(() => {
-    setVariantIndex((i) => Math.max(i - 1, 0));
-  }, []);
 
   const { panGesture, animatedCardStyle, glowOpacity, isLikeDirection } =
     useFeedGesture({ onNext: handleNext, onPrev: handlePrev });
 
-  // Single tap → expand after 300 ms; double-tap cancels that and likes instead
-  const lastTapRef = useRef(0);
-  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(
-    () => () => {
-      if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
-    },
-    [],
+  const handleTap = useDoubleTap(
+    () => onExpand(currentVariant.id),
+    () => onLike(currentVariant.id, isCurrentSaved),
   );
-
-  const handleTap = useCallback(() => {
-    const now = Date.now();
-    if (now - lastTapRef.current < 300) {
-      if (tapTimerRef.current) {
-        clearTimeout(tapTimerRef.current);
-        tapTimerRef.current = null;
-      }
-      onLike(currentVariant.id, isCurrentSaved);
-      lastTapRef.current = 0;
-    } else {
-      lastTapRef.current = now;
-      tapTimerRef.current = setTimeout(() => {
-        tapTimerRef.current = null;
-        lastTapRef.current = 0;
-        onExpand(currentVariant.id);
-      }, 300);
-    }
-  }, [onLike, onExpand, currentVariant.id, isCurrentSaved]);
 
   const entryY = useSharedValue(screenHeight * 0.06);
   useEffect(() => {
