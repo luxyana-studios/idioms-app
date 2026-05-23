@@ -51,15 +51,27 @@ export function FeedCard({
     useFeedGesture({ onNext, onPrev });
 
   const lastTapRef = useRef(0);
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleTap = useCallback(() => {
     const now = Date.now();
     if (now - lastTapRef.current < 300) {
+      // Double-tap: cancel pending single-tap expand, fire like instead
+      if (tapTimerRef.current) {
+        clearTimeout(tapTimerRef.current);
+        tapTimerRef.current = null;
+      }
       onLike();
       lastTapRef.current = 0;
     } else {
       lastTapRef.current = now;
+      // Single-tap: expand after 300 ms unless a second tap arrives first
+      tapTimerRef.current = setTimeout(() => {
+        tapTimerRef.current = null;
+        lastTapRef.current = 0;
+        onExpand();
+      }, 300);
     }
-  }, [onLike]);
+  }, [onLike, onExpand]);
 
   const entryY = useSharedValue(screenHeight * 0.06);
   useEffect(() => {
@@ -275,8 +287,9 @@ const styles = StyleSheet.create((theme) => ({
   },
   actions: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
+    gap: theme.spacing.xl,
     paddingTop: theme.spacing.xs,
   },
 }));

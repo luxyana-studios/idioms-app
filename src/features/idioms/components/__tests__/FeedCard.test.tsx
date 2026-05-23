@@ -169,7 +169,11 @@ const defaultProps = {
 };
 
 describe("FeedCard", () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+  });
+  afterEach(() => jest.useRealTimers());
 
   it("renders the idiom expression", () => {
     const { getByText } = render(<FeedCard {...defaultProps} />);
@@ -181,15 +185,28 @@ describe("FeedCard", () => {
     expect(getByText("To die")).toBeTruthy();
   });
 
+  it("calls onExpand on single tap of card body after delay", () => {
+    const onExpand = jest.fn();
+    const { getByLabelText } = render(
+      <FeedCard {...defaultProps} onExpand={onExpand} />,
+    );
+    fireEvent.press(getByLabelText("Kick the bucket"));
+    expect(onExpand).not.toHaveBeenCalled();
+    jest.advanceTimersByTime(300);
+    expect(onExpand).toHaveBeenCalledTimes(1);
+  });
+
   it("calls onLike on double-tap of card body", () => {
     const onLike = jest.fn();
+    const onExpand = jest.fn();
     const { getByLabelText } = render(
-      <FeedCard {...defaultProps} onLike={onLike} />,
+      <FeedCard {...defaultProps} onLike={onLike} onExpand={onExpand} />,
     );
     const overlay = getByLabelText("Kick the bucket");
-    fireEvent.press(overlay); // first tap
-    fireEvent.press(overlay); // second tap within 300 ms
+    fireEvent.press(overlay); // first tap — starts 300 ms timer
+    fireEvent.press(overlay); // second tap — cancels timer, fires like
     expect(onLike).toHaveBeenCalledTimes(1);
+    expect(onExpand).not.toHaveBeenCalled();
   });
 
   it("calls onLike when save button is pressed", () => {

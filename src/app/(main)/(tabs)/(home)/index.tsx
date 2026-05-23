@@ -73,7 +73,9 @@ export default function HomeScreen() {
   const handleNext = useCallback(
     (index: number) => {
       const nextIdx = Math.min(index + 1, idioms.length - 1);
-      flatListRef.current?.scrollToIndex({ index: nextIdx, animated: true });
+      // animated: false — the swipe gesture already handles the visual; a
+      // simultaneous vertical scroll animation would look like the card goes down
+      flatListRef.current?.scrollToIndex({ index: nextIdx, animated: false });
       setCurrentIndex(nextIdx);
     },
     [idioms.length, setCurrentIndex],
@@ -82,7 +84,7 @@ export default function HomeScreen() {
   const handlePrev = useCallback(
     (index: number) => {
       const prevIdx = Math.max(index - 1, 0);
-      flatListRef.current?.scrollToIndex({ index: prevIdx, animated: true });
+      flatListRef.current?.scrollToIndex({ index: prevIdx, animated: false });
       setCurrentIndex(prevIdx);
     },
     [setCurrentIndex],
