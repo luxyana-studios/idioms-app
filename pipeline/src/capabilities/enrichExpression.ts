@@ -7,6 +7,7 @@ import {
   FREQUENCY_RUBRIC,
   IDIOM_DEFINITION,
   renderAnchorsForLang,
+  renderFrequencyAnchorsForLang,
   SCHOLARLY_PERSONA,
   SCRIPT_RULE,
   SELF_CHECK,
@@ -111,6 +112,8 @@ export async function enrichExpression(input: {
     `NATIVE LANGUAGE: ${LANGUAGE_NAMES[input.language]} (${input.language})`,
     "",
     renderAnchorsForLang(input.language),
+    "",
+    renderFrequencyAnchorsForLang(input.language),
   ].join("\n");
 
   const completion = await openai.beta.chat.completions.parse({

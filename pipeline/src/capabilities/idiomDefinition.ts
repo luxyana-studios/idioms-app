@@ -405,3 +405,192 @@ export function renderAnchorsForLang(lang: Language): string {
     ...a.anti.map((x) => `- "${x.example}" — ${x.category}`),
   ].join("\n");
 }
+
+// Per-language anchors for the 5-bucket frequency rubric. The model has a
+// strong prior that any well-known idiom is "common" — without labelled
+// per-language examples of what each bucket looks like, the lower-frequency
+// buckets (rare / very_rare) are never populated. These anchors give the
+// rubric a foothold in each language.
+//
+// Anchors for it/pt/zh/hi/ar/ja/ko are FIRST-PASS PLACEHOLDERS and need
+// native-speaker review before they can be trusted for calibration.
+type FrequencyAnchors = {
+  very_common: string[];
+  common: string[];
+  uncommon: string[];
+  rare: string[];
+  very_rare: string[];
+};
+
+export const FREQUENCY_ANCHORS_BY_LANG: Record<Language, FrequencyAnchors> = {
+  en: {
+    very_common: [
+      "piece of cake",
+      "spill the beans",
+      "break the ice",
+      "hit the nail on the head",
+    ],
+    common: [
+      "kick the bucket",
+      "under the weather",
+      "throw in the towel",
+      "bite the bullet",
+    ],
+    uncommon: [
+      "burn the midnight oil",
+      "let the cat out of the bag",
+      "beat around the bush",
+    ],
+    rare: ["gild the lily", "cut the Gordian knot", "take French leave"],
+    very_rare: [
+      "hoist by one's own petard",
+      "let slip the dogs of war",
+      "give up the ghost",
+    ],
+  },
+  es: {
+    very_common: [
+      "meter la pata",
+      "tomar el pelo",
+      "dar en el clavo",
+      "estar entre la espada y la pared",
+    ],
+    common: [
+      "llover a cántaros",
+      "pan comido",
+      "hacer la vista gorda",
+      "no tener pelos en la lengua",
+    ],
+    uncommon: [
+      "hacer de tripas corazón",
+      "dormirse en los laureles",
+      "tirar la toalla",
+    ],
+    rare: [
+      "irse por los cerros de Úbeda",
+      "vivir en el quinto pino",
+      "ir de punta en blanco",
+      "estar en babia",
+    ],
+    very_rare: [
+      "a la chita callando",
+      "andar a la sopa boba",
+      "tomar las de Villadiego",
+    ],
+  },
+  de: {
+    very_common: ["Daumen drücken", "ins Gras beißen", "Hals- und Beinbruch"],
+    common: [
+      "den Löffel abgeben",
+      "ein Auge zudrücken",
+      "auf dem Schlauch stehen",
+    ],
+    uncommon: [
+      "jemandem einen Bären aufbinden",
+      "ins Fettnäpfchen treten",
+      "die Kuh vom Eis holen",
+    ],
+    rare: [
+      "Tomaten auf den Augen haben",
+      "jemandem das Wasser nicht reichen können",
+    ],
+    very_rare: ["wie ein Stier sehen", "etwas auf dem Kerbholz haben"],
+  },
+  fr: {
+    very_common: [
+      "coûter les yeux de la tête",
+      "il pleut des cordes",
+      "casser les pieds",
+      "tomber dans les pommes",
+    ],
+    common: [
+      "mettre les pieds dans le plat",
+      "couper la poire en deux",
+      "donner sa langue au chat",
+    ],
+    uncommon: [
+      "être un jeu d'enfant",
+      "filer à l'anglaise",
+      "faire chou blanc",
+    ],
+    rare: [
+      "passer l'arme à gauche",
+      "ne pas être dans son assiette",
+      "en avoir gros sur la patate",
+    ],
+    very_rare: ["aller à dache", "découvrir le pot aux roses"],
+  },
+  // ─── PLACEHOLDERS — native-speaker review required ───────────────────
+  it: {
+    very_common: ["in bocca al lupo", "essere al verde", "non vedere l'ora"],
+    common: ["avere le mani in pasta", "tirare le cuoia"],
+    uncommon: ["fare orecchie da mercante", "menare il can per l'aia"],
+    rare: ["andare a Canossa", "rompere il ghiaccio"],
+    very_rare: ["fare il portoghese", "essere come il prezzemolo"],
+  },
+  pt: {
+    very_common: ["bater as botas", "pisar na bola", "pagar o pato"],
+    common: ["engolir sapos", "tirar o cavalinho da chuva"],
+    uncommon: ["chutar o balde", "ficar de queixo caído"],
+    rare: ["ver navios", "bater perna"],
+    very_rare: ["matar a cobra e mostrar o pau", "fazer das tripas coração"],
+  },
+  zh: {
+    very_common: ["对牛弹琴", "一举两得", "亡羊补牢"],
+    common: ["画蛇添足", "破釜沉舟"],
+    uncommon: ["叶公好龙", "杞人忧天"],
+    rare: ["邯郸学步", "买椟还珠"],
+    very_rare: ["庖丁解牛", "南柯一梦"],
+  },
+  ja: {
+    very_common: ["朝飯前", "猫の手も借りたい", "口が滑る"],
+    common: ["釘を刺す", "腹を割る"],
+    uncommon: ["油を売る", "袖の下"],
+    rare: ["井の中の蛙大海を知らず", "塞翁が馬"],
+    very_rare: ["大山鳴動して鼠一匹", "羹に懲りて膾を吹く"],
+  },
+  ko: {
+    very_common: ["식은 죽 먹기", "발 벗고 나서다", "눈에 밟히다"],
+    common: ["입에 침이 마르다", "발이 넓다"],
+    uncommon: ["귀가 얇다", "손이 크다"],
+    rare: ["배보다 배꼽이 크다", "쇠귀에 경 읽기"],
+    very_rare: ["등잔 밑이 어둡다", "낫 놓고 기역자도 모른다"],
+  },
+  hi: {
+    very_common: ["आँखों का तारा", "बाल बाल बचना", "हाथ मलना"],
+    common: ["नौ दो ग्यारह होना", "नाक में दम करना"],
+    uncommon: ["आसमान सिर पर उठाना", "ईंट का जवाब पत्थर से देना"],
+    rare: ["लोहे के चने चबाना", "अंगूर खट्टे हैं"],
+    very_rare: ["आ बैल मुझे मार", "तू डाल डाल मैं पात पात"],
+  },
+  ar: {
+    very_common: ["ضرب عصفورين بحجر", "يد واحدة لا تصفق", "وقع في الفخ"],
+    common: ["على باب الكريم", "بين المطرقة والسندان"],
+    uncommon: ["كمن يحرث في البحر", "أعطى القوس باريها"],
+    rare: ["رجع بخفي حنين", "ربّ رمية من غير رامٍ"],
+    very_rare: ["جزاء سنمار", "وافق شن طبقة"],
+  },
+};
+
+export function renderFrequencyAnchorsForLang(lang: Language): string {
+  const a = FREQUENCY_ANCHORS_BY_LANG[lang];
+  const lines = [
+    `FREQUENCY ANCHORS for ${lang} — labelled examples per bucket.`,
+    "Use these as CALIBRATION REFERENCES to judge the input idiom against,",
+    "NOT as templates to echo. Do not emit anchor expressions as output.",
+    "",
+  ];
+  const order: (keyof FrequencyAnchors)[] = [
+    "very_common",
+    "common",
+    "uncommon",
+    "rare",
+    "very_rare",
+  ];
+  for (const bucket of order) {
+    if (a[bucket].length === 0) continue;
+    lines.push(`  ${bucket}:`);
+    for (const ex of a[bucket]) lines.push(`    - ${ex}`);
+  }
+  return lines.join("\n");
+}
