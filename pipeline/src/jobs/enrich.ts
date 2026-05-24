@@ -7,6 +7,7 @@ import {
   type FrequencyBucket,
   listPendingEnrichment,
   listPendingPromotion,
+  type Register,
   upsertEnrichment,
 } from "../lib/enrichments.js";
 import { promoteIdiom, promotePendingLinks } from "../lib/promote.js";
@@ -16,13 +17,6 @@ import type { Language } from "../types.js";
 type EnrichConfig = {
   concurrency: number;
 };
-
-type Register =
-  | "contemporary_colloquial"
-  | "contemporary_formal"
-  | "literary"
-  | "dated"
-  | "regional";
 
 type FrequencySample = {
   expression: string;
@@ -73,6 +67,11 @@ export async function runEnrich(
             `enrich: is_idiom=true but frequency missing for "${row.expression}" (${row.language})`,
           );
         }
+        if (!result.register) {
+          throw new Error(
+            `enrich: is_idiom=true but register missing for "${row.expression}" (${row.language})`,
+          );
+        }
         await upsertEnrichment({
           expressionId: row.id,
           enrichment: {
@@ -80,16 +79,12 @@ export async function runEnrich(
             explanation: result.explanation,
             examples: result.examples,
             frequency: result.frequency,
+            register: result.register,
           },
           runId: run.id,
         });
         await sql`update pipeline.expressions set status = 'enriched' where id = ${row.id}`;
         enriched++;
-        if (!result.register) {
-          throw new Error(
-            `enrich: is_idiom=true but register missing for "${row.expression}" (${row.language})`,
-          );
-        }
         frequencySamples.push({
           expression: row.expression,
           language: row.language,

@@ -197,6 +197,7 @@ export type Database = {
           idiomatic_meaning: string;
           language_code: string;
           likes_count: number;
+          register: string | null;
           source: string;
           status: string;
           updated_at: string;
@@ -212,6 +213,7 @@ export type Database = {
           idiomatic_meaning: string;
           language_code: string;
           likes_count?: number;
+          register?: string | null;
           source?: string;
           status?: string;
           updated_at?: string;
@@ -227,6 +229,7 @@ export type Database = {
           idiomatic_meaning?: string;
           language_code?: string;
           likes_count?: number;
+          register?: string | null;
           source?: string;
           status?: string;
           updated_at?: string;
