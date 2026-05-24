@@ -11,14 +11,19 @@ Supabase Postgres, writing into `pipeline.*` staging tables and promoting to `pu
 # From repo root
 cd pipeline && npm install
 
+# Languages: en es de fr it pt zh ja ko hi ar (11 total).
 # Each job is idempotent and resumable. All write to `pipeline.runs` for observability.
-npm run mine -- --lang <en|es|de|fr> [--count <n>]           # generate seed candidates
+npm run mine -- --lang <lang> [--count <n>]                  # generate seed candidates
 npm run discover -- [--top-n <n>] [--per-lang-cap <n>] [--max-iter <n>] [--concurrency <n>]
 npm run enrich -- [--concurrency <n>]                        # enrich + promote to public.idioms
-npm run translate -- --lang <en|es|de|fr> [--concurrency <n>]
-npm run seed-tag-translations                                # one-off: backfill ES/DE/FR tag labels
+npm run translate -- --lang <lang> [--concurrency <n>]       # hub-and-spoke; see "Translation" below
+npm run seed-tag-translations                                # one-off: backfill non-EN tag labels
 npm run tag -- [--concurrency <n>]
 npm run verify -- [--lang <...>] [--source <ai_mined|all>] [--concurrency <n>] [--commit]
+
+# Backups
+npm run db:backup                       # snapshot corpus → pipeline/backups/<ts>.dump
+npm run db:restore -- <dump-file>       # populate clean DB from dump (truncate + pg_restore)
 
 npm run lint            # biome check
 npm run lint:fix        # biome check --write
@@ -39,9 +44,10 @@ tag         → public.idiom_tags
 verify      → second-pass LLM gate; can delete leaked non-idioms (writes pipeline status='rejected')
 ```
 
-`seed-tag-translations` is a one-off that backfills ES/DE/FR labels for the canonical tag
-taxonomy seeded by `supabase/migrations/20260511070000_seed_tags_canonical.sql`. Run it
-once after pulling the canonical migration.
+`seed-tag-translations` is a one-off that backfills non-EN labels for the canonical tag
+taxonomy seeded by `supabase/migrations/20260511070000_seed_tags_canonical.sql`. It iterates
+every non-EN language in the `LANGUAGES` tuple; run once after pulling the canonical
+migration, again whenever a new language is added to the enum.
 
 ### Directory layout
 
@@ -50,6 +56,7 @@ pipeline/src/
 ├── cli.ts                  # entrypoint — switch on `process.argv[2]` to a job
 ├── types.ts                # Language enum, ExpressionRow / RunRow row types
 ├── capabilities/           # one file per LLM call — pure, no DB
+│   ├── idiomDefinition.ts  # shared prompt primitives + per-lang anchors
 │   ├── generateCandidates.ts
 │   ├── suggestEquivalents.ts
 │   ├── enrichExpression.ts
@@ -93,16 +100,92 @@ Add a new step: drop a capability file in `capabilities/`, a job file in `jobs/`
 case in `cli.ts`, and an npm script in `package.json`. Reuse `lib/` helpers — do not
 inline SQL in job files except for tiny status flips.
 
+### Shared prompt primitives (`idiomDefinition.ts`)
+
+`mine` / `discover` / `enrich` / `verify` all rely on the same definition of an idiom
+and the same enumerated failure modes. These live in
+`pipeline/src/capabilities/idiomDefinition.ts` as exported strings:
+
+- `GENERATIVE_PERSONA` — "prolific master native speaker" framing used by
+  `generateCandidates` (and a good fit for any future *list-producing* capability).
+  Pushes the model out of anchor-overfit into the language's full idiomatic range —
+  everyday + literary + historical — while holding a hard line against hallucination.
+- `SCHOLARLY_PERSONA` — same underlying identity reframed as a careful lexicographer,
+  used by `enrichExpression`. Use this anywhere the output is *descriptive prose
+  about* an idiom (meaning, etymology, examples) rather than a list of new ones.
+  Explicitly forbids inventing etymologies, stretching meanings, or stylistic
+  flourish — sober and factual.
+- `IDIOM_DEFINITION` — what an idiom is + THE TEST + "when uncertain, exclude"
+- `EXCLUDED_FORMS` — 9 categories of false positives (plain verb phrases, calques,
+  proverbs, dead metaphors, single-word slang, etc.)
+- `SCRIPT_RULE` — non-Latin scripts must not be romanized
+- `SELF_CHECK` — re-read the output before responding
+- `FREQUENCY_RUBRIC` — common/uncommon/rare bucket definitions
+- `ANCHORS_BY_LANG` — 4 positive + 4 anti examples per language
+- `renderAnchorsForLang(lang)` — builds the per-language prompt block
+
+Edit prompts here when tuning the gate; downstream capability prompts compose from this file.
+Anchors for non-EN/ES/DE/FR languages are placeholders that require native-speaker review
+before mining runs.
+
+The two personas split intentionally: generation should reach broadly across registers
+(literary/historical idioms welcome), enrichment should stay conservative (no flourish,
+no invented etymology). If you add a capability that creates new idioms, compose with
+`GENERATIVE_PERSONA`; if it analyzes existing ones, compose with `SCHOLARLY_PERSONA`.
+
+### Per-capability model setting
+
+`lib/openai.ts` exports `getModel(capability)` which reads per-capability env overrides
+and falls back to `OPENAI_MODEL`. Use this in every capability instead of the bare
+`model` constant. Configure via `.env`:
+
+```
+OPENAI_MODEL=gpt-4o-mini                      # default
+OPENAI_MODEL_GENERATE_CANDIDATES=gpt-4o       # spend more where it matters
+OPENAI_MODEL_SUGGEST_EQUIVALENTS=gpt-4o
+OPENAI_MODEL_VERIFY=gpt-4o                    # second-opinion gate
+# (other capabilities use the OPENAI_MODEL default)
+```
+
+### Translation (hub-and-spoke)
+
+`translate` operates in two modes per language:
+
+- `--lang en`: collects EN translations for every non-EN promoted idiom. Run this FIRST
+  before any spoke runs so the hub is populated.
+- `--lang <other>`: broadcasts EN-source idioms into the target lang. Selects only
+  `language_code = 'en'`; non-EN sources are not translated directly to non-EN targets.
+
+Read-time display fallback (`prefer(userLang) → en → source`) is a deferred follow-up;
+until it ships, non-EN ↔ non-EN viewing falls back to the source form.
+
+### Frequency
+
+Every promoted idiom carries a `frequency ∈ {common, uncommon, rare}` set by `enrich`.
+The bucket definitions live in `idiomDefinition.ts:FREQUENCY_RUBRIC`. Browse-by-frequency
+queries use the `(language_code, frequency)` index on `public.idioms`.
+
+### Backups
+
+`scripts/db-backup.sh` produces a timestamped data-only dump (excludes `idiom_likes`,
+which is user-coupled). `scripts/db-restore.sh` truncates corpus tables and restores via
+`pg_restore --data-only` — schema must already exist (run `supabase db reset` first if
+rebuilding from scratch). Dumps live in `pipeline/backups/` (gitignored).
+
 ### Normalization (CRITICAL)
 
 There are **two** functions in `lib/normalize.ts`:
 
-- `cleanExpression(raw)` — collapses runs of whitespace + trims. Applied **at ingress**
-  (mining + discovery) on every raw LLM string before it is stored. Stops weird LLM
-  whitespace from breaking dedup.
-- `normalize(expression)` — `trim().toLowerCase()`. Must match the SQL generated column
-  `expression_key = lower(trim(expression))` on both `pipeline.expressions` and
-  `public.idioms`. Used for in-process key comparisons.
+- `cleanExpression(raw)` — applies Unicode NFKC, collapses runs of whitespace, trims.
+  Applied **at ingress** (mining + discovery) on every raw LLM string before storage.
+  Stops weird LLM whitespace and script variants from breaking dedup.
+- `normalize(expression)` — `.normalize("NFKC").trim().toLowerCase()`. Must match the
+  SQL generated column `expression_key = lower(trim(normalize(expression, NFKC)))` on
+  both `pipeline.expressions` and `public.idioms`. Used for in-process key comparisons.
+
+NFKC normalization is essential for non-Latin scripts: characters with multiple byte
+representations (combining marks, CJK half/full-width, Arabic presentation forms,
+ligatures) collapse to one canonical key.
 
 If you change either function, **also change the matching SQL generated column** or
 canonicalize inputs before they hit the DB. Misalignment causes silent dedup failures

@@ -9,15 +9,31 @@ export type IdiomNeedingTranslation = {
   idiomatic_meaning: string;
 };
 
+// Hub-and-spoke translation. Every non-EN idiom translates to EN once
+// (collection); every EN-source idiom translates to each other language
+// (broadcast). Non-EN ↔ non-EN pairs are NOT translated directly — those
+// are resolved at read-time via the display fallback chain (deferred).
 export async function listIdiomsMissingTranslation(
   targetLang: Language,
 ): Promise<IdiomNeedingTranslation[]> {
+  if (targetLang === "en") {
+    return await sql<IdiomNeedingTranslation[]>`
+      select i.id, i.expression, i.language_code, i.idiomatic_meaning
+        from public.idioms i
+        left join public.idiom_translations t
+          on t.idiom_id = i.id and t.language_code = 'en'
+       where i.language_code <> 'en'
+         and t.id is null
+       order by i.language_code, i.expression_key
+    `;
+  }
+
   return await sql<IdiomNeedingTranslation[]>`
     select i.id, i.expression, i.language_code, i.idiomatic_meaning
       from public.idioms i
       left join public.idiom_translations t
         on t.idiom_id = i.id and t.language_code = ${targetLang}
-     where i.language_code <> ${targetLang}
+     where i.language_code = 'en'
        and t.id is null
      order by i.language_code, i.expression_key
   `;

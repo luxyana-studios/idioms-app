@@ -4,15 +4,32 @@ import { enrichExpression } from "../capabilities/enrichExpression.js";
 import { mapWithConcurrency } from "../lib/concurrency.js";
 import { sql } from "../lib/db.js";
 import {
+  type FrequencyBucket,
   listPendingEnrichment,
   listPendingPromotion,
   upsertEnrichment,
 } from "../lib/enrichments.js";
 import { promoteIdiom, promotePendingLinks } from "../lib/promote.js";
 import { finishRun, startRun } from "../lib/runs.js";
+import type { Language } from "../types.js";
 
 type EnrichConfig = {
   concurrency: number;
+};
+
+type Register =
+  | "contemporary_colloquial"
+  | "contemporary_formal"
+  | "literary"
+  | "dated"
+  | "regional";
+
+type FrequencySample = {
+  expression: string;
+  language: Language;
+  register: Register;
+  frequency: FrequencyBucket;
+  rationale: string;
 };
 
 const DEFAULT: EnrichConfig = { concurrency: 4 };
@@ -31,6 +48,7 @@ export async function runEnrich(
   let enrichFailed = 0;
   let promoted = 0;
   let promoteFailed = 0;
+  const frequencySamples: FrequencySample[] = [];
 
   try {
     const pending = await listPendingEnrichment();
@@ -50,17 +68,35 @@ export async function runEnrich(
           );
           return;
         }
+        if (!result.frequency) {
+          throw new Error(
+            `enrich: is_idiom=true but frequency missing for "${row.expression}" (${row.language})`,
+          );
+        }
         await upsertEnrichment({
           expressionId: row.id,
           enrichment: {
             idiomatic_meaning: result.idiomatic_meaning,
             explanation: result.explanation,
             examples: result.examples,
+            frequency: result.frequency,
           },
           runId: run.id,
         });
         await sql`update pipeline.expressions set status = 'enriched' where id = ${row.id}`;
         enriched++;
+        if (!result.register) {
+          throw new Error(
+            `enrich: is_idiom=true but register missing for "${row.expression}" (${row.language})`,
+          );
+        }
+        frequencySamples.push({
+          expression: row.expression,
+          language: row.language,
+          register: result.register,
+          frequency: result.frequency,
+          rationale: result.frequency_rationale,
+        });
       } catch (err) {
         enrichFailed++;
         console.error(
@@ -69,6 +105,25 @@ export async function runEnrich(
         );
       }
     });
+
+    const frequencyDistribution = frequencySamples.reduce<
+      Record<FrequencyBucket, number>
+    >(
+      (acc, s) => {
+        acc[s.frequency]++;
+        return acc;
+      },
+      {
+        very_common: 0,
+        common: 0,
+        uncommon: 0,
+        rare: 0,
+        very_rare: 0,
+      },
+    );
+    console.log(
+      `[enrich] frequency distribution: ${JSON.stringify(frequencyDistribution)}`,
+    );
 
     console.log(
       `[enrich] enriched ${enriched}, rejected ${rejected}, failed ${enrichFailed}`,
@@ -109,6 +164,8 @@ export async function runEnrich(
           promoteFailed,
           linksPromoted: linkResult.promoted,
           linksStillPending: linkResult.skipped,
+          frequencyDistribution,
+          frequencySamples,
         },
         null,
         2,

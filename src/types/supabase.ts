@@ -192,6 +192,7 @@ export type Database = {
           explanation: string | null;
           expression: string;
           expression_key: string;
+          frequency: string;
           id: string;
           idiomatic_meaning: string;
           language_code: string;
@@ -206,6 +207,7 @@ export type Database = {
           explanation?: string | null;
           expression: string;
           expression_key?: string;
+          frequency?: string;
           id?: string;
           idiomatic_meaning: string;
           language_code: string;
@@ -220,6 +222,7 @@ export type Database = {
           explanation?: string | null;
           expression?: string;
           expression_key?: string;
+          frequency?: string;
           id?: string;
           idiomatic_meaning?: string;
           language_code?: string;

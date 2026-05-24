@@ -2,7 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Annotation, END, START, StateGraph } from "@langchain/langgraph";
 import {
-  type EquivalentSuggestion,
+  type SuggestEquivalentsResult,
   suggestEquivalents,
 } from "../capabilities/suggestEquivalents.js";
 import { mapWithConcurrency } from "../lib/concurrency.js";
@@ -71,9 +71,9 @@ async function processExpression(
   for (const targetLang of otherLangs) {
     if ((capacity.get(targetLang) ?? 0) <= 0) continue;
 
-    let suggestions: EquivalentSuggestion[];
+    let result: SuggestEquivalentsResult;
     try {
-      suggestions = await suggestEquivalents({
+      result = await suggestEquivalents({
         expression: ref.expression,
         sourceLang: ref.language,
         targetLang,
@@ -87,7 +87,13 @@ async function processExpression(
       continue;
     }
 
-    for (const s of suggestions) {
+    if (result.rejected.length > 0) {
+      console.log(
+        `[discover] "${ref.expression}" → ${targetLang}: ${result.rejected.length} self-rejected`,
+      );
+    }
+
+    for (const s of result.suggestions) {
       const expression = cleanExpression(s.expression);
       if (expression.length === 0) continue;
 

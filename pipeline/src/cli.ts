@@ -24,20 +24,26 @@ function parseFlags(argv: string[]): Record<string, string> {
   return flags;
 }
 
+const LANGS = "<en|es|de|fr|it|pt|zh|ja|ko|hi|ar>";
+
 function usage(): never {
   console.error("usage:");
-  console.error("  pipeline mine     --lang <en|es|de|fr> [--count <n>]");
+  console.error(`  pipeline mine     --lang ${LANGS} [--count <n>]`);
   console.error(
     "  pipeline discover [--top-n <n>] [--per-lang-cap <n>] [--max-iter <n>] [--concurrency <n>]",
   );
   console.error("  pipeline enrich    [--concurrency <n>]");
+  console.error(`  pipeline translate --lang ${LANGS} [--concurrency <n>]`);
   console.error(
-    "  pipeline translate --lang <en|es|de|fr> [--concurrency <n>]",
+    "                    (hub-and-spoke: --lang en collects from non-EN sources;",
+  );
+  console.error(
+    "                     --lang <other> broadcasts EN sources to the spoke)",
   );
   console.error("  pipeline seed-tag-translations");
   console.error("  pipeline tag       [--concurrency <n>]");
   console.error(
-    "  pipeline verify    [--lang <en|es|de|fr>] [--source <ai_mined|all>] [--concurrency <n>] [--commit]",
+    `  pipeline verify    [--lang ${LANGS}] [--source <ai_mined|all>] [--concurrency <n>] [--commit]`,
   );
   console.error("                    (defaults to dry-run; --commit deletes)");
   process.exit(1);

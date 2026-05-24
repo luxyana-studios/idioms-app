@@ -1,7 +1,8 @@
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
-import { model, openai } from "../lib/openai.js";
+import { getModel, openai } from "../lib/openai.js";
 import { LANGUAGE_NAMES, type Language } from "../types.js";
+import { SCRIPT_RULE } from "./idiomDefinition.js";
 
 const Output = z.object({
   literal_translation: z.string(),
@@ -11,17 +12,49 @@ const Output = z.object({
 
 export type Translation = z.infer<typeof Output>;
 
-const SYSTEM = `You translate idioms across languages into three separate fields, in the TARGET language.
+const SYSTEM = `You translate idioms into three separate fields, all in the
+TARGET language.
 
-Critical distinction:
-- "literal_translation": a WORD-FOR-WORD rendering of the source idiom into the target language. Preserve the imagery. Do NOT translate to meaning. This is what reveals the cultural "aha" moment to a learner.
-- "idiomatic_meaning": the actual meaning of the source idiom, expressed in plain target-language prose. 1–2 sentences.
-- "explanation": brief etymological or cultural context (1–3 sentences) in the target language. Empty string if no clear etymology exists. Do not invent.
+${SCRIPT_RULE}
 
-Rules:
-- All three fields MUST be written in the TARGET language.
-- literal_translation MUST be distinct from idiomatic_meaning — one preserves the words, the other gives the meaning.
-- Do not quote, italicize, or annotate any field. Plain text only.`;
+THE THREE FIELDS:
+- literal_translation: an IMAGERY-PRESERVING rendering of the source idiom.
+  Aim for word-for-word fidelity; if that produces ungrammatical text in
+  the target, render the closest imagery-preserving form — keep the
+  METAPHOR, not the exact word order. This is what reveals the cultural
+  "aha" moment to a learner: they see the original image in their own
+  language.
+
+- idiomatic_meaning: the actual meaning of the source idiom, in plain
+  target-language prose. 1–2 sentences. NEVER preserve the source imagery
+  here — that's literal_translation's job.
+
+- explanation: 1–3 sentences of etymological or cultural context, in the
+  target language. If the source idiom is culture-specific (regional food,
+  sport, ritual), add one sentence of cultural anchoring so a target-
+  language reader unfamiliar with the source culture understands the
+  reference. Hedge contested or folk etymologies explicitly. Empty string
+  if no clear etymology exists. Do not invent.
+
+INVARIANTS:
+- literal_translation MUST be distinct from idiomatic_meaning. One
+  preserves the words/imagery, the other gives the meaning. If you cannot
+  produce a distinct literal (the source is so abstract its literal form
+  IS its meaning), output the SAME text in BOTH — downstream code will
+  skip the row. Do not pad with filler to fake a difference.
+- All three fields in the TARGET language, in the TARGET's native script.
+- Plain text. No quotes, italics, parentheticals, or annotations.
+
+WORKED EXAMPLE:
+  SOURCE: "spill the beans" (EN)
+  TARGET: Italian (it)
+  {
+    literal_translation: "rovesciare i fagioli",
+    idiomatic_meaning: "Rivelare un segreto, spesso involontariamente.",
+    explanation: "L'origine è incerta; popolarmente associata a sistemi di votazione antichi in cui i fagioli rappresentavano i voti."
+  }
+  Note: literal preserves the food imagery (beans); meaning describes the
+  act of revealing a secret. The two are clearly different.`.trim();
 
 export async function translateIdiom(input: {
   expression: string;
@@ -29,18 +62,18 @@ export async function translateIdiom(input: {
   targetLang: Language;
   sourceMeaning: string;
 }): Promise<Translation> {
-  const prompt = [
+  const userPrompt = [
     `SOURCE idiom: "${input.expression}"`,
     `SOURCE language: ${LANGUAGE_NAMES[input.sourceLang]} (${input.sourceLang})`,
-    `SOURCE meaning (for your reference, do not translate it directly): ${input.sourceMeaning}`,
+    `SOURCE meaning (reference; do not translate directly): ${input.sourceMeaning}`,
     `TARGET language: ${LANGUAGE_NAMES[input.targetLang]} (${input.targetLang})`,
   ].join("\n");
 
   const completion = await openai.beta.chat.completions.parse({
-    model,
+    model: getModel("translateIdiom"),
     messages: [
       { role: "system", content: SYSTEM },
-      { role: "user", content: prompt },
+      { role: "user", content: userPrompt },
     ],
     response_format: zodResponseFormat(Output, "translation"),
   });

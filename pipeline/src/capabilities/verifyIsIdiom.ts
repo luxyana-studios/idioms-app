@@ -1,55 +1,76 @@
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
-import { model, openai } from "../lib/openai.js";
+import { getModel, openai } from "../lib/openai.js";
 import { LANGUAGE_NAMES, type Language } from "../types.js";
+import {
+  EXCLUDED_FORMS,
+  IDIOM_DEFINITION,
+  renderAnchorsForLang,
+  SCRIPT_RULE,
+  SELF_CHECK,
+} from "./idiomDefinition.js";
 
 const Output = z.object({
   is_idiom: z.boolean(),
+  confidence: z.enum(["high", "medium", "low"]),
   rationale: z.string(),
 });
 
 export type VerifyResult = z.infer<typeof Output>;
 
-const SYSTEM = `You decide whether a given phrase is a TRUE idiom.
+const SYSTEM = `You decide whether a given phrase is a TRUE idiom. This is
+a second-opinion gate that runs after initial enrichment — be strict.
 
-DEFINITION OF AN IDIOM:
-A true idiom is a phrase whose figurative meaning CANNOT be inferred from the literal meaning of its words. A learner who knows every word must still be TAUGHT what the phrase means.
+${IDIOM_DEFINITION}
 
-THE TEST:
-Would a learner who understands each word individually correctly guess the meaning of the phrase? If yes → NOT an idiom. If no → idiom.
+${EXCLUDED_FORMS}
 
-Set is_idiom = false if the phrase is ANY of:
-- a collocation or common verb phrase whose meaning is the sum of its words (e.g. "go to bed", "ins Bett gehen", "ir a la cama", "aller au lit", "open the door", "have dinner", "Hunger haben")
-- a phrasal verb whose meaning is literal (e.g. "stand up", "sit down")
-- a proverb / full-sentence saying ("a stitch in time saves nine") — idioms are shorter phrases
-- a plain description, paraphrase, or generic adverbial expression
+${SCRIPT_RULE}
 
-Set is_idiom = true ONLY when the phrase's figurative meaning genuinely differs from its literal words and a learner would need to be taught it.
+GATE — Set is_idiom = false if the phrase falls into ANY of the EXCLUDED
+FORMS categories.
 
-POSITIVE EXAMPLES (true idioms):
-- EN: kick the bucket, spill the beans, piece of cake
-- ES: pan comido, estirar la pata, irse de la lengua
-- DE: ins Gras beißen, den Löffel abgeben, Kinderspiel
-- FR: casser sa pipe, être un jeu d'enfant, donner sa langue au chat
+ADDITIONAL REJECTION RULES:
+- MEANING SANITY: cross-check the RECORDED MEANING against the expression.
+  If the meaning is wrong, generic ("to be very happy"), or simply restates
+  a literal reading of the expression → set is_idiom=false even when the
+  expression itself might be idiomatic. A correct idiom with a wrong meaning
+  is unusable.
+- LENGTH SANITY: if the input is longer than ~8 words, spans multiple
+  sentences, or contains URLs / numbers / punctuation oddities → set
+  is_idiom=false. Idioms are short phrases.
 
-Rationale: one short sentence explaining the decision.`;
+CONFIDENCE:
+  high   — clearly is (or clearly isn't) an idiom.
+  medium — defensible decision but reasonable arguments exist either way.
+  low    — genuinely borderline; lean toward is_idiom=false per the
+           "WHEN UNCERTAIN, EXCLUDE" rule.
+
+RATIONALE: one short sentence stating the specific reason
+(e.g. "Plain verb phrase; meaning is literal",
+      "True idiom: figurative meaning unrecoverable from the words",
+      "Meaning mismatch: recorded meaning describes a different idiom").
+
+${SELF_CHECK}`.trim();
 
 export async function verifyIsIdiom(input: {
   expression: string;
   language: Language;
   idiomatic_meaning: string;
 }): Promise<VerifyResult> {
-  const prompt = [
+  const userPrompt = [
     `EXPRESSION: "${input.expression}"`,
     `LANGUAGE: ${LANGUAGE_NAMES[input.language]} (${input.language})`,
-    `RECORDED MEANING (for reference): ${input.idiomatic_meaning}`,
+    `RECORDED MEANING: ${input.idiomatic_meaning}`,
+    "",
+    renderAnchorsForLang(input.language),
   ].join("\n");
 
   const completion = await openai.beta.chat.completions.parse({
-    model,
+    model: getModel("verifyIsIdiom"),
     messages: [
       { role: "system", content: SYSTEM },
-      { role: "user", content: prompt },
+      { role: "user", content: userPrompt },
     ],
     response_format: zodResponseFormat(Output, "verify"),
   });

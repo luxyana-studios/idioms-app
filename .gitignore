@@ -46,3 +46,9 @@ google-service-account.json
 
 # Vercel
 .vercel/
+
+# Playwright MCP session artifacts
+.playwright-mcp/
+
+# Supabase CLI per-machine state
+supabase/.temp/
