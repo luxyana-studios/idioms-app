@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
+  type ListRenderItem,
+  Pressable,
   useWindowDimensions,
   View,
   type ViewToken,
@@ -30,7 +32,8 @@ export default function HomeScreen() {
   const { height: screenHeight } = useWindowDimensions();
   const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
-  const { idioms, isLoading, currentIndex, setCurrentIndex } = useFeedList();
+  const { idioms, isLoading, isError, refetch, currentIndex, setCurrentIndex } =
+    useFeedList();
   // isError intentionally not handled — likes failing silently is acceptable;
   // the feed still shows and hearts render as unsaved until the query recovers.
   const { data: likedIds } = useLikedIdiomIds();
@@ -38,24 +41,20 @@ export default function HomeScreen() {
   const toggleIdiomLike = useToggleIdiomLike();
 
   const flatListRef = useRef<FlatList<Idiom>>(null);
-  const lastScrollTo = useRef<string | null>(null);
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 });
 
   useEffect(() => {
-    if (
-      !scrollToId ||
-      idioms.length === 0 ||
-      scrollToId === lastScrollTo.current
-    ) {
+    if (!scrollToId || idioms.length === 0) {
       return;
     }
-    lastScrollTo.current = scrollToId;
     const idx = idioms.findIndex((i) => i.id === scrollToId);
     if (idx >= 0) {
       flatListRef.current?.scrollToIndex({ index: idx, animated: false });
       setCurrentIndex(idx);
     }
-  }, [scrollToId, idioms, setCurrentIndex]);
+    // Clear the param so re-tapping the same idiom from Explore re-triggers this effect.
+    router.setParams({ scrollToId: undefined });
+  }, [scrollToId, idioms, setCurrentIndex, router]);
 
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -82,10 +81,40 @@ export default function HomeScreen() {
     [screenHeight],
   );
 
+  const renderItem = useCallback<ListRenderItem<Idiom>>(
+    ({ item, index }) => (
+      <FeedCard
+        idiom={item}
+        currentIndex={index}
+        totalCount={idioms.length}
+        likedIds={likedIdsSet}
+        onLike={handleLike}
+        onExpand={(idiomId) => router.push(`/(main)/(tabs)/(home)/${idiomId}`)}
+      />
+    ),
+    [idioms.length, likedIdsSet, handleLike, router],
+  );
+
   if (isLoading) {
     return (
       <View style={[styles.root, styles.centered]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={[styles.root, styles.centered]}>
+        <Pressable
+          onPress={() => refetch()}
+          accessibilityRole="button"
+          accessibilityLabel={t("home.feedError")}
+        >
+          <Typography variant="body" style={{ color: theme.colors.textMuted }}>
+            {t("home.feedError")}
+          </Typography>
+        </Pressable>
       </View>
     );
   }
@@ -106,18 +135,7 @@ export default function HomeScreen() {
         ref={flatListRef}
         data={idioms}
         keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <FeedCard
-            idiom={item}
-            currentIndex={index}
-            totalCount={idioms.length}
-            likedIds={likedIdsSet}
-            onLike={handleLike}
-            onExpand={(idiomId) =>
-              router.push(`/(main)/(tabs)/(home)/${idiomId}`)
-            }
-          />
-        )}
+        renderItem={renderItem}
         pagingEnabled
         snapToInterval={screenHeight}
         snapToAlignment="start"
@@ -127,7 +145,6 @@ export default function HomeScreen() {
         viewabilityConfig={viewabilityConfig.current}
         getItemLayout={getItemLayout}
         initialScrollIndex={currentIndex > 0 ? currentIndex : undefined}
-        removeClippedSubviews
         windowSize={3}
       />
 
