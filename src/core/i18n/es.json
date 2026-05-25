@@ -72,5 +72,7 @@
   "home.translation": "Traducción",
   "home.idiomCount": "{{current}} de {{total}}",
   "home.noTranslation": "Traducción no disponible",
-  "home.emptyFeed": "No hay modismos disponibles"
+  "home.emptyFeed": "No hay modismos disponibles",
+  "home.feedError": "No se pudo cargar el feed. Toca para reintentar.",
+  "home.unsaveIdiom": "Quitar de guardados"
 }

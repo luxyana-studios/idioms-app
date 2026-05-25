@@ -147,6 +147,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   divider: {
     height: 1,
-    backgroundColor: "rgba(255,255,255,0.10)",
+    backgroundColor: theme.colors.translationOverlayDivider,
   },
 }));

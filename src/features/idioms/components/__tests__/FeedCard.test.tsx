@@ -58,6 +58,7 @@ const mockTheme = {
     feedProgressLineActive: "#914731",
     translationOverlayBg: "rgba(28,28,25,0.82)",
     translationOverlayText: "#fcf9f4",
+    translationOverlayDivider: "rgba(252,249,244,0.10)",
     border: "#dac1bb",
     shadow: "#000",
     feedCardScrimStart: "rgba(252,249,244,0)",
@@ -98,6 +99,12 @@ const mockTheme = {
       "5xl": 38,
     },
     weights: { regular: "400", medium: "500", semibold: "600", bold: "700" },
+  },
+  feed: {
+    headerSlotWidth: 72,
+    scrimHeight: 300,
+    dotSize: 6,
+    progressBarHeight: 2,
   },
 };
 
@@ -229,6 +236,6 @@ describe("FeedCard", () => {
     const { getByLabelText } = render(
       <FeedCard {...defaultProps} likedIds={new Set(["test-1"])} />,
     );
-    expect(getByLabelText("home.saved")).toBeTruthy();
+    expect(getByLabelText("home.unsaveIdiom")).toBeTruthy();
   });
 });

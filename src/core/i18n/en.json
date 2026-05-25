@@ -72,5 +72,7 @@
   "home.translation": "Translation",
   "home.idiomCount": "{{current}} of {{total}}",
   "home.noTranslation": "No translation available",
-  "home.emptyFeed": "No idioms available"
+  "home.emptyFeed": "No idioms available",
+  "home.feedError": "Couldn't load the feed. Tap to retry.",
+  "home.unsaveIdiom": "Remove from saved"
 }

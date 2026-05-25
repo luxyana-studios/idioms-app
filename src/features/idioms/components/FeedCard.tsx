@@ -77,7 +77,10 @@ export function FeedCard({
     opacity: glowOpacity.value,
   }));
 
-  const expressionSize = Math.min(screenWidth * 0.2, 72);
+  const expressionSize = Math.min(
+    screenWidth * 0.2,
+    theme.feed.headerSlotWidth,
+  );
   const trayPaddingBottom =
     Math.max(insets.bottom, theme.spacing.md) + theme.spacing.md;
 
@@ -207,7 +210,7 @@ export function FeedCard({
                     containerSize={52}
                     borderRadius={theme.radius.full}
                     accessibilityLabel={t(
-                      isCurrentSaved ? "home.saved" : "home.saveIdiom",
+                      isCurrentSaved ? "home.unsaveIdiom" : "home.saveIdiom",
                     )}
                   />
                 </View>
@@ -246,7 +249,7 @@ const styles = StyleSheet.create((theme) => ({
     right: 0,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 72,
+    paddingHorizontal: theme.feed.headerSlotWidth,
     zIndex: 10,
   },
   heroArea: {
@@ -263,7 +266,7 @@ const styles = StyleSheet.create((theme) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 300,
+    height: theme.feed.scrimHeight,
     zIndex: 1,
   },
   tray: {
@@ -280,8 +283,8 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.xs,
   },
   dot: {
-    width: 6,
-    height: 6,
+    width: theme.feed.dotSize,
+    height: theme.feed.dotSize,
     borderRadius: theme.radius.full,
   },
   meaning: {

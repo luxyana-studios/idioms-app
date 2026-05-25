@@ -31,12 +31,12 @@ export function FeedProgressBar({ current, total }: FeedProgressBarProps) {
 const styles = StyleSheet.create((theme) => ({
   track: {
     flex: 1,
-    height: 2,
+    height: theme.feed.progressBarHeight,
     borderRadius: theme.radius.full,
     overflow: "hidden",
   },
   fill: {
-    height: 2,
+    height: theme.feed.progressBarHeight,
     borderRadius: theme.radius.full,
   },
 }));

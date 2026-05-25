@@ -1,4 +1,4 @@
-import { radius, spacing, typography } from "./tokens";
+import { feed, radius, spacing, typography } from "./tokens";
 
 // Light theme: "Futurist Serenity" — warm cream & terracotta
 export const lightTheme = {
@@ -51,6 +51,7 @@ export const lightTheme = {
     feedProgressLineActive: "#914731",
     translationOverlayBg: "rgba(28,28,25,0.82)",
     translationOverlayText: "#fcf9f4",
+    translationOverlayDivider: "rgba(252,249,244,0.10)",
     feedCardScrimStart: "rgba(252,249,244,0)",
     feedCardScrimEnd: "rgba(252,249,244,0.97)",
     feedTrayBg: "rgba(252,249,244,0.92)",
@@ -64,6 +65,7 @@ export const lightTheme = {
   spacing,
   radius,
   typography,
+  feed,
 } as const;
 
 // Dark theme: "Forest Night" — deep forest green & golden
@@ -117,6 +119,7 @@ export const darkTheme = {
     feedProgressLineActive: "#ecbe8e",
     translationOverlayBg: "rgba(13,20,9,0.92)",
     translationOverlayText: "#e4ead6",
+    translationOverlayDivider: "rgba(228,234,214,0.10)",
     feedCardScrimStart: "rgba(19,26,15,0)",
     feedCardScrimEnd: "rgba(19,26,15,0.97)",
     feedTrayBg: "rgba(19,26,15,0.93)",
@@ -130,6 +133,7 @@ export const darkTheme = {
   spacing,
   radius,
   typography,
+  feed,
 } as const;
 
 export type AppTheme = typeof lightTheme;
