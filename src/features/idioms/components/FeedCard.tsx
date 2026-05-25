@@ -12,13 +12,12 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { Idiom } from "@/features/idioms/types";
-import { CategoryChip } from "@/shared/components/CategoryChip";
 import { GlowBackground } from "@/shared/components/GlowBackground";
-import { IconButton } from "@/shared/components/IconButton";
-import { Typography } from "@/shared/components/Typography";
 import { useDoubleTap } from "../hooks/useDoubleTap";
 import { useFeedGesture } from "../hooks/useFeedGesture";
 import { useVariantCarousel } from "../hooks/useVariantCarousel";
+import { FeedCardHero } from "./FeedCardHero";
+import { FeedCardTray } from "./FeedCardTray";
 import { FeedProgressBar } from "./FeedProgressBar";
 import { TranslationOverlay } from "./TranslationOverlay";
 
@@ -92,7 +91,6 @@ export function FeedCard({
         <Animated.View style={[{ flex: 1 }, animatedCardStyle]}>
           <View style={styles.fill}>
             <GlowBackground />
-
             <Animated.View pointerEvents="none" style={likeGlowStyle} />
 
             {/* Tap overlay — below tray (zIndex 0) to avoid nested <button> on web */}
@@ -106,7 +104,6 @@ export function FeedCard({
               accessibilityHint={t("home.holdToTranslate")}
             />
 
-            {/* Progress bar — sits between the two floating header buttons */}
             <View
               style={[
                 styles.topStrip,
@@ -116,24 +113,11 @@ export function FeedCard({
               <FeedProgressBar current={currentIndex} total={totalCount} />
             </View>
 
-            {/* Expression */}
-            <View style={styles.heroArea} pointerEvents="none">
-              <Typography
-                variant="display"
-                weight="extraBold"
-                style={[
-                  styles.expression,
-                  {
-                    color: theme.colors.primary,
-                    fontSize: expressionSize,
-                    lineHeight: expressionSize * 1.1,
-                  },
-                ]}
-                numberOfLines={4}
-              >
-                {currentVariant.expression}
-              </Typography>
-            </View>
+            <FeedCardHero
+              expression={currentVariant.expression}
+              expressionSize={expressionSize}
+              color={theme.colors.primary}
+            />
 
             <LinearGradient
               colors={[
@@ -144,78 +128,15 @@ export function FeedCard({
               pointerEvents="none"
             />
 
-            <View
-              style={[
-                styles.tray,
-                {
-                  backgroundColor: theme.colors.feedTrayBg,
-                  paddingBottom: trayPaddingBottom,
-                },
-              ]}
-            >
-              {/* Language variant dots — visible only when equivalents are loaded */}
-              {variants.length > 1 && (
-                <View style={styles.variantDots}>
-                  {variants.map((variant, i) => (
-                    <View
-                      key={variant.id}
-                      style={[
-                        styles.dot,
-                        {
-                          backgroundColor:
-                            i === variantIndex
-                              ? theme.colors.feedProgressLineActive
-                              : theme.colors.feedProgressLine,
-                        },
-                      ]}
-                    />
-                  ))}
-                </View>
-              )}
-
-              <Typography
-                variant="body"
-                weight="medium"
-                style={[styles.meaning, { color: theme.colors.textSecondary }]}
-                numberOfLines={3}
-              >
-                {currentVariant.idiomaticMeaning}
-              </Typography>
-
-              {/* Chips left, action buttons right */}
-              <View style={styles.tagsActions}>
-                <View style={styles.tagsRow}>
-                  <CategoryChip
-                    label={currentVariant.languageCode.toUpperCase()}
-                  />
-                  {currentVariant.tags.slice(0, 2).map((tag) => (
-                    <CategoryChip key={tag.key} label={tag.label} />
-                  ))}
-                </View>
-                <View style={styles.actions}>
-                  <IconButton
-                    icon="chevron-forward"
-                    onPress={() => onExpand(currentVariant.id)}
-                    variant="bare"
-                    iconSize={22}
-                    containerSize={44}
-                    borderRadius={theme.radius.full}
-                    accessibilityLabel={t("home.expandIdiom")}
-                  />
-                  <IconButton
-                    icon={isCurrentSaved ? "heart" : "heart-outline"}
-                    onPress={() => onLike(currentVariant.id, isCurrentSaved)}
-                    variant="primary"
-                    iconSize={26}
-                    containerSize={52}
-                    borderRadius={theme.radius.full}
-                    accessibilityLabel={t(
-                      isCurrentSaved ? "home.unsaveIdiom" : "home.saveIdiom",
-                    )}
-                  />
-                </View>
-              </View>
-            </View>
+            <FeedCardTray
+              currentVariant={currentVariant}
+              variants={variants}
+              variantIndex={variantIndex}
+              isSaved={isCurrentSaved}
+              onLike={() => onLike(currentVariant.id, isCurrentSaved)}
+              onExpand={() => onExpand(currentVariant.id)}
+              paddingBottom={trayPaddingBottom}
+            />
 
             {showTranslation && (
               <TranslationOverlay
@@ -252,15 +173,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.feed.headerSlotWidth,
     zIndex: 10,
   },
-  heroArea: {
-    flex: 1,
-    justifyContent: "flex-end",
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing["2xl"],
-  },
-  expression: {
-    letterSpacing: -2,
-  },
   scrim: {
     position: "absolute",
     left: 0,
@@ -268,43 +180,5 @@ const styles = StyleSheet.create((theme) => ({
     bottom: 0,
     height: theme.feed.scrimHeight,
     zIndex: 1,
-  },
-  tray: {
-    borderTopLeftRadius: theme.radius["2xl"],
-    borderTopRightRadius: theme.radius["2xl"],
-    paddingTop: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.xl,
-    gap: theme.spacing.md,
-    zIndex: 2,
-  },
-  variantDots: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: theme.spacing.xs,
-  },
-  dot: {
-    width: theme.feed.dotSize,
-    height: theme.feed.dotSize,
-    borderRadius: theme.radius.full,
-  },
-  meaning: {
-    lineHeight: 22,
-    letterSpacing: 0.1,
-  },
-  tagsActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.sm,
-  },
-  tagsRow: {
-    flex: 1,
-    flexDirection: "row",
-    gap: theme.spacing.xs,
-    flexWrap: "wrap",
-  },
-  actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.xs,
   },
 }));
