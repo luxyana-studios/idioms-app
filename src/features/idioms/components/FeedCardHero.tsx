@@ -23,10 +23,9 @@ export function FeedCardHero({
           {
             color,
             fontSize: expressionSize,
-            lineHeight: expressionSize * 1.1,
+            lineHeight: expressionSize * 1.2,
           },
         ]}
-        numberOfLines={4}
       >
         {expression}
       </Typography>
