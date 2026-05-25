@@ -65,5 +65,14 @@
   "common.like": "Gefällt mir",
   "common.unlike": "Gefällt mir nicht mehr",
   "likes.count": "{{count}} Likes",
-  "common.close": "Schließen"
+  "common.close": "Schließen",
+  "home.saveIdiom": "Redewendung speichern",
+  "home.expandIdiom": "Redewendung erweitern",
+  "home.holdToTranslate": "Gedrückt halten zum Übersetzen",
+  "home.translation": "Übersetzung",
+  "home.idiomCount": "{{current}} von {{total}}",
+  "home.noTranslation": "Keine Übersetzung verfügbar",
+  "home.emptyFeed": "Keine Redewendungen verfügbar",
+  "home.feedError": "Feed konnte nicht geladen werden. Zum Wiederholen tippen.",
+  "home.unsaveIdiom": "Aus Gespeichertem entfernen"
 }

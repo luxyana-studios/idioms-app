@@ -12,6 +12,7 @@ jest.mock("react-native-unistyles", () => ({
         glassBtnBorder: "rgba(0,0,0,0.07)",
         primary: "#914731",
         primaryText: "#ffffff",
+        textSecondary: "#6b5a54",
       },
     },
   }),

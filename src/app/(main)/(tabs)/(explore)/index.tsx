@@ -245,7 +245,9 @@ export default function ExploreScreen() {
           filtered.map((idiom) => (
             <Pressable
               key={idiom.id}
-              onPress={() => router.push(`/(main)/(tabs)/(home)/${idiom.id}`)}
+              onPress={() => {
+                router.push(`/(main)/(tabs)/(home)?scrollToId=${idiom.id}`);
+              }}
               style={({ pressed }) => [
                 styles.idiomCard,
                 {

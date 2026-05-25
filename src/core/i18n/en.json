@@ -65,5 +65,14 @@
   "common.ok": "OK",
   "settings.restartTitle": "Restart required",
   "settings.restartMessage": "The app needs to restart to apply the new layout direction.",
-  "common.close": "Close"
+  "common.close": "Close",
+  "home.saveIdiom": "Save idiom",
+  "home.expandIdiom": "Expand idiom",
+  "home.holdToTranslate": "Hold to translate",
+  "home.translation": "Translation",
+  "home.idiomCount": "{{current}} of {{total}}",
+  "home.noTranslation": "No translation available",
+  "home.emptyFeed": "No idioms available",
+  "home.feedError": "Couldn't load the feed. Tap to retry.",
+  "home.unsaveIdiom": "Remove from saved"
 }

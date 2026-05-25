@@ -230,10 +230,11 @@ A component file is too big when any of these is true. Cut early — don't wait 
 
 ### i18n Pattern
 
-- Flat key translations in `src/core/i18n/en.json` and `es.json`
+- Flat key translations in `src/core/i18n/<lang>.json` — currently `en.json`, `es.json`, `de.json`, `fr.json`
 - Keys follow `section.key` format: `"auth.login"`, `"settings.theme"`, `"common.logout"`
 - Use `const { t } = useTranslation()` then `t("section.key")`
 - Interpolation: `t("home.welcome", { name: "John" })` with `"home.welcome": "Welcome, {{name}}!"`
+- **Adding or renaming a key: update EVERY language file in the same PR.** Missing keys fall back to English silently, which hides regressions for non-English users. Verify parity with `jq 'keys | length' src/core/i18n/*.json` — all files must report the same count
 - Adding a language: create the JSON file, add it to `resources` in `src/core/i18n/index.ts`,
   add an entry to the languages array in the settings screen
 
@@ -359,7 +360,7 @@ Or use: `/new-feature <name>`
 
 1. Create the screen file in `src/app/(main)/(<group>)/<screen>.tsx` with default export
 2. Register it in the group's `_layout.tsx` as a `<Stack.Screen>`
-3. Add translation keys (`<group>.<screen>`) to both `en.json` and `es.json`
+3. Add translation keys (`<group>.<screen>`) to **every** language file in `src/core/i18n/` (`en.json`, `es.json`, `de.json`, `fr.json`)
 
 Or use: `/new-screen <group> <screenName>`
 
@@ -367,7 +368,7 @@ Or use: `/new-screen <group> <screenName>`
 
 1. Create `src/app/(main)/(<tab>)/` with `_layout.tsx` (Stack) and `index.tsx`
 2. Add `<Tabs.Screen name="(<tab>)">` in `src/app/(main)/_layout.tsx` with icon and title
-3. Add translation key (`<tab>.title`) to both language files
+3. Add translation key (`<tab>.title`) to every language file in `src/core/i18n/`
 
 Or use: `/new-tab <name> [icon]`
 

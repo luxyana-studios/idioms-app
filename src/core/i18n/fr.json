@@ -65,5 +65,14 @@
   "common.like": "J'aime",
   "common.unlike": "Je n'aime plus",
   "likes.count": "{{count}} j'aime",
-  "common.close": "Fermer"
+  "common.close": "Fermer",
+  "home.saveIdiom": "Enregistrer l'expression",
+  "home.expandIdiom": "Développer l'expression",
+  "home.holdToTranslate": "Maintenir pour traduire",
+  "home.translation": "Traduction",
+  "home.idiomCount": "{{current}} sur {{total}}",
+  "home.noTranslation": "Traduction non disponible",
+  "home.emptyFeed": "Aucune expression disponible",
+  "home.feedError": "Impossible de charger le fil. Touchez pour réessayer.",
+  "home.unsaveIdiom": "Retirer des favoris"
 }

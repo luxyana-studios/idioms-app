@@ -21,6 +21,13 @@ export const radius = {
   full: 9999,
 } as const;
 
+export const feed = {
+  headerSlotWidth: 72,
+  scrimHeight: 300,
+  dotSize: 6,
+  progressBarHeight: 2,
+} as const;
+
 export const typography = {
   fonts: {
     sans: "Manrope_400Regular",

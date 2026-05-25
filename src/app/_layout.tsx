@@ -1,7 +1,8 @@
 import { Slot, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { Platform, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProviders } from "@/core/providers/AppProviders";
 import { useLoadFonts } from "@/core/theme/fonts";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
@@ -38,6 +39,8 @@ function WebFrame({ children }: { children: React.ReactNode }) {
   );
 }
 
+const styles = StyleSheet.create({ gestureRoot: { flex: 1 } });
+
 export default function RootLayout() {
   const initialize = useAuthStore((s) => s.initialize);
   const initialized = useAuthStore((s) => s.initialized);
@@ -54,12 +57,14 @@ export default function RootLayout() {
   }, [initialized, fontsLoaded, fontError]);
 
   return (
-    <AppProviders>
-      <WebFrame>
-        <AuthGate>
-          <Slot />
-        </AuthGate>
-      </WebFrame>
-    </AppProviders>
+    <GestureHandlerRootView style={styles.gestureRoot}>
+      <AppProviders>
+        <WebFrame>
+          <AuthGate>
+            <Slot />
+          </AuthGate>
+        </WebFrame>
+      </AppProviders>
+    </GestureHandlerRootView>
   );
 }
