@@ -10,7 +10,6 @@ export function useFeedList() {
   const shuffledIds = useIdiomsStore((s) => s.shuffledIds);
   const shuffleKey = useIdiomsStore((s) => s.shuffleKey);
   const enableShuffle = useIdiomsStore((s) => s.enableShuffle);
-  const disableShuffle = useIdiomsStore((s) => s.disableShuffle);
 
   const feedIdioms = useMemo(() => {
     if (!isShuffled || shuffledIds.length === 0) return idioms;
@@ -21,9 +20,11 @@ export function useFeedList() {
     });
   }, [idioms, isShuffled, shuffledIds]);
 
+  const allIdiomIds = useMemo(() => idioms.map((i) => i.id), [idioms]);
+
   return {
     idioms: feedIdioms,
-    allIdiomIds: idioms.map((i) => i.id),
+    allIdiomIds,
     isLoading,
     isError,
     refetch,
@@ -31,7 +32,6 @@ export function useFeedList() {
     setCurrentIndex,
     isShuffled,
     enableShuffle,
-    disableShuffle,
     currentIdiomId: feedIdioms[currentIndex]?.id,
     shuffleKey,
   };

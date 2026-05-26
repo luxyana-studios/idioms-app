@@ -70,6 +70,5 @@
   "common.unlike": "إلغاء الإعجاب",
   "likes.count": "{{count}} إعجاب",
   "common.close": "إغلاق",
-  "home.shuffleOn": "تشغيل الترتيب العشوائي",
-  "home.shuffleOff": "إيقاف الترتيب العشوائي"
+  "home.shuffle": "تشغيل الترتيب العشوائي"
 }

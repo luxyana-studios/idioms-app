@@ -66,6 +66,5 @@
   "common.unlike": "Descurtir",
   "likes.count": "{{count}} curtidas",
   "common.close": "Fechar",
-  "home.shuffleOn": "Aleatório ativado",
-  "home.shuffleOff": "Aleatório desativado"
+  "home.shuffle": "Aleatório ativado"
 }

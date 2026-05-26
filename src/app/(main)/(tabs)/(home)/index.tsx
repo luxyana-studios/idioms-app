@@ -14,7 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { FeedCard } from "@/features/idioms/components/FeedCard";
-import { ShuffleToggle } from "@/features/idioms/components/ShuffleToggle";
+import { ShuffleButton } from "@/features/idioms/components/ShuffleButton";
 import { useFeedList } from "@/features/idioms/hooks/useFeedList";
 import {
   useLikedIdiomIds,
@@ -185,9 +185,9 @@ export default function HomeScreen() {
           accessibilityLabel={t("common.openMenu")}
         />
         <View style={styles.headerActions}>
-          <ShuffleToggle
+          <ShuffleButton
             onPress={handleShuffle}
-            accessibilityLabel={t("home.shuffleOn")}
+            accessibilityLabel={t("home.shuffle")}
           />
           <IconButton
             icon="search"

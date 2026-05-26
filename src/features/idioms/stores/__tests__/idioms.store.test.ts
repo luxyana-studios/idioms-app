@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   currentIndex: 0,
   isShuffled: false,
   shuffledIds: [],
+  shuffleKey: 0,
 };
 
 describe("useIdiomsStore", () => {
@@ -49,20 +50,29 @@ describe("useIdiomsStore", () => {
       useIdiomsStore.getState().enableShuffle(ids);
       expect(useIdiomsStore.getState().currentIndex).toBe(0);
     });
-  });
 
-  describe("disableShuffle", () => {
-    it("clears isShuffled and shuffledIds, resets currentIndex", () => {
-      useIdiomsStore.setState({
-        isShuffled: true,
-        shuffledIds: ["a", "b"],
-        currentIndex: 3,
-      });
-      useIdiomsStore.getState().disableShuffle();
-      const state = useIdiomsStore.getState();
-      expect(state.isShuffled).toBe(false);
-      expect(state.shuffledIds).toEqual([]);
-      expect(state.currentIndex).toBe(0);
+    it("increments shuffleKey on each call", () => {
+      useIdiomsStore.getState().enableShuffle(ids);
+      expect(useIdiomsStore.getState().shuffleKey).toBe(1);
+      useIdiomsStore.getState().enableShuffle(ids);
+      expect(useIdiomsStore.getState().shuffleKey).toBe(2);
+    });
+
+    it("does not place currentId at position 0 when alternatives exist", () => {
+      const currentId = ids[0];
+      // Run enough times to rule out a lucky coincidence
+      for (let i = 0; i < 20; i++) {
+        useIdiomsStore.getState().enableShuffle(ids, currentId);
+        expect(useIdiomsStore.getState().shuffledIds[0]).not.toBe(currentId);
+      }
+    });
+
+    it("does not crash with a single-item list where currentId equals that item", () => {
+      expect(() =>
+        useIdiomsStore.getState().enableShuffle(["a"], "a"),
+      ).not.toThrow();
+      const { shuffledIds } = useIdiomsStore.getState();
+      expect(shuffledIds).toEqual(["a"]);
     });
   });
 });

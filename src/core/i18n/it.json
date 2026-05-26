@@ -66,6 +66,5 @@
   "common.unlike": "Non mi piace più",
   "likes.count": "{{count}} mi piace",
   "common.close": "Chiudi",
-  "home.shuffleOn": "Casuale attivato",
-  "home.shuffleOff": "Casuale disattivato"
+  "home.shuffle": "Casuale attivato"
 }

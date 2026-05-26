@@ -65,6 +65,5 @@
   "common.unlike": "いいねを取り消す",
   "likes.count": "{{count}} いいね",
   "common.close": "閉じる",
-  "home.shuffleOn": "シャッフルオン",
-  "home.shuffleOff": "シャッフルオフ"
+  "home.shuffle": "シャッフルオン"
 }

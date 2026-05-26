@@ -16,7 +16,6 @@ interface IdiomsState {
   shuffledIds: string[];
   shuffleKey: number;
   enableShuffle: (idiomIds: string[], currentId?: string) => void;
-  disableShuffle: () => void;
 }
 
 export const useIdiomsStore = create<IdiomsState>()((set, get) => ({
@@ -40,6 +39,4 @@ export const useIdiomsStore = create<IdiomsState>()((set, get) => ({
       shuffleKey: get().shuffleKey + 1,
     });
   },
-  disableShuffle: () =>
-    set({ isShuffled: false, shuffledIds: [], currentIndex: 0 }),
 }));

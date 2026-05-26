@@ -75,6 +75,5 @@
   "home.emptyFeed": "No hay modismos disponibles",
   "home.feedError": "No se pudo cargar el feed. Toca para reintentar.",
   "home.unsaveIdiom": "Quitar de guardados",
-  "home.shuffleOn": "Mezclar activado",
-  "home.shuffleOff": "Mezclar desactivado"
+  "home.shuffle": "Mezclar activado"
 }

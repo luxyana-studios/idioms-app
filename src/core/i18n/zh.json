@@ -65,6 +65,5 @@
   "common.unlike": "取消点赞",
   "likes.count": "{{count}} 个赞",
   "common.close": "关闭",
-  "home.shuffleOn": "随机播放开启",
-  "home.shuffleOff": "随机播放关闭"
+  "home.shuffle": "随机播放开启"
 }

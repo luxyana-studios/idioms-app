@@ -15,7 +15,7 @@ interface ShuffleButtonProps {
   accessibilityLabel?: string;
 }
 
-export function ShuffleToggle({
+export function ShuffleButton({
   onPress,
   accessibilityLabel,
 }: ShuffleButtonProps) {
@@ -37,21 +37,22 @@ export function ShuffleToggle({
   return (
     <AnimatedPressable
       onPress={handlePress}
-      style={[styles.pill, animatedStyle]}
+      style={[styles.btn, animatedStyle]}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      hitSlop={8}
+      hitSlop={4}
     >
-      <Ionicons name="shuffle" size={16} color={theme.colors.textMuted} />
+      <Ionicons name="shuffle" size={20} color={theme.colors.textMuted} />
     </AnimatedPressable>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  pill: {
+  btn: {
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
-    padding: 8,
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.glassBtn,
     borderWidth: 1,

@@ -75,6 +75,5 @@
   "home.emptyFeed": "Aucune expression disponible",
   "home.feedError": "Impossible de charger le fil. Touchez pour réessayer.",
   "home.unsaveIdiom": "Retirer des favoris",
-  "home.shuffleOn": "Aléatoire activé",
-  "home.shuffleOff": "Aléatoire désactivé"
+  "home.shuffle": "Aléatoire activé"
 }
