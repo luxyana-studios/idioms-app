@@ -8,6 +8,7 @@ export function useFeedList() {
   const setCurrentIndex = useIdiomsStore((s) => s.setCurrentIndex);
   const isShuffled = useIdiomsStore((s) => s.isShuffled);
   const shuffledIds = useIdiomsStore((s) => s.shuffledIds);
+  const shuffleKey = useIdiomsStore((s) => s.shuffleKey);
   const enableShuffle = useIdiomsStore((s) => s.enableShuffle);
   const disableShuffle = useIdiomsStore((s) => s.disableShuffle);
 
@@ -31,5 +32,7 @@ export function useFeedList() {
     isShuffled,
     enableShuffle,
     disableShuffle,
+    currentIdiomId: feedIdioms[currentIndex]?.id,
+    shuffleKey,
   };
 }

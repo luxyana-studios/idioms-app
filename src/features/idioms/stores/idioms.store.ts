@@ -14,21 +14,32 @@ interface IdiomsState {
   setCurrentIndex: (index: number) => void;
   isShuffled: boolean;
   shuffledIds: string[];
-  enableShuffle: (idiomIds: string[]) => void;
+  shuffleKey: number;
+  enableShuffle: (idiomIds: string[], currentId?: string) => void;
   disableShuffle: () => void;
 }
 
-export const useIdiomsStore = create<IdiomsState>()((set) => ({
+export const useIdiomsStore = create<IdiomsState>()((set, get) => ({
   currentIndex: 0,
   setCurrentIndex: (index) => set({ currentIndex: index }),
   isShuffled: false,
   shuffledIds: [],
-  enableShuffle: (idiomIds) =>
+  shuffleKey: 0,
+  enableShuffle: (idiomIds, currentId) => {
+    const shuffled = fisherYatesShuffle(idiomIds);
+    // Ensure the currently visible card is never at position 0 so the user
+    // always sees a different card after pressing shuffle.
+    if (currentId && shuffled[0] === currentId && shuffled.length > 1) {
+      const swapIdx = 1 + Math.floor(Math.random() * (shuffled.length - 1));
+      [shuffled[0], shuffled[swapIdx]] = [shuffled[swapIdx], shuffled[0]];
+    }
     set({
       isShuffled: true,
-      shuffledIds: fisherYatesShuffle(idiomIds),
+      shuffledIds: shuffled,
       currentIndex: 0,
-    }),
+      shuffleKey: get().shuffleKey + 1,
+    });
+  },
   disableShuffle: () =>
     set({ isShuffled: false, shuffledIds: [], currentIndex: 0 }),
 }));

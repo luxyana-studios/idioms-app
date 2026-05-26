@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { FeedCard } from "@/features/idioms/components/FeedCard";
+import { ShuffleToggle } from "@/features/idioms/components/ShuffleToggle";
 import { useFeedList } from "@/features/idioms/hooks/useFeedList";
 import {
   useLikedIdiomIds,
@@ -40,9 +41,9 @@ export default function HomeScreen() {
     refetch,
     currentIndex,
     setCurrentIndex,
-    isShuffled,
     enableShuffle,
-    disableShuffle,
+    currentIdiomId,
+    shuffleKey,
   } = useFeedList();
   // isError intentionally not handled — likes failing silently is acceptable;
   // the feed still shows and hearts render as unsaved until the query recovers.
@@ -82,14 +83,20 @@ export default function HomeScreen() {
     [toggleIdiomLike],
   );
 
-  const handleShuffleToggle = useCallback(() => {
-    if (isShuffled) {
-      disableShuffle();
-    } else {
-      enableShuffle(allIdiomIds);
+  // Scroll to top AFTER React re-renders the new shuffled data, not before.
+  const isMounted = useRef(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: shuffleKey is an intentional trigger, not a value used inside the effect
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
     }
     flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
-  }, [isShuffled, enableShuffle, disableShuffle, allIdiomIds]);
+  }, [shuffleKey]);
+
+  const handleShuffle = useCallback(() => {
+    enableShuffle(allIdiomIds, currentIdiomId);
+  }, [enableShuffle, allIdiomIds, currentIdiomId]);
 
   const getItemLayout = useCallback(
     (_: ArrayLike<Idiom> | null | undefined, index: number) => ({
@@ -178,13 +185,9 @@ export default function HomeScreen() {
           accessibilityLabel={t("common.openMenu")}
         />
         <View style={styles.headerActions}>
-          <IconButton
-            icon="shuffle"
-            onPress={handleShuffleToggle}
-            variant={isShuffled ? "primary" : "bare"}
-            accessibilityLabel={t(
-              isShuffled ? "home.shuffleOff" : "home.shuffleOn",
-            )}
+          <ShuffleToggle
+            onPress={handleShuffle}
+            accessibilityLabel={t("home.shuffleOn")}
           />
           <IconButton
             icon="search"
