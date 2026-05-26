@@ -32,8 +32,18 @@ export default function HomeScreen() {
   const { height: screenHeight } = useWindowDimensions();
   const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
-  const { idioms, isLoading, isError, refetch, currentIndex, setCurrentIndex } =
-    useFeedList();
+  const {
+    idioms,
+    allIdiomIds,
+    isLoading,
+    isError,
+    refetch,
+    currentIndex,
+    setCurrentIndex,
+    isShuffled,
+    enableShuffle,
+    disableShuffle,
+  } = useFeedList();
   // isError intentionally not handled — likes failing silently is acceptable;
   // the feed still shows and hearts render as unsaved until the query recovers.
   const { data: likedIds } = useLikedIdiomIds();
@@ -71,6 +81,15 @@ export default function HomeScreen() {
     },
     [toggleIdiomLike],
   );
+
+  const handleShuffleToggle = useCallback(() => {
+    if (isShuffled) {
+      disableShuffle();
+    } else {
+      enableShuffle(allIdiomIds);
+    }
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [isShuffled, enableShuffle, disableShuffle, allIdiomIds]);
 
   const getItemLayout = useCallback(
     (_: ArrayLike<Idiom> | null | undefined, index: number) => ({
@@ -158,11 +177,21 @@ export default function HomeScreen() {
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
           accessibilityLabel={t("common.openMenu")}
         />
-        <IconButton
-          icon="search"
-          onPress={() => router.push("/(main)/(tabs)/(explore)")}
-          accessibilityLabel={t("explore.title")}
-        />
+        <View style={styles.headerActions}>
+          <IconButton
+            icon="shuffle"
+            onPress={handleShuffleToggle}
+            variant={isShuffled ? "primary" : "bare"}
+            accessibilityLabel={t(
+              isShuffled ? "home.shuffleOff" : "home.shuffleOn",
+            )}
+          />
+          <IconButton
+            icon="search"
+            onPress={() => router.push("/(main)/(tabs)/(explore)")}
+            accessibilityLabel={t("explore.title")}
+          />
+        </View>
       </View>
     </View>
   );
@@ -184,8 +213,14 @@ const styles = StyleSheet.create((theme) => ({
     right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: theme.spacing.lg,
     paddingBottom: theme.spacing.sm,
     zIndex: 20,
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.xs,
   },
 }));

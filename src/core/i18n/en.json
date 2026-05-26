@@ -74,5 +74,7 @@
   "home.noTranslation": "No translation available",
   "home.emptyFeed": "No idioms available",
   "home.feedError": "Couldn't load the feed. Tap to retry.",
-  "home.unsaveIdiom": "Remove from saved"
+  "home.unsaveIdiom": "Remove from saved",
+  "home.shuffleOn": "Shuffle on",
+  "home.shuffleOff": "Shuffle off"
 }

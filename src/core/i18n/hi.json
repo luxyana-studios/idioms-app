@@ -65,5 +65,7 @@
   "common.like": "लाइक",
   "common.unlike": "लाइक हटाएँ",
   "likes.count": "{{count}} लाइक",
-  "common.close": "बंद करें"
+  "common.close": "बंद करें",
+  "home.shuffleOn": "शफ़ल चालू",
+  "home.shuffleOff": "शफ़ल बंद"
 }
