@@ -22,6 +22,7 @@ import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useExploreFiltersStore } from "@/features/idioms/stores/exploreFilters.store";
 import type { IdiomTag } from "@/features/idioms/types";
 import { useUserLanguages } from "@/features/languages/hooks/useUserLanguages";
+import { BOTTOM_NAV_EXTRA_PADDING } from "@/shared/components/BottomNav";
 import { CategoryChip } from "@/shared/components/CategoryChip";
 import { DirectionalIcon } from "@/shared/components/DirectionalIcon";
 import { GlowBackground } from "@/shared/components/GlowBackground";
@@ -166,7 +167,10 @@ export default function ExploreScreen() {
             style={styles.list}
             contentContainerStyle={[
               styles.listContent,
-              { paddingBottom: Math.max(insets.bottom, 8) + 24 },
+              {
+                paddingBottom:
+                  Math.max(insets.bottom, 8) + 24 + BOTTOM_NAV_EXTRA_PADDING,
+              },
             ]}
             showsVerticalScrollIndicator={false}
           >

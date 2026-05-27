@@ -4,7 +4,7 @@
 create or replace function public.get_random_idiom(exclude_ids uuid[] default '{}')
 returns setof public.idioms
 language sql
-stable
+volatile
 security invoker
 set search_path = public
 as $$
@@ -16,4 +16,4 @@ as $$
   limit 1;
 $$;
 
-grant execute on function public.get_random_idiom to anon, authenticated;
+grant execute on function public.get_random_idiom(uuid[]) to anon, authenticated;

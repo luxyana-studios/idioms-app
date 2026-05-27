@@ -39,7 +39,7 @@ export default function SurpriseScreen() {
     );
   }
 
-  if (isError || !idiom) {
+  if (isError && !idiom) {
     return (
       <View style={[styles.root, styles.centered]}>
         <Typography variant="body" style={{ color: theme.colors.textMuted }}>
@@ -48,6 +48,9 @@ export default function SurpriseScreen() {
       </View>
     );
   }
+
+  // Narrowing: after the guards above, idiom is always present.
+  if (!idiom) return null;
 
   return (
     <View style={styles.root}>
