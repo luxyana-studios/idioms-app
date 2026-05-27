@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { FeedCard } from "@/features/idioms/components/FeedCard";
+import { ShuffleButton } from "@/features/idioms/components/ShuffleButton";
 import { useFeedList } from "@/features/idioms/hooks/useFeedList";
 import {
   useLikedIdiomIds,
@@ -32,8 +33,18 @@ export default function HomeScreen() {
   const { height: screenHeight } = useWindowDimensions();
   const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
-  const { idioms, isLoading, isError, refetch, currentIndex, setCurrentIndex } =
-    useFeedList();
+  const {
+    idioms,
+    allIdiomIds,
+    isLoading,
+    isError,
+    refetch,
+    currentIndex,
+    setCurrentIndex,
+    enableShuffle,
+    currentIdiomId,
+    shuffleKey,
+  } = useFeedList();
   // isError intentionally not handled — likes failing silently is acceptable;
   // the feed still shows and hearts render as unsaved until the query recovers.
   const { data: likedIds } = useLikedIdiomIds();
@@ -71,6 +82,21 @@ export default function HomeScreen() {
     },
     [toggleIdiomLike],
   );
+
+  // Scroll to top AFTER React re-renders the new shuffled data, not before.
+  const isMounted = useRef(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: shuffleKey is an intentional trigger, not a value used inside the effect
+  useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+  }, [shuffleKey]);
+
+  const handleShuffle = useCallback(() => {
+    enableShuffle(allIdiomIds, currentIdiomId);
+  }, [enableShuffle, allIdiomIds, currentIdiomId]);
 
   const getItemLayout = useCallback(
     (_: ArrayLike<Idiom> | null | undefined, index: number) => ({
@@ -158,11 +184,17 @@ export default function HomeScreen() {
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
           accessibilityLabel={t("common.openMenu")}
         />
-        <IconButton
-          icon="search"
-          onPress={() => router.push("/(main)/(tabs)/(explore)")}
-          accessibilityLabel={t("explore.title")}
-        />
+        <View style={styles.headerActions}>
+          <ShuffleButton
+            onPress={handleShuffle}
+            accessibilityLabel={t("home.shuffle")}
+          />
+          <IconButton
+            icon="search"
+            onPress={() => router.push("/(main)/(tabs)/(explore)")}
+            accessibilityLabel={t("explore.title")}
+          />
+        </View>
       </View>
     </View>
   );
@@ -184,8 +216,14 @@ const styles = StyleSheet.create((theme) => ({
     right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: theme.spacing.lg,
     paddingBottom: theme.spacing.sm,
     zIndex: 20,
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.xs,
   },
 }));

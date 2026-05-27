@@ -69,5 +69,6 @@
   "common.like": "إعجاب",
   "common.unlike": "إلغاء الإعجاب",
   "likes.count": "{{count}} إعجاب",
-  "common.close": "إغلاق"
+  "common.close": "إغلاق",
+  "home.shuffle": "تشغيل الترتيب العشوائي"
 }

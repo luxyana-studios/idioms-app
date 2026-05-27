@@ -74,5 +74,6 @@
   "home.noTranslation": "Keine Übersetzung verfügbar",
   "home.emptyFeed": "Keine Redewendungen verfügbar",
   "home.feedError": "Feed konnte nicht geladen werden. Zum Wiederholen tippen.",
-  "home.unsaveIdiom": "Aus Gespeichertem entfernen"
+  "home.unsaveIdiom": "Aus Gespeichertem entfernen",
+  "home.shuffle": "Zufallsmodus an"
 }

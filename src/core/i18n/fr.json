@@ -74,5 +74,6 @@
   "home.noTranslation": "Traduction non disponible",
   "home.emptyFeed": "Aucune expression disponible",
   "home.feedError": "Impossible de charger le fil. Touchez pour réessayer.",
-  "home.unsaveIdiom": "Retirer des favoris"
+  "home.unsaveIdiom": "Retirer des favoris",
+  "home.shuffle": "Aléatoire activé"
 }

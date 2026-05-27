@@ -64,5 +64,6 @@
   "common.like": "좋아요",
   "common.unlike": "좋아요 취소",
   "likes.count": "좋아요 {{count}}개",
-  "common.close": "닫기"
+  "common.close": "닫기",
+  "home.shuffle": "셔플 켜기"
 }
