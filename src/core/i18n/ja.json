@@ -82,5 +82,8 @@
   "languages.availableSection": "利用可能な言語",
   "languages.pickColor": "色を選択",
   "languages.pickFlag": "国旗を選択",
-  "languages.dragToReorder": "ドラッグして並べ替え"
+  "languages.dragToReorder": "ドラッグして並べ替え",
+  "home.surprise": "サプライズ",
+  "home.surpriseMe": "サプライズ",
+  "home.rollAgain": "もう一度"
 }

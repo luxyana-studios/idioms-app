@@ -366,6 +366,25 @@ export type Database = {
           translations: Json;
         }[];
       };
+      get_random_idiom: {
+        Args: {
+          exclude_ids?: string[];
+        };
+        Returns: {
+          created_at: string;
+          examples: string[] | null;
+          explanation: string | null;
+          expression: string;
+          expression_key: string;
+          id: string;
+          idiomatic_meaning: string;
+          language_code: string;
+          likes_count: number;
+          source: string;
+          status: string;
+          updated_at: string;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;

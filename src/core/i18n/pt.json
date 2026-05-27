@@ -83,5 +83,8 @@
   "languages.availableSection": "Idiomas disponíveis",
   "languages.pickColor": "Escolha uma cor",
   "languages.pickFlag": "Escolha uma bandeira",
-  "languages.dragToReorder": "Arraste para reordenar"
+  "languages.dragToReorder": "Arraste para reordenar",
+  "home.surprise": "Surpresa",
+  "home.surpriseMe": "Me surpreenda",
+  "home.rollAgain": "Jogar novamente"
 }

@@ -144,7 +144,7 @@ export default function SavedScreen() {
           style={styles.list}
           contentContainerStyle={[
             styles.listContent,
-            { paddingBottom: Math.max(insets.bottom, 8) + 24 },
+            { paddingBottom: Math.max(insets.bottom, 8) + 24 + 76 },
           ]}
           showsVerticalScrollIndicator={false}
         >

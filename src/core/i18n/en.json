@@ -92,5 +92,8 @@
   "languages.availableSection": "Available languages",
   "languages.pickColor": "Pick a color",
   "languages.pickFlag": "Pick a flag",
-  "languages.dragToReorder": "Drag to reorder"
+  "languages.dragToReorder": "Drag to reorder",
+  "home.surprise": "Surprise",
+  "home.surpriseMe": "Surprise me",
+  "home.rollAgain": "Roll again"
 }

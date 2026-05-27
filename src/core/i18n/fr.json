@@ -92,5 +92,8 @@
   "languages.availableSection": "Langues disponibles",
   "languages.pickColor": "Choisir une couleur",
   "languages.pickFlag": "Choisir un drapeau",
-  "languages.dragToReorder": "Glissez pour réorganiser"
+  "languages.dragToReorder": "Glissez pour réorganiser",
+  "home.surprise": "Surprise",
+  "home.surpriseMe": "Surprends-moi",
+  "home.rollAgain": "Relancer"
 }

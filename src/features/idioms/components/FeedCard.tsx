@@ -12,6 +12,7 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { Idiom } from "@/features/idioms/types";
+import { BOTTOM_NAV_EXTRA_PADDING } from "@/shared/components/BottomNav";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { useDoubleTap } from "../hooks/useDoubleTap";
 import { useFeedGesture } from "../hooks/useFeedGesture";
@@ -81,11 +82,20 @@ export function FeedCard({
     theme.feed.headerSlotWidth,
   );
   const trayPaddingBottom =
-    Math.max(insets.bottom, theme.spacing.md) + theme.spacing.md;
+    Math.max(insets.bottom, theme.spacing.md) +
+    theme.spacing.md +
+    BOTTOM_NAV_EXTRA_PADDING;
 
   return (
     <Animated.View
-      style={[{ width: screenWidth, height: screenHeight }, entryStyle]}
+      style={[
+        {
+          width: screenWidth,
+          height: screenHeight,
+          backgroundColor: theme.colors.background,
+        },
+        entryStyle,
+      ]}
     >
       <GestureDetector gesture={panGesture}>
         <Animated.View style={[{ flex: 1 }, animatedCardStyle]}>

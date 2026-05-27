@@ -82,5 +82,8 @@
   "languages.availableSection": "사용 가능한 언어",
   "languages.pickColor": "색상 선택",
   "languages.pickFlag": "깃발 선택",
-  "languages.dragToReorder": "드래그하여 순서 변경"
+  "languages.dragToReorder": "드래그하여 순서 변경",
+  "home.surprise": "서프라이즈",
+  "home.surpriseMe": "깜짝 놀라게 해줘",
+  "home.rollAgain": "다시 굴리기"
 }
