@@ -20,6 +20,9 @@ export function LanguagePickerModal({
   const { theme } = useUnistyles();
   const { language, setLanguage } = useSettings();
   const insets = useSafeAreaInsets();
+  const uiLanguageLabel = t("settings.uiLanguage", {
+    defaultValue: t("settings.language"),
+  });
 
   const handlePick = (code: SupportedUiLanguage) => {
     const restartNeeded = setLanguage(code);
@@ -57,7 +60,7 @@ export function LanguagePickerModal({
         >
           <View style={styles.handle} />
           <Typography variant="heading" style={styles.title}>
-            {t("settings.language")}
+            {uiLanguageLabel}
           </Typography>
           <ScrollView
             showsVerticalScrollIndicator={false}

@@ -13,7 +13,9 @@ import {
 } from "react-native-unistyles";
 import { useUiFonts } from "@/core/theme/fonts";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
+import { useExploreFiltersStore } from "@/features/idioms/stores/exploreFilters.store";
 import type { IdiomTag } from "@/features/idioms/types";
+import { useUserLanguages } from "@/features/languages/hooks/useUserLanguages";
 import { CategoryChip } from "@/shared/components/CategoryChip";
 import { DirectionalIcon } from "@/shared/components/DirectionalIcon";
 import { GlowBackground } from "@/shared/components/GlowBackground";
@@ -31,14 +33,31 @@ export default function ExploreScreen() {
   const navigation = useNavigation();
   const { tag: tagParam } = useLocalSearchParams<{ tag?: string }>();
   const { data: idioms = [] } = useIdioms();
+  const { languages } = useUserLanguages();
+  const selectedLanguageCodes = useExploreFiltersStore(
+    (s) => s.selectedLanguageCodes,
+  );
+  const selectedTagKeys = useExploreFiltersStore((s) => s.selectedTagKeys);
+  const toggleLanguage = useExploreFiltersStore((s) => s.toggleLanguage);
+  const toggleTag = useExploreFiltersStore((s) => s.toggleTag);
+  const setTags = useExploreFiltersStore((s) => s.setTags);
+  const clearLanguages = useExploreFiltersStore((s) => s.clearLanguages);
+  const clearTags = useExploreFiltersStore((s) => s.clearTags);
   const [search, setSearch] = useState("");
-  const [activeTag, setActiveTag] = useState<string | null>(tagParam ?? null);
+  const languageCodes = useMemo(
+    () => languages.map((language) => language.languageCode),
+    [languages],
+  );
+  const activeLanguageCodes = selectedLanguageCodes.filter((code) =>
+    languageCodes.includes(code),
+  );
 
   // Sync filter + clear stale search when navigating here from a tag chip
   useEffect(() => {
-    setActiveTag(tagParam ?? null);
-    if (tagParam) setSearch("");
-  }, [tagParam]);
+    if (!tagParam) return;
+    setTags([tagParam]);
+    setSearch("");
+  }, [tagParam, setTags]);
 
   const allTags = useMemo(() => {
     const tagMap = new Map<string, IdiomTag>();
@@ -53,22 +72,22 @@ export default function ExploreScreen() {
   }, [idioms]);
 
   const filtered = idioms.filter((idiom) => {
+    const normalizedSearch = search.toLowerCase();
     const matchesSearch =
       search === "" ||
-      idiom.expression.toLowerCase().includes(search.toLowerCase()) ||
-      idiom.idiomaticMeaning.toLowerCase().includes(search.toLowerCase());
+      idiom.expression.toLowerCase().includes(normalizedSearch) ||
+      idiom.idiomaticMeaning.toLowerCase().includes(normalizedSearch);
 
     const matchesTag =
-      activeTag === null || idiom.tags.some((tag) => tag.key === activeTag);
+      selectedTagKeys.length === 0 ||
+      idiom.tags.some((tag) => selectedTagKeys.includes(tag.key));
 
-    return matchesSearch && matchesTag;
+    const matchesLanguage =
+      activeLanguageCodes.length === 0 ||
+      activeLanguageCodes.includes(idiom.languageCode);
+
+    return matchesSearch && matchesTag && matchesLanguage;
   });
-
-  function selectTag(key: string | null) {
-    setActiveTag(key);
-    // Keep URL in sync so web share/refresh reflects current filter
-    router.setParams({ tag: key ?? undefined });
-  }
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
@@ -140,7 +159,7 @@ export default function ExploreScreen() {
         )}
       </View>
 
-      {/* Tag filter chips */}
+      {/* Language filter chips */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -148,12 +167,12 @@ export default function ExploreScreen() {
         contentContainerStyle={styles.chipsContent}
       >
         <Pressable
-          onPress={() => selectTag(null)}
-          accessibilityRole="radio"
-          accessibilityState={{ selected: activeTag === null }}
+          onPress={clearLanguages}
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: activeLanguageCodes.length === 0 }}
           style={[
             styles.chip,
-            activeTag === null
+            activeLanguageCodes.length === 0
               ? { backgroundColor: theme.colors.primary }
               : {
                   backgroundColor: theme.colors.chipBg,
@@ -166,7 +185,79 @@ export default function ExploreScreen() {
             weight="bold"
             style={{
               color:
-                activeTag === null
+                activeLanguageCodes.length === 0
+                  ? theme.colors.primaryText
+                  : theme.colors.primary,
+              fontSize: 12,
+            }}
+          >
+            {t("explore.filterAll")}
+          </Typography>
+        </Pressable>
+
+        {languages.map((language) => {
+          const code = language.languageCode;
+          const isActive = activeLanguageCodes.includes(code);
+          return (
+            <Pressable
+              key={code}
+              onPress={() => toggleLanguage(code)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: isActive }}
+              style={[
+                styles.chip,
+                isActive
+                  ? { backgroundColor: theme.colors.primary }
+                  : {
+                      backgroundColor: theme.colors.chipBg,
+                      borderColor: theme.colors.chipBorder,
+                    },
+              ]}
+            >
+              <Typography
+                variant="caption"
+                weight="bold"
+                style={{
+                  color: isActive
+                    ? theme.colors.primaryText
+                    : theme.colors.primary,
+                  fontSize: 12,
+                }}
+              >
+                {t(`lang.${code}`, { defaultValue: code.toUpperCase() })}
+              </Typography>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
+      {/* Tag filter chips */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.chipsScroll}
+        contentContainerStyle={styles.chipsContent}
+      >
+        <Pressable
+          onPress={clearTags}
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: selectedTagKeys.length === 0 }}
+          style={[
+            styles.chip,
+            selectedTagKeys.length === 0
+              ? { backgroundColor: theme.colors.primary }
+              : {
+                  backgroundColor: theme.colors.chipBg,
+                  borderColor: theme.colors.chipBorder,
+                },
+          ]}
+        >
+          <Typography
+            variant="caption"
+            weight="bold"
+            style={{
+              color:
+                selectedTagKeys.length === 0
                   ? theme.colors.primaryText
                   : theme.colors.primary,
               fontSize: 12,
@@ -177,13 +268,13 @@ export default function ExploreScreen() {
         </Pressable>
 
         {allTags.map((tag) => {
-          const isActive = tag.key === activeTag;
+          const isActive = selectedTagKeys.includes(tag.key);
           return (
             <Pressable
               key={tag.key}
-              onPress={() => selectTag(tag.key)}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: isActive }}
+              onPress={() => toggleTag(tag.key)}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: isActive }}
               style={[
                 styles.chip,
                 isActive

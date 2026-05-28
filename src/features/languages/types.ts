@@ -7,6 +7,10 @@ export interface UserLanguage {
   position: number; // order in the quick-filter bar
 }
 
+export interface EffectiveUserLanguage extends UserLanguage {
+  source: "user" | "default";
+}
+
 // Fields a user can set when adding or editing a configured language.
 export interface UserLanguageInput {
   languageCode: string;

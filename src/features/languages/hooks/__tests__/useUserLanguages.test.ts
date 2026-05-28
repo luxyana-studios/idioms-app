@@ -53,6 +53,7 @@ describe("useUserLanguages", () => {
     });
 
     expect(result.current.fetchStatus).toBe("idle");
+    expect(result.current.isLoading).toBe(true);
     expect(mockFrom).not.toHaveBeenCalled();
   });
 
@@ -67,7 +68,7 @@ describe("useUserLanguages", () => {
     expect(mockFrom).not.toHaveBeenCalled();
   });
 
-  it("maps rows to camelCase UserLanguage, ordered as returned", async () => {
+  it("maps rows and uses configured rows as the effective scope", async () => {
     const rows = [
       { language_code: "es", color: "#C96F4A", flag: "🇪🇸", position: 0 },
       { language_code: "fr", color: "#3B5BA5", flag: "🇫🇷", position: 1 },
@@ -80,13 +81,36 @@ describe("useUserLanguages", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(result.current.data).toEqual([
+    expect(result.current.configuredLanguages).toEqual([
       { languageCode: "es", color: "#C96F4A", flag: "🇪🇸", position: 0 },
       { languageCode: "fr", color: "#3B5BA5", flag: "🇫🇷", position: 1 },
     ]);
+    expect(result.current.languages).toEqual([
+      {
+        languageCode: "es",
+        color: "#C96F4A",
+        flag: "🇪🇸",
+        position: 0,
+        source: "user",
+      },
+      {
+        languageCode: "fr",
+        color: "#3B5BA5",
+        flag: "🇫🇷",
+        position: 1,
+        source: "user",
+      },
+    ]);
+    expect(result.current.hasUserConfiguration).toBe(true);
+    expect(result.current.configuredByCode.get("fr")).toEqual({
+      languageCode: "fr",
+      color: "#3B5BA5",
+      flag: "🇫🇷",
+      position: 1,
+    });
   });
 
-  it("returns an empty array when the user has configured nothing", async () => {
+  it("returns default effective languages when the user has configured nothing", async () => {
     mockFrom.mockReturnValueOnce(makeSelectChain({ data: [], error: null }));
 
     const { result } = renderHook(() => useUserLanguages(), {
@@ -95,6 +119,54 @@ describe("useUserLanguages", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([]);
+    expect(result.current.configuredLanguages).toEqual([]);
+    expect(result.current.hasUserConfiguration).toBe(false);
+    expect(result.current.languages.map((lang) => lang.languageCode)).toEqual([
+      "en",
+      "es",
+      "de",
+      "fr",
+      "it",
+      "pt",
+      "zh",
+      "hi",
+      "ar",
+      "ja",
+      "ko",
+    ]);
+    expect(
+      result.current.languages.every((lang) => lang.source === "default"),
+    ).toBe(true);
+    expect(result.current.byCode.get("es")).toMatchObject({
+      languageCode: "es",
+      color: "#C96F4A",
+      flag: "🇪🇸",
+      source: "default",
+    });
+  });
+
+  it("exposes default languages not configured by the user as available", async () => {
+    mockFrom.mockReturnValueOnce(
+      makeSelectChain({
+        data: [
+          { language_code: "es", color: "#C96F4A", flag: "🇪🇸", position: 0 },
+        ],
+        error: null,
+      }),
+    );
+
+    const { result } = renderHook(() => useUserLanguages(), {
+      wrapper: makeWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(
+      result.current.availableLanguages.map((lang) => lang.languageCode),
+    ).not.toContain("es");
+    expect(
+      result.current.availableLanguages.map((lang) => lang.languageCode),
+    ).toContain("fr");
   });
 
   it("propagates database errors", async () => {

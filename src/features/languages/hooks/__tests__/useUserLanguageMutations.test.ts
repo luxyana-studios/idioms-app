@@ -12,13 +12,33 @@ jest.mock("@/features/auth/hooks/useAuth", () => ({
 }));
 
 import { supabase } from "@/core/supabase/client";
+import type { UserLanguage } from "../../types";
 import {
   useAddUserLanguage,
   useRemoveUserLanguage,
+  useReorderUserLanguages,
   useUpdateUserLanguage,
 } from "../useUserLanguageMutations";
+import { userLanguagesKey } from "../useUserLanguages";
 
 const mockFrom = supabase.from as jest.Mock;
+
+// update().eq().eq() chain that resolves to { error: null }, capturing the
+// position written for each call so reorder assertions can inspect them.
+const makeUpdateChain = (sink: Array<Record<string, unknown>>) => ({
+  update: jest.fn((patch: Record<string, unknown>) => {
+    sink.push(patch);
+    return { eq: () => ({ eq: () => Promise.resolve({ error: null }) }) };
+  }),
+});
+
+const lang = (overrides: Partial<UserLanguage>): UserLanguage => ({
+  languageCode: "es",
+  color: "#C96F4A",
+  flag: "🇪🇸",
+  position: 0,
+  ...overrides,
+});
 
 const makeWrapper = () => {
   const queryClient = new QueryClient({
@@ -111,5 +131,65 @@ describe("user language mutations", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error?.message).toMatch(/signed in/i);
     expect(mockFrom).not.toHaveBeenCalled();
+  });
+});
+
+describe("useReorderUserLanguages", () => {
+  beforeEach(() => {
+    mockFrom.mockReset();
+    mockUseAuth.mockReturnValue({ user: { id: "u-1" }, initialized: true });
+  });
+
+  it("writes each language's new index as its position", async () => {
+    const positions: Array<Record<string, unknown>> = [];
+    mockFrom.mockReturnValue(makeUpdateChain(positions));
+
+    const { result } = renderHook(() => useReorderUserLanguages(), {
+      wrapper: makeWrapper(),
+    });
+
+    result.current.mutate(["fr", "es", "de"]);
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(positions).toEqual([
+      { position: 0 },
+      { position: 1 },
+      { position: 2 },
+    ]);
+  });
+
+  it("optimistically reorders the cached list", async () => {
+    const positions: Array<Record<string, unknown>> = [];
+    mockFrom.mockReturnValue(makeUpdateChain(positions));
+
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    queryClient.setQueryData<UserLanguage[]>(userLanguagesKey("u-1"), [
+      lang({ languageCode: "es", position: 0 }),
+      lang({ languageCode: "fr", position: 1 }),
+    ]);
+
+    const wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(
+        QueryClientProvider,
+        { client: queryClient },
+        children,
+      );
+
+    const { result } = renderHook(() => useReorderUserLanguages(), { wrapper });
+
+    result.current.mutate(["fr", "es"]);
+
+    await waitFor(() =>
+      expect(
+        queryClient
+          .getQueryData<UserLanguage[]>(userLanguagesKey("u-1"))
+          ?.map((l) => l.languageCode),
+      ).toEqual(["fr", "es"]),
+    );
   });
 });

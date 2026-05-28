@@ -2,21 +2,24 @@ import { useMemo } from "react";
 import { useUserLanguages } from "./useUserLanguages";
 
 interface SelectedLanguages {
-  // Ordered list of selected language codes. Empty = unconfigured = no filter.
+  // Ordered effective language scope. Defaults to frontend catalog when the
+  // user has not persisted a custom language configuration.
   codes: string[];
   // Stable lookup of a code's display config (color/flag) for UI differentiation.
   byCode: Map<string, { color: string; flag: string }>;
   // True once the user has explicitly configured at least one language.
   hasSelection: boolean;
+  hasUserConfiguration: boolean;
   isLoading: boolean;
   isError: boolean;
 }
 
-// Derives the active content-language scope from the user's configuration.
-// Consumers filter feed/equivalents/translations against `codes` (skipping the
-// filter when empty) and read color/flag from `byCode` for display.
+// Transitional compatibility wrapper around useUserLanguages. New code should
+// prefer useUserLanguages() directly so it can distinguish effective defaults
+// from persisted user configuration.
 export const useSelectedLanguages = (): SelectedLanguages => {
-  const { data: languages = [], isLoading, isError } = useUserLanguages();
+  const { languages, hasUserConfiguration, isLoading, isError } =
+    useUserLanguages();
 
   return useMemo(() => {
     const codes = languages.map((lang) => lang.languageCode);
@@ -29,9 +32,10 @@ export const useSelectedLanguages = (): SelectedLanguages => {
     return {
       codes,
       byCode,
-      hasSelection: codes.length > 0,
+      hasSelection: hasUserConfiguration,
+      hasUserConfiguration,
       isLoading,
       isError,
     };
-  }, [languages, isLoading, isError]);
+  }, [languages, hasUserConfiguration, isLoading, isError]);
 };
