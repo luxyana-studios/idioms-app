@@ -301,6 +301,39 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_languages: {
+        Row: {
+          color: string;
+          created_at: string;
+          flag: string;
+          id: string;
+          language_code: string;
+          position: number;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          color: string;
+          created_at?: string;
+          flag: string;
+          id?: string;
+          language_code: string;
+          position?: number;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          color?: string;
+          created_at?: string;
+          flag?: string;
+          id?: string;
+          language_code?: string;
+          position?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
