@@ -120,13 +120,24 @@ and the same enumerated failure modes. These live in
   proverbs, dead metaphors, single-word slang, etc.)
 - `SCRIPT_RULE` — non-Latin scripts must not be romanized
 - `SELF_CHECK` — re-read the output before responding
-- `FREQUENCY_RUBRIC` — common/uncommon/rare bucket definitions
-- `ANCHORS_BY_LANG` — 4 positive + 4 anti examples per language
-- `renderAnchorsForLang(lang)` — builds the per-language prompt block
+- `FREQUENCY_RUBRIC` — combined REGISTER + FREQUENCY rubric. Defines the 5 register
+  values (contemporary_colloquial, contemporary_formal, literary, dated, regional)
+  and the 5 frequency buckets (very_common, common, uncommon, rare, very_rare),
+  with the register → frequency mapping that constrains which buckets are reachable
+  from each register. Also defines the `frequency_rationale` contract (one
+  short sentence in the idiom's native language naming a concrete signal).
+- `ANCHORS_BY_LANG` — 4 positive + 4 anti examples per language (used by `mine` /
+  `discover` / `enrich` / `verify` to anchor the idiom/non-idiom boundary)
+- `FREQUENCY_ANCHORS_BY_LANG` — labelled `very_common` / `common` / `uncommon` /
+  `rare` / `very_rare` examples per language, used by `enrichExpression` to
+  calibrate the rubric in the target language
+- `renderAnchorsForLang(lang)` — builds the per-language positive/anti block
+- `renderFrequencyAnchorsForLang(lang)` — builds the per-language frequency-bucket
+  anchor block
 
 Edit prompts here when tuning the gate; downstream capability prompts compose from this file.
-Anchors for non-EN/ES/DE/FR languages are placeholders that require native-speaker review
-before mining runs.
+Anchors for non-EN/ES/DE/FR languages (both `ANCHORS_BY_LANG` and `FREQUENCY_ANCHORS_BY_LANG`)
+are first-pass placeholders that require native-speaker review before mining runs.
 
 The two personas split intentionally: generation should reach broadly across registers
 (literary/historical idioms welcome), enrichment should stay conservative (no flourish,
