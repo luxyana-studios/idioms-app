@@ -1,12 +1,42 @@
-export type Language = "en" | "es" | "de" | "fr";
+export type Language =
+  | "en"
+  | "es"
+  | "de"
+  | "fr"
+  | "it"
+  | "pt"
+  | "zh"
+  | "ja"
+  | "ko"
+  | "hi"
+  | "ar";
 
-export const LANGUAGES = ["en", "es", "de", "fr"] as const;
+export const LANGUAGES = [
+  "en",
+  "es",
+  "de",
+  "fr",
+  "it",
+  "pt",
+  "zh",
+  "ja",
+  "ko",
+  "hi",
+  "ar",
+] as const;
 
 export const LANGUAGE_NAMES: Record<Language, string> = {
   en: "English",
   es: "Spanish",
   de: "German",
   fr: "French",
+  it: "Italian",
+  pt: "Portuguese",
+  zh: "Chinese",
+  ja: "Japanese",
+  ko: "Korean",
+  hi: "Hindi",
+  ar: "Arabic",
 };
 
 export function isLanguage(value: string): value is Language {

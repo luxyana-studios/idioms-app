@@ -1,6 +1,6 @@
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
-import { model, openai } from "../lib/openai.js";
+import { getModel, openai } from "../lib/openai.js";
 import { LANGUAGE_NAMES, type Language } from "../types.js";
 
 const Item = z.object({
@@ -23,12 +23,23 @@ export type SourceTagLabel = {
 
 const SYSTEM = `You localize taxonomy labels for an idiom dictionary.
 
-Rules:
+RULES:
 - For each English entry, produce the target-language label and description.
-- The "key" is a stable identifier — copy it through EXACTLY, do not translate.
-- Labels are short noun phrases (1–3 words typically). Capitalize like a title.
-- Descriptions are one short sentence in the target language.
-- Preserve the meaning faithfully; do not paraphrase loosely.`;
+- The "key" is a stable identifier — COPY IT THROUGH EXACTLY. Do not
+  translate, modify case, or alter punctuation. Mismatched keys cause
+  the translation to be dropped.
+- SCOPE EQUIVALENCE: the target label must mean exactly what the English
+  label means — same scope, same boundaries. If EN is "Money", the target
+  must mean "Money" specifically, not "Finance", "Wealth", or "Economics".
+- Labels are short noun phrases (typically 1–3 words).
+- CAPITALIZATION:
+  · Latin-script langs (en/es/de/fr/it/pt): title case for labels.
+  · CJK (zh/ja/ko), Arabic, Hindi: use the conventional dictionary form
+    for the script — no Latin case rules apply.
+- Descriptions: one short sentence in the target language.
+- Maintain consistent register and style across all entries in a batch —
+  they appear together in the UI.
+- Preserve meaning faithfully. Do not paraphrase loosely.`.trim();
 
 export async function translateTagLabels(input: {
   source: SourceTagLabel[];
@@ -41,7 +52,7 @@ export async function translateTagLabels(input: {
     )
     .join("\n");
 
-  const prompt = [
+  const userPrompt = [
     `TARGET language: ${LANGUAGE_NAMES[input.targetLang]} (${input.targetLang})`,
     "",
     `English entries (${input.source.length}):`,
@@ -49,10 +60,10 @@ export async function translateTagLabels(input: {
   ].join("\n");
 
   const completion = await openai.beta.chat.completions.parse({
-    model,
+    model: getModel("translateTagLabels"),
     messages: [
       { role: "system", content: SYSTEM },
-      { role: "user", content: prompt },
+      { role: "user", content: userPrompt },
     ],
     response_format: zodResponseFormat(Output, "tag_translations"),
   });

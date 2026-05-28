@@ -192,10 +192,12 @@ export type Database = {
           explanation: string | null;
           expression: string;
           expression_key: string;
+          frequency: string;
           id: string;
           idiomatic_meaning: string;
           language_code: string;
           likes_count: number;
+          register: string | null;
           source: string;
           status: string;
           updated_at: string;
@@ -206,10 +208,12 @@ export type Database = {
           explanation?: string | null;
           expression: string;
           expression_key?: string;
+          frequency?: string;
           id?: string;
           idiomatic_meaning: string;
           language_code: string;
           likes_count?: number;
+          register?: string | null;
           source?: string;
           status?: string;
           updated_at?: string;
@@ -220,10 +224,12 @@ export type Database = {
           explanation?: string | null;
           expression?: string;
           expression_key?: string;
+          frequency?: string;
           id?: string;
           idiomatic_meaning?: string;
           language_code?: string;
           likes_count?: number;
+          register?: string | null;
           source?: string;
           status?: string;
           updated_at?: string;

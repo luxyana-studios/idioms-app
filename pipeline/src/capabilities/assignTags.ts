@@ -1,6 +1,6 @@
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
-import { model, openai } from "../lib/openai.js";
+import { getModel, openai } from "../lib/openai.js";
 import type { CanonicalTagWithEn } from "../lib/tags.js";
 import { LANGUAGE_NAMES, type Language } from "../types.js";
 
@@ -13,14 +13,38 @@ const Output = z.object({
 
 export type TagAssignment = z.infer<typeof Output>;
 
-const SYSTEM = `You assign canonical taxonomy tags to an idiom for a multilingual dictionary.
+const SYSTEM = `You assign canonical taxonomy tags to an idiom for a
+multilingual dictionary.
 
-Rules:
-- Pick tags ONLY from the canonical list below. Never invent. Output the tag KEY (lowercase identifier), never the label.
-- Tags are grouped into 4 facets: theme, meaning, register, occasion.
-- REQUIRED: choose at least 1 "meaning" tag (up to 2 if multiple apply) AND exactly 1 "register" tag.
-- OPTIONAL: choose 0–2 "theme" tags (the visible imagery or domain of the idiom), and 0–1 "occasion" tag (only when the idiom is reliably used in a specific situation).
-- Place each chosen key into the array corresponding to its facet. A key may only appear in its native facet's array.`;
+OUTPUT FORMAT:
+- Pick tags ONLY from the canonical list provided in the user message.
+  Never invent.
+- Output the tag KEY (lowercase identifier), never the label.
+- Each chosen key goes into the array for its facet (theme, meaning,
+  register, occasion). A key may only appear in its native facet's array.
+
+FACET RULES:
+- meaning (REQUIRED): pick exactly 1 best-fit tag. Add a second ONLY if
+  the idiom is genuinely ambiguous and both meanings apply equally.
+  PREFER ONE STRONG TAG OVER TWO WEAK ONES.
+- register (REQUIRED, exactly 1): the dominant register. If the idiom
+  flexes between formal and informal use, pick "neutral" if that key
+  exists in the canonical list; otherwise the register most common in
+  actual use.
+- theme (OPTIONAL, 0–2): the visible imagery or domain (body parts,
+  food, weather, etc.). Pick theme tags only when the imagery is
+  CONCRETE and CENTRAL to the idiom. Skip when the idiom is abstract.
+- occasion (OPTIONAL, 0–1): only when the idiom is reliably used in a
+  specific situation. Skip otherwise.
+
+WORKED EXAMPLE (keys below are illustrative — pick only from the
+canonical list provided in the user message):
+  IDIOM: "spill the beans" (EN), meaning: "to reveal a secret"
+  Assignment:
+    meaning:  ["reveal-secret"]      ← one strong tag
+    register: ["informal"]            ← single dominant register
+    theme:    ["communication"]       ← food imagery is incidental, not the theme
+    occasion: []                      ← not occasion-bound`.trim();
 
 function renderCanonical(tags: CanonicalTagWithEn[]): string {
   const byFacet = new Map<string, CanonicalTagWithEn[]>();
@@ -51,7 +75,7 @@ export async function assignTags(input: {
   };
   canonical: CanonicalTagWithEn[];
 }): Promise<TagAssignment> {
-  const prompt = [
+  const userPrompt = [
     "CANONICAL TAG LIST",
     "",
     renderCanonical(input.canonical),
@@ -62,10 +86,10 @@ export async function assignTags(input: {
   ].join("\n");
 
   const completion = await openai.beta.chat.completions.parse({
-    model,
+    model: getModel("assignTags"),
     messages: [
       { role: "system", content: SYSTEM },
-      { role: "user", content: prompt },
+      { role: "user", content: userPrompt },
     ],
     response_format: zodResponseFormat(Output, "tag_assignment"),
   });

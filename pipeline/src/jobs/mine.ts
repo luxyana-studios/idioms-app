@@ -20,12 +20,14 @@ export async function runMine(input: {
     const avoid = await readExistingKeys(input.language);
     console.log(`[mine] ${avoid.length} existing expressions to avoid`);
 
-    const candidates = await generateCandidates({
+    const { expressions: candidates, rejected } = await generateCandidates({
       language: input.language,
       count: input.count,
       avoid,
     });
-    console.log(`[mine] LLM returned ${candidates.length} candidates`);
+    console.log(
+      `[mine] LLM returned ${candidates.length} candidates, ${rejected.length} self-rejected`,
+    );
 
     const seenKeys = new Set<string>();
     let inserted = 0;
@@ -70,6 +72,7 @@ export async function runMine(input: {
           language: input.language,
           requested: input.count,
           received: candidates.length,
+          selfRejected: rejected,
           inserted,
           duplicate,
           accepted,

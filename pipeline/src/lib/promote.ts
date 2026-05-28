@@ -13,13 +13,15 @@ export async function promoteIdiom(
   return await sql.begin(async (tx) => {
     const inserted = await tx<{ id: string }[]>`
       insert into public.idioms
-        (expression, language_code, idiomatic_meaning, explanation, examples, source, status)
+        (expression, language_code, idiomatic_meaning, explanation, examples, frequency, register, source, status)
       values (
         ${row.expression},
         ${row.language},
         ${row.idiomatic_meaning},
         ${row.explanation},
         ${row.examples},
+        ${row.frequency},
+        ${row.register},
         'ai_mined',
         'draft'
       )
@@ -27,6 +29,8 @@ export async function promoteIdiom(
         idiomatic_meaning = excluded.idiomatic_meaning,
         explanation       = excluded.explanation,
         examples          = excluded.examples,
+        frequency         = excluded.frequency,
+        register          = excluded.register,
         source            = excluded.source,
         updated_at        = now()
       returning id
