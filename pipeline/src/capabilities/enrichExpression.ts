@@ -142,5 +142,14 @@ export async function enrichExpression(input: {
       `enrichExpression: is_idiom=true but frequency_rationale missing for "${input.expression}" (${input.language})`,
     );
   }
+  // Prompt requires EXACTLY 2 or 3 examples when is_idiom=true. Schema can
+  // only express the upper bound (.max(3)) because is_idiom=false rows
+  // legitimately return []. Catch the under-2 case here so it never reaches
+  // the corpus.
+  if (parsed.is_idiom && parsed.examples.length < 2) {
+    throw new Error(
+      `enrichExpression: is_idiom=true but examples.length=${parsed.examples.length} (need 2 or 3) for "${input.expression}" (${input.language})`,
+    );
+  }
   return parsed;
 }

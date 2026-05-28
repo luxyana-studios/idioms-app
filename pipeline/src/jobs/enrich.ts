@@ -62,24 +62,21 @@ export async function runEnrich(
           );
           return;
         }
-        if (!result.frequency) {
-          throw new Error(
-            `enrich: is_idiom=true but frequency missing for "${row.expression}" (${row.language})`,
-          );
-        }
-        if (!result.register) {
-          throw new Error(
-            `enrich: is_idiom=true but register missing for "${row.expression}" (${row.language})`,
-          );
-        }
+        // enrichExpression guarantees non-null frequency + register when
+        // is_idiom=true (it throws otherwise). Assert that contract here so
+        // TS narrows the type without re-running the same validation.
+        // biome-ignore lint/style/noNonNullAssertion: trusted by enrichExpression contract
+        const frequency = result.frequency!;
+        // biome-ignore lint/style/noNonNullAssertion: trusted by enrichExpression contract
+        const register = result.register!;
         await upsertEnrichment({
           expressionId: row.id,
           enrichment: {
             idiomatic_meaning: result.idiomatic_meaning,
             explanation: result.explanation,
             examples: result.examples,
-            frequency: result.frequency,
-            register: result.register,
+            frequency,
+            register,
           },
           runId: run.id,
         });
@@ -88,8 +85,8 @@ export async function runEnrich(
         frequencySamples.push({
           expression: row.expression,
           language: row.language,
-          register: result.register,
-          frequency: result.frequency,
+          register,
+          frequency,
           rationale: result.frequency_rationale,
         });
       } catch (err) {
