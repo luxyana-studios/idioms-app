@@ -4,14 +4,14 @@ import { BlurView } from "expo-blur";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, Pressable, ScrollView, TextInput, View } from "react-native";
+import { Platform, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   StyleSheet,
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
-import { useUiFonts } from "@/core/theme/fonts";
+import { ExploreFilterControls } from "@/features/idioms/components/ExploreFilterControls";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import { useExploreFiltersStore } from "@/features/idioms/stores/exploreFilters.store";
 import type { IdiomTag } from "@/features/idioms/types";
@@ -26,7 +26,6 @@ import { Typography } from "@/shared/components/Typography";
 export default function ExploreScreen() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
-  const fonts = useUiFonts();
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -112,195 +111,18 @@ export default function ExploreScreen() {
         }
       />
 
-      {/* Search bar */}
-      <View
-        style={[
-          styles.searchBar,
-          {
-            backgroundColor: theme.colors.glassSurface,
-            borderColor: theme.colors.border,
-          },
-        ]}
-      >
-        <Ionicons
-          name="search-outline"
-          size={18}
-          color={theme.colors.textMuted}
-        />
-        <TextInput
-          style={[
-            styles.searchInput,
-            {
-              color: theme.colors.text,
-              fontFamily: fonts.family("regular"),
-              fontWeight: fonts.weight("regular"),
-            },
-          ]}
-          placeholder={t("explore.search")}
-          placeholderTextColor={theme.colors.textMuted}
-          value={search}
-          onChangeText={setSearch}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-        {search.length > 0 && (
-          <Pressable
-            onPress={() => setSearch("")}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel={t("explore.clearSearch")}
-          >
-            <Ionicons
-              name="close-circle"
-              size={18}
-              color={theme.colors.textMuted}
-            />
-          </Pressable>
-        )}
-      </View>
-
-      {/* Language filter chips */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.chipsScroll}
-        contentContainerStyle={styles.chipsContent}
-      >
-        <Pressable
-          onPress={clearLanguages}
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: activeLanguageCodes.length === 0 }}
-          style={[
-            styles.chip,
-            activeLanguageCodes.length === 0
-              ? { backgroundColor: theme.colors.primary }
-              : {
-                  backgroundColor: theme.colors.chipBg,
-                  borderColor: theme.colors.chipBorder,
-                },
-          ]}
-        >
-          <Typography
-            variant="caption"
-            weight="bold"
-            style={{
-              color:
-                activeLanguageCodes.length === 0
-                  ? theme.colors.primaryText
-                  : theme.colors.primary,
-              fontSize: 12,
-            }}
-          >
-            {t("explore.filterAll")}
-          </Typography>
-        </Pressable>
-
-        {languages.map((language) => {
-          const code = language.languageCode;
-          const isActive = activeLanguageCodes.includes(code);
-          return (
-            <Pressable
-              key={code}
-              onPress={() => toggleLanguage(code)}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: isActive }}
-              style={[
-                styles.chip,
-                isActive
-                  ? { backgroundColor: theme.colors.primary }
-                  : {
-                      backgroundColor: theme.colors.chipBg,
-                      borderColor: theme.colors.chipBorder,
-                    },
-              ]}
-            >
-              <Typography
-                variant="caption"
-                weight="bold"
-                style={{
-                  color: isActive
-                    ? theme.colors.primaryText
-                    : theme.colors.primary,
-                  fontSize: 12,
-                }}
-              >
-                {t(`lang.${code}`, { defaultValue: code.toUpperCase() })}
-              </Typography>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-
-      {/* Tag filter chips */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.chipsScroll}
-        contentContainerStyle={styles.chipsContent}
-      >
-        <Pressable
-          onPress={clearTags}
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: selectedTagKeys.length === 0 }}
-          style={[
-            styles.chip,
-            selectedTagKeys.length === 0
-              ? { backgroundColor: theme.colors.primary }
-              : {
-                  backgroundColor: theme.colors.chipBg,
-                  borderColor: theme.colors.chipBorder,
-                },
-          ]}
-        >
-          <Typography
-            variant="caption"
-            weight="bold"
-            style={{
-              color:
-                selectedTagKeys.length === 0
-                  ? theme.colors.primaryText
-                  : theme.colors.primary,
-              fontSize: 12,
-            }}
-          >
-            {t("explore.filterAll")}
-          </Typography>
-        </Pressable>
-
-        {allTags.map((tag) => {
-          const isActive = selectedTagKeys.includes(tag.key);
-          return (
-            <Pressable
-              key={tag.key}
-              onPress={() => toggleTag(tag.key)}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: isActive }}
-              style={[
-                styles.chip,
-                isActive
-                  ? { backgroundColor: theme.colors.primary }
-                  : {
-                      backgroundColor: theme.colors.chipBg,
-                      borderColor: theme.colors.chipBorder,
-                    },
-              ]}
-            >
-              <Typography
-                variant="caption"
-                weight="bold"
-                style={{
-                  color: isActive
-                    ? theme.colors.primaryText
-                    : theme.colors.primary,
-                  fontSize: 12,
-                }}
-              >
-                {tag.label}
-              </Typography>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+      <ExploreFilterControls
+        search={search}
+        onSearchChange={setSearch}
+        languages={languages}
+        selectedLanguageCodes={activeLanguageCodes}
+        selectedTagKeys={selectedTagKeys}
+        tags={allTags}
+        onToggleLanguage={toggleLanguage}
+        onToggleTag={toggleTag}
+        onClearLanguages={clearLanguages}
+        onClearTags={clearTags}
+      />
 
       {/* Results count */}
       <View style={styles.resultsHeader}>
@@ -414,38 +236,6 @@ const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
     backgroundColor: theme.colors.background,
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
-    borderWidth: 1,
-    borderRadius: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    overflow: "hidden",
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    padding: 0,
-  },
-  chipsScroll: {
-    flexGrow: 0,
-    marginBottom: theme.spacing.sm,
-  },
-  chipsContent: {
-    paddingHorizontal: theme.spacing.lg,
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: theme.radius.full,
-    borderWidth: 1,
-    borderColor: "transparent",
   },
   resultsHeader: {
     paddingHorizontal: theme.spacing.lg,

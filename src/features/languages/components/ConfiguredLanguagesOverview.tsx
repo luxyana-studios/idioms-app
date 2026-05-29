@@ -1,9 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Typography } from "@/shared/components/Typography";
 import { useUserLanguages } from "../hooks/useUserLanguages";
+import {
+  LanguageDisplayRow,
+  languageDisplayRowStyles,
+} from "./LanguageDisplayRow";
 
 interface ConfiguredLanguagesOverviewProps {
   onEdit: () => void;
@@ -71,18 +75,17 @@ export function ConfiguredLanguagesOverview({
           {configuredLanguages.map((config) => {
             const code = config.languageCode;
             return (
-              <View key={code} style={styles.languageRow}>
-                <Typography variant="body" style={styles.languageLabel}>
-                  {t(`lang.${code}`, { defaultValue: code.toUpperCase() })}
-                </Typography>
-                <View style={styles.controls}>
-                  <View style={styles.flagBtn}>
-                    <Text style={styles.flagGlyph}>{config.flag}</Text>
-                  </View>
-                  <View
-                    style={[styles.colorDot, { backgroundColor: config.color }]}
-                  />
-                </View>
+              <View
+                key={code}
+                style={[languageDisplayRowStyles.row, styles.languageRow]}
+              >
+                <LanguageDisplayRow
+                  label={t(`lang.${code}`, {
+                    defaultValue: code.toUpperCase(),
+                  })}
+                  flag={config.flag}
+                  color={config.color}
+                />
               </View>
             );
           })}
@@ -121,33 +124,6 @@ const styles = StyleSheet.create((theme) => ({
     borderBottomColor: theme.colors.border,
   },
   languageRow: {
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    justifyContent: "space-between" as const,
-    gap: theme.spacing.sm,
-    minHeight: theme.spacing.touchTarget,
     paddingVertical: theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  controls: {
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    gap: theme.spacing.sm,
-  },
-  flagBtn: {
-    alignItems: "center" as const,
-    justifyContent: "center" as const,
-  },
-  flagGlyph: {
-    fontSize: theme.typography.sizes.xl,
-  },
-  languageLabel: {
-    flex: 1,
-  },
-  colorDot: {
-    width: theme.spacing.lg,
-    height: theme.spacing.lg,
-    borderRadius: theme.radius.full,
   },
 }));

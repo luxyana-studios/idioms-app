@@ -2,8 +2,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { PickerSheet } from "@/shared/components/PickerSheet";
 import { LANGUAGE_SWATCHES } from "../constants";
-import { PickerSheet } from "./PickerSheet";
 
 interface ColorSwatchPickerProps {
   visible: boolean;

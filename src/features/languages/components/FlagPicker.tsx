@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { PickerSheet } from "@/shared/components/PickerSheet";
 import { FLAG_OPTIONS } from "../constants";
-import { PickerSheet } from "./PickerSheet";
 
 interface FlagPickerProps {
   visible: boolean;

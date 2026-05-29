@@ -11,9 +11,13 @@ import {
   View,
 } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Typography } from "@/shared/components/Typography";
 import { ColorSwatchPicker } from "./ColorSwatchPicker";
 import { FlagPicker } from "./FlagPicker";
+import {
+  LanguageAppearanceControls,
+  LanguageRowBody,
+  languageDisplayRowStyles,
+} from "./LanguageDisplayRow";
 
 interface LanguageConfigRowProps {
   code: string;
@@ -86,85 +90,83 @@ function LanguageConfigRowComponent({
   return (
     <Animated.View
       style={[
-        styles.row,
+        languageDisplayRowStyles.row,
         isDragging && styles.dragging,
         { transform: [{ translateY }] },
       ]}
       onLayout={handleLayout}
     >
       <TouchableOpacity
-        style={styles.rowPressable}
+        style={languageDisplayRowStyles.pressableContent}
         onPress={() => onToggle(code)}
         activeOpacity={0.75}
       >
-        <View
-          style={styles.toggle}
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: isSelected }}
-          accessibilityLabel={label}
-        >
-          <Ionicons
-            name={isSelected ? "checkmark-circle" : "ellipse-outline"}
-            size={24}
-            color={isSelected ? theme.colors.primary : theme.colors.textMuted}
-          />
-        </View>
-
-        <Typography variant="body" style={styles.label}>
-          {label}
-        </Typography>
+        <LanguageRowBody
+          label={label}
+          leading={
+            <View
+              style={styles.toggle}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: isSelected }}
+              accessibilityLabel={label}
+            >
+              <Ionicons
+                name={isSelected ? "checkmark-circle" : "ellipse-outline"}
+                size={24}
+                color={
+                  isSelected ? theme.colors.primary : theme.colors.textMuted
+                }
+              />
+            </View>
+          }
+        />
       </TouchableOpacity>
 
-      <View style={styles.controls}>
-        {isSelected ? (
-          <Pressable
-            style={styles.flagBtn}
-            onPress={() => setFlagOpen(true)}
-            accessibilityRole="button"
-            accessibilityLabel={t("languages.pickFlag")}
-            hitSlop={8}
-          >
-            <Text style={styles.flagGlyph}>{flag}</Text>
-          </Pressable>
-        ) : (
-          <View style={[styles.flagBtn, styles.inactiveControl]}>
-            <Text style={styles.flagGlyph}>{flag}</Text>
-          </View>
-        )}
-
-        {isSelected ? (
-          <Pressable
-            style={[styles.colorDot, { backgroundColor: color }]}
-            onPress={() => setColorOpen(true)}
-            accessibilityRole="button"
-            accessibilityLabel={t("languages.pickColor")}
-            hitSlop={8}
-          />
-        ) : (
-          <View
-            style={[
-              styles.colorDot,
-              styles.inactiveControl,
-              { backgroundColor: color },
-            ]}
-          />
-        )}
-
-        {isSelected && (
-          <View
-            style={styles.dragHandle}
-            accessibilityRole="adjustable"
-            accessibilityLabel={t("languages.dragToReorder")}
-            {...panResponder.panHandlers}
-          >
-            <Ionicons
-              name="reorder-three-outline"
-              size={24}
-              color={theme.colors.textMuted}
+      <LanguageAppearanceControls
+        flag={flag}
+        color={color}
+        inactive={!isSelected}
+        flagControl={
+          isSelected ? (
+            <Pressable
+              style={styles.flagBtn}
+              onPress={() => setFlagOpen(true)}
+              accessibilityRole="button"
+              accessibilityLabel={t("languages.pickFlag")}
+              hitSlop={8}
+            >
+              <Text style={styles.flagGlyph}>{flag}</Text>
+            </Pressable>
+          ) : undefined
+        }
+        colorControl={
+          isSelected ? (
+            <Pressable
+              style={[styles.colorDot, { backgroundColor: color }]}
+              onPress={() => setColorOpen(true)}
+              accessibilityRole="button"
+              accessibilityLabel={t("languages.pickColor")}
+              hitSlop={8}
             />
-          </View>
-        )}
-      </View>
+          ) : undefined
+        }
+        trailing={
+          isSelected ? (
+            <View
+              style={styles.dragHandle}
+              accessibilityRole="adjustable"
+              accessibilityLabel={t("languages.dragToReorder")}
+              {...panResponder.panHandlers}
+            >
+              <Ionicons
+                name="reorder-three-outline"
+                size={24}
+                color={theme.colors.textMuted}
+              />
+            </View>
+          ) : undefined
+        }
+      />
 
       <ColorSwatchPicker
         visible={colorOpen}
@@ -185,23 +187,6 @@ function LanguageConfigRowComponent({
 export const LanguageConfigRow = memo(LanguageConfigRowComponent);
 
 const styles = StyleSheet.create((theme) => ({
-  row: {
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    gap: theme.spacing.sm,
-    minHeight: theme.spacing.touchTarget,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    backgroundColor: theme.colors.background,
-  },
-  rowPressable: {
-    flex: 1,
-    minHeight: theme.spacing.touchTarget,
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    gap: theme.spacing.sm,
-    paddingVertical: theme.spacing.sm,
-  },
   dragging: {
     opacity: 0.85,
     zIndex: 2,
@@ -217,14 +202,6 @@ const styles = StyleSheet.create((theme) => ({
   flagGlyph: {
     fontSize: theme.typography.sizes.xl,
   },
-  label: {
-    flex: 1,
-  },
-  controls: {
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    gap: theme.spacing.sm,
-  },
   colorDot: {
     width: theme.spacing.lg,
     height: theme.spacing.lg,
@@ -236,8 +213,5 @@ const styles = StyleSheet.create((theme) => ({
     height: 32,
     alignItems: "center" as const,
     justifyContent: "center" as const,
-  },
-  inactiveControl: {
-    opacity: 0.45,
   },
 }));

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Modal, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Typography } from "@/shared/components/Typography";
+import { Typography } from "./Typography";
 
 interface PickerSheetProps {
   visible: boolean;
@@ -12,10 +12,9 @@ interface PickerSheetProps {
   children: ReactNode;
 }
 
-// Bottom-sheet scaffold (backdrop + handle + title) shared by the color and
-// flag pickers. Mirrors the layering approach used by LanguagePickerModal:
-// backdrop is a sibling of the sheet, not a parent, to avoid nested <button>s
-// on RN Web.
+// Bottom-sheet scaffold (backdrop + handle + title) for simple pickers.
+// The backdrop is a sibling of the sheet, not a parent, to avoid nested
+// <button> output on RN Web when picker options are Pressables.
 export function PickerSheet({
   visible,
   title,
