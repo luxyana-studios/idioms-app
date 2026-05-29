@@ -1,8 +1,10 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { ConfiguredLanguagesOverview } from "@/features/languages/components/ConfiguredLanguagesOverview";
 import { LanguagePickerModal } from "@/features/settings/components/LanguagePickerModal";
 import { useSettings } from "@/features/settings/hooks/useSettings";
 import type { ThemeMode } from "@/features/settings/stores/settings.store";
@@ -19,6 +21,9 @@ export default function SettingsScreen() {
   const { themeMode, language, setThemeMode } = useSettings();
   const { signOut } = useAuth();
   const [pickerOpen, setPickerOpen] = useState(false);
+  const uiLanguageLabel = t("settings.uiLanguage", {
+    defaultValue: t("settings.language"),
+  });
 
   const themeLabelKey = (mode: ThemeMode) => {
     const map: Record<ThemeMode, string> = {
@@ -31,41 +36,60 @@ export default function SettingsScreen() {
 
   return (
     <ScreenContainer>
-      <View style={styles.section}>
-        <Typography variant="label">{t("settings.theme")}</Typography>
-        <View style={styles.optionRow}>
-          {themeModes.map((mode) => (
-            <Pressable
-              key={mode}
-              style={[styles.option, themeMode === mode && styles.optionActive]}
-              onPress={() => setThemeMode(mode)}
-            >
-              <Typography
-                variant="body"
-                color={themeMode === mode ? "primary" : "text"}
-              >
-                {t(themeLabelKey(mode))}
-              </Typography>
-            </Pressable>
-          ))}
-        </View>
+      <View style={styles.sectionGroup}>
+        <Typography variant="label" color="textSecondary">
+          {t("settings.userSettings")}
+        </Typography>
+
+        <ConfiguredLanguagesOverview
+          onEdit={() => router.push("/(main)/(settings)/languages")}
+        />
       </View>
 
-      <View style={styles.section}>
-        <Typography variant="label">{t("settings.language")}</Typography>
-        <Pressable
-          style={styles.languageRow}
-          onPress={() => setPickerOpen(true)}
-          accessibilityRole="button"
-          accessibilityLabel={t("settings.language")}
-        >
-          <Typography variant="body">{t(`lang.${language}`)}</Typography>
-          <DirectionalIcon
-            name="chevron-forward"
-            size={18}
-            color={theme.colors.textMuted}
-          />
-        </Pressable>
+      <View style={styles.sectionGroup}>
+        <Typography variant="label" color="textSecondary">
+          {t("settings.appearance")}
+        </Typography>
+
+        <View style={styles.section}>
+          <Typography variant="label">{t("settings.theme")}</Typography>
+          <View style={styles.optionRow}>
+            {themeModes.map((mode) => (
+              <Pressable
+                key={mode}
+                style={[
+                  styles.option,
+                  themeMode === mode && styles.optionActive,
+                ]}
+                onPress={() => setThemeMode(mode)}
+              >
+                <Typography
+                  variant="body"
+                  color={themeMode === mode ? "primary" : "text"}
+                >
+                  {t(themeLabelKey(mode))}
+                </Typography>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Typography variant="label">{uiLanguageLabel}</Typography>
+          <Pressable
+            style={styles.languageRow}
+            onPress={() => setPickerOpen(true)}
+            accessibilityRole="button"
+            accessibilityLabel={uiLanguageLabel}
+          >
+            <Typography variant="body">{t(`lang.${language}`)}</Typography>
+            <DirectionalIcon
+              name="chevron-forward"
+              size={18}
+              color={theme.colors.textMuted}
+            />
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.logout}>
@@ -85,9 +109,12 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create((theme) => ({
+  sectionGroup: {
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.xl,
+  },
   section: {
     gap: theme.spacing.sm,
-    marginBottom: theme.spacing.xl,
   },
   optionRow: {
     flexDirection: "row" as const,

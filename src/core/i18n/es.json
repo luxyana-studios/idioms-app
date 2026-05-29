@@ -75,5 +75,22 @@
   "home.emptyFeed": "No hay modismos disponibles",
   "home.feedError": "No se pudo cargar el feed. Toca para reintentar.",
   "home.unsaveIdiom": "Quitar de guardados",
-  "home.shuffle": "Mezclar activado"
+  "home.shuffle": "Mezclar activado",
+  "settings.uiLanguage": "Idioma de la app",
+  "settings.userSettings": "Ajustes de usuario",
+  "settings.appearance": "Apariencia",
+  "settings.exploreLanguages": "Idiomas de modismos",
+  "languages.title": "Idiomas de modismos",
+  "languages.subtitle": "Elige idiomas para explorar",
+  "languages.intro": "Elige los idiomas que quieres explorar. Cada uno tiene un color y una bandera que puedes personalizar.",
+  "languages.noneConfigured": "Aún no hay idiomas configurados",
+  "languages.add": "Añadir idiomas",
+  "languages.editConfigured": "Editar idiomas configurados",
+  "languages.empty": "Aún no hay idiomas disponibles.",
+  "languages.error": "No se pudieron cargar los idiomas. Desliza para reintentar.",
+  "languages.configuredSection": "Idiomas configurados",
+  "languages.availableSection": "Idiomas disponibles",
+  "languages.pickColor": "Elige un color",
+  "languages.pickFlag": "Elige una bandera",
+  "languages.dragToReorder": "Arrastra para reordenar"
 }

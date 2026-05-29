@@ -66,5 +66,22 @@
   "common.unlike": "लाइक हटाएँ",
   "likes.count": "{{count}} लाइक",
   "common.close": "बंद करें",
-  "home.shuffle": "शफ़ल चालू"
+  "home.shuffle": "शफ़ल चालू",
+  "settings.uiLanguage": "ऐप की भाषा",
+  "settings.userSettings": "उपयोगकर्ता सेटिंग्स",
+  "settings.appearance": "रूप",
+  "settings.exploreLanguages": "मुहावरों की भाषाएँ",
+  "languages.title": "मुहावरों की भाषाएँ",
+  "languages.subtitle": "एक्सप्लोर करने के लिए भाषाएँ चुनें",
+  "languages.intro": "वे भाषाएँ चुनें जिन्हें आप एक्सप्लोर करना चाहते हैं। हर एक को एक रंग और झंडा मिलता है जिसे आप अनुकूलित कर सकते हैं।",
+  "languages.noneConfigured": "अभी तक कोई भाषा कॉन्फ़िगर नहीं की गई",
+  "languages.add": "भाषाएँ जोड़ें",
+  "languages.editConfigured": "कॉन्फ़िगर की गई भाषाएँ संपादित करें",
+  "languages.empty": "अभी तक कोई भाषा उपलब्ध नहीं है।",
+  "languages.error": "भाषाएँ लोड नहीं हो सकीं। पुनः प्रयास के लिए खींचें।",
+  "languages.configuredSection": "कॉन्फ़िगर की गई भाषाएँ",
+  "languages.availableSection": "उपलब्ध भाषाएँ",
+  "languages.pickColor": "रंग चुनें",
+  "languages.pickFlag": "झंडा चुनें",
+  "languages.dragToReorder": "पुनः क्रमित करने के लिए खींचें"
 }

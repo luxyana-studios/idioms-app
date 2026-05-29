@@ -66,5 +66,22 @@
   "common.unlike": "Non mi piace più",
   "likes.count": "{{count}} mi piace",
   "common.close": "Chiudi",
-  "home.shuffle": "Casuale attivato"
+  "home.shuffle": "Casuale attivato",
+  "settings.uiLanguage": "Lingua dell'app",
+  "settings.userSettings": "Impostazioni utente",
+  "settings.appearance": "Aspetto",
+  "settings.exploreLanguages": "Lingue dei modi di dire",
+  "languages.title": "Lingue dei modi di dire",
+  "languages.subtitle": "Scegli le lingue da esplorare",
+  "languages.intro": "Scegli le lingue che vuoi esplorare. Ognuna ha un colore e una bandiera personalizzabili.",
+  "languages.noneConfigured": "Nessuna lingua configurata",
+  "languages.add": "Aggiungi lingue",
+  "languages.editConfigured": "Modifica lingue configurate",
+  "languages.empty": "Nessuna lingua ancora disponibile.",
+  "languages.error": "Impossibile caricare le lingue. Trascina per riprovare.",
+  "languages.configuredSection": "Lingue configurate",
+  "languages.availableSection": "Lingue disponibili",
+  "languages.pickColor": "Scegli un colore",
+  "languages.pickFlag": "Scegli una bandiera",
+  "languages.dragToReorder": "Trascina per riordinare"
 }

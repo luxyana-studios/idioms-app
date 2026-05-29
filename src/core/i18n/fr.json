@@ -75,5 +75,22 @@
   "home.emptyFeed": "Aucune expression disponible",
   "home.feedError": "Impossible de charger le fil. Touchez pour réessayer.",
   "home.unsaveIdiom": "Retirer des favoris",
-  "home.shuffle": "Aléatoire activé"
+  "home.shuffle": "Aléatoire activé",
+  "settings.uiLanguage": "Langue de l'application",
+  "settings.userSettings": "Paramètres utilisateur",
+  "settings.appearance": "Apparence",
+  "settings.exploreLanguages": "Langues des expressions",
+  "languages.title": "Langues des expressions",
+  "languages.subtitle": "Choisissez des langues à explorer",
+  "languages.intro": "Choisissez les langues que vous souhaitez explorer. Chacune reçoit une couleur et un drapeau personnalisables.",
+  "languages.noneConfigured": "Aucune langue configurée pour l'instant",
+  "languages.add": "Ajouter des langues",
+  "languages.editConfigured": "Modifier les langues configurées",
+  "languages.empty": "Aucune langue disponible pour l'instant.",
+  "languages.error": "Impossible de charger les langues. Tirez pour réessayer.",
+  "languages.configuredSection": "Langues configurées",
+  "languages.availableSection": "Langues disponibles",
+  "languages.pickColor": "Choisir une couleur",
+  "languages.pickFlag": "Choisir un drapeau",
+  "languages.dragToReorder": "Glissez pour réorganiser"
 }

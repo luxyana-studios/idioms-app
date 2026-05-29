@@ -9,6 +9,7 @@ profiles ──< bookmarks >── idioms ──< idiom_equivalents >── idio
 profiles ──< user_deck_saves >── decks ──< deck_idioms >── idioms
 profiles ──< decks (owner)
 profiles ──< follows >── profiles
+auth.users ──< user_languages          (per-user content-language scope)
 ```
 
 ---
@@ -237,6 +238,46 @@ CHECK(follower_id != following_id)
 
 ---
 
+### `user_languages`
+Per-user set of content languages the user wants to explore, each with a
+user-chosen display color and flag emoji. Row presence = the language is
+"selected". This is the durable, cross-device **content scope**: languages a
+user has not selected are filtered out of the feed, the quick filters, and
+equivalent-idiom browsing (use case: a user who doesn't read Hindi never sees
+Hindi anywhere). An empty set means "unconfigured → no filter, show all" until
+onboarding forces an initial choice.
+
+References `auth.users` directly — there is no `profiles` table yet (consistent
+with `idiom_likes`).
+
+```sql
+id            uuid PRIMARY KEY DEFAULT gen_random_uuid()
+user_id       uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE
+language_code text NOT NULL                       -- ISO 639-1, e.g. 'es'
+color         text NOT NULL CHECK (color ~ '^#[0-9A-Fa-f]{6}$')  -- '#RRGGBB'
+flag          text NOT NULL                       -- flag emoji, e.g. '🇪🇸'
+position      integer NOT NULL DEFAULT 0          -- order in the quick-filter bar
+created_at    timestamptz NOT NULL DEFAULT now()
+updated_at    timestamptz NOT NULL DEFAULT now()
+
+UNIQUE(user_id, language_code)
+INDEX(user_id, position)
+```
+
+Notes:
+- color/flag are **per-user** data, not global language metadata — there is no
+  canonical `languages` table. Two users may give the same language different
+  colors/flags.
+- `color`/`flag` are user-owned content (like `decks.cover_image_url`), not
+  Unistyles theme tokens — the "no color literals in components" rule does not
+  apply to this stored data.
+- `language_code` has no FK/enum: the available content languages are currently
+  a fixed frontend catalog (`DEFAULT_IDIOM_LANGUAGE_CODES`), validated app-side
+  rather than in SQL. Deriving them dynamically from distinct
+  `idioms.language_code` is deferred to increment 3.
+
+---
+
 ## Row Level Security (RLS)
 
 All tables have RLS enabled. Key policies:
@@ -255,6 +296,7 @@ All tables have RLS enabled. Key policies:
 | `user_deck_saves` | Owner only | Owner only |
 | `profiles` | Public (username, avatar) | Owner only |
 | `follows` | Public | Owner (follower_id) only |
+| `user_languages` | Owner only | Owner only |
 
 ---
 

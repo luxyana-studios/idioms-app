@@ -75,5 +75,22 @@
   "home.emptyFeed": "Keine Redewendungen verfügbar",
   "home.feedError": "Feed konnte nicht geladen werden. Zum Wiederholen tippen.",
   "home.unsaveIdiom": "Aus Gespeichertem entfernen",
-  "home.shuffle": "Zufallsmodus an"
+  "home.shuffle": "Zufallsmodus an",
+  "settings.uiLanguage": "App-Sprache",
+  "settings.userSettings": "Benutzereinstellungen",
+  "settings.appearance": "Darstellung",
+  "settings.exploreLanguages": "Redewendungssprachen",
+  "languages.title": "Redewendungssprachen",
+  "languages.subtitle": "Sprachen zum Entdecken auswählen",
+  "languages.intro": "Wähle die Sprachen, die du entdecken möchtest. Jede erhält eine Farbe und eine Flagge, die du anpassen kannst.",
+  "languages.noneConfigured": "Noch keine Sprachen konfiguriert",
+  "languages.add": "Sprachen hinzufügen",
+  "languages.editConfigured": "Konfigurierte Sprachen bearbeiten",
+  "languages.empty": "Noch keine Sprachen verfügbar.",
+  "languages.error": "Sprachen konnten nicht geladen werden. Zum Wiederholen ziehen.",
+  "languages.configuredSection": "Konfigurierte Sprachen",
+  "languages.availableSection": "Verfügbare Sprachen",
+  "languages.pickColor": "Farbe auswählen",
+  "languages.pickFlag": "Flagge auswählen",
+  "languages.dragToReorder": "Zum Neuordnen ziehen"
 }

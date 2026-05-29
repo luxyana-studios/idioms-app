@@ -66,5 +66,22 @@
   "common.unlike": "Descurtir",
   "likes.count": "{{count}} curtidas",
   "common.close": "Fechar",
-  "home.shuffle": "Aleatório ativado"
+  "home.shuffle": "Aleatório ativado",
+  "settings.uiLanguage": "Idioma do app",
+  "settings.userSettings": "Configurações do usuário",
+  "settings.appearance": "Aparência",
+  "settings.exploreLanguages": "Idiomas das expressões",
+  "languages.title": "Idiomas das expressões",
+  "languages.subtitle": "Escolha idiomas para explorar",
+  "languages.intro": "Escolha os idiomas que você quer explorar. Cada um recebe uma cor e uma bandeira personalizáveis.",
+  "languages.noneConfigured": "Nenhum idioma configurado ainda",
+  "languages.add": "Adicionar idiomas",
+  "languages.editConfigured": "Editar idiomas configurados",
+  "languages.empty": "Nenhum idioma disponível ainda.",
+  "languages.error": "Não foi possível carregar os idiomas. Puxe para tentar novamente.",
+  "languages.configuredSection": "Idiomas configurados",
+  "languages.availableSection": "Idiomas disponíveis",
+  "languages.pickColor": "Escolha uma cor",
+  "languages.pickFlag": "Escolha uma bandeira",
+  "languages.dragToReorder": "Arraste para reordenar"
 }

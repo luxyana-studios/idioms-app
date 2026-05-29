@@ -65,5 +65,22 @@
   "common.unlike": "いいねを取り消す",
   "likes.count": "{{count}} いいね",
   "common.close": "閉じる",
-  "home.shuffle": "シャッフルオン"
+  "home.shuffle": "シャッフルオン",
+  "settings.uiLanguage": "アプリの言語",
+  "settings.userSettings": "ユーザー設定",
+  "settings.appearance": "外観",
+  "settings.exploreLanguages": "イディオムの言語",
+  "languages.title": "イディオムの言語",
+  "languages.subtitle": "探索する言語を選択",
+  "languages.intro": "探索したい言語を選んでください。それぞれにカスタマイズできる色と国旗が付きます。",
+  "languages.noneConfigured": "まだ言語が設定されていません",
+  "languages.add": "言語を追加",
+  "languages.editConfigured": "設定済みの言語を編集",
+  "languages.empty": "利用できる言語はまだありません。",
+  "languages.error": "言語を読み込めませんでした。引っ張って再試行してください。",
+  "languages.configuredSection": "設定済みの言語",
+  "languages.availableSection": "利用可能な言語",
+  "languages.pickColor": "色を選択",
+  "languages.pickFlag": "国旗を選択",
+  "languages.dragToReorder": "ドラッグして並べ替え"
 }
