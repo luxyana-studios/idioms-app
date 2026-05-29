@@ -88,7 +88,7 @@ const swatchForCode = (code: string): string => {
 };
 
 // Initial color + flag to seed when the user first selects `languageCode`.
-export const defaultLanguageConfig = (
+const defaultLanguageConfig = (
   languageCode: string,
   position: number,
 ): UserLanguageInput => {

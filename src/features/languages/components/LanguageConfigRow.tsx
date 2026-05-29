@@ -209,8 +209,8 @@ const styles = StyleSheet.create((theme) => ({
     marginRight: theme.spacing.xs,
   },
   dragHandle: {
-    width: 32,
-    height: 32,
+    width: theme.spacing.xl,
+    height: theme.spacing.xl,
     alignItems: "center" as const,
     justifyContent: "center" as const,
   },

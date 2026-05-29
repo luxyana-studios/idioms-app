@@ -271,9 +271,10 @@ Notes:
 - `color`/`flag` are user-owned content (like `decks.cover_image_url`), not
   Unistyles theme tokens — the "no color literals in components" rule does not
   apply to this stored data.
-- `language_code` has no FK/enum: the available content languages are derived
-  dynamically from distinct `idioms.language_code`, so validity is enforced
-  app-side against that list, not in SQL.
+- `language_code` has no FK/enum: the available content languages are currently
+  a fixed frontend catalog (`DEFAULT_IDIOM_LANGUAGE_CODES`), validated app-side
+  rather than in SQL. Deriving them dynamically from distinct
+  `idioms.language_code` is deferred to increment 3.
 
 ---
 

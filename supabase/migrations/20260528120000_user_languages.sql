@@ -5,8 +5,10 @@
 --
 -- No profiles table exists yet, so reference auth.users directly (consistent
 -- with idiom_likes). color/flag are user-owned data (like cover_image_url),
--- not UI-theme tokens. language_code is validated app-side against the dynamic
--- set of available content languages, so it carries no FK/enum constraint here.
+-- not UI-theme tokens. language_code is validated app-side against the current
+-- fixed frontend catalog (DEFAULT_IDIOM_LANGUAGE_CODES), so it carries no
+-- FK/enum constraint here; deriving the set dynamically from distinct
+-- idioms.language_code is deferred to increment 3.
 
 create table public.user_languages (
   id            uuid        primary key default gen_random_uuid(),

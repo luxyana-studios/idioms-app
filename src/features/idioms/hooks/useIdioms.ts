@@ -90,13 +90,28 @@ export const useIdioms = () => {
     languages,
     isLoading: languagesLoading,
     isError: languagesError,
+    refetch: refetchLanguages,
   } = useUserLanguages();
   const languageCodes = languages.map((lang) => lang.languageCode);
   const languageScopeKey = [...languageCodes].sort().join(",");
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ["idioms", i18n.language, languageScopeKey],
     queryFn: () => fetchIdioms(i18n.language, languageCodes),
     enabled: !languagesLoading && !languagesError,
   });
+
+  // The idioms query is gated on the language scope. When useUserLanguages
+  // errors, that query is *disabled* — neither loading nor errored — which would
+  // otherwise surface as a silent empty feed. Fold the languages state in so
+  // consumers see a real loading/error, and let retry recover the languages too.
+  return {
+    ...query,
+    isLoading: query.isLoading || languagesLoading,
+    isError: query.isError || languagesError,
+    refetch: async () => {
+      if (languagesError) await refetchLanguages();
+      return query.refetch();
+    },
+  };
 };

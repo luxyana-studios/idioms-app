@@ -4,7 +4,13 @@ import { BlurView } from "expo-blur";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, Pressable, ScrollView, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  ScrollView,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   StyleSheet,
@@ -31,7 +37,7 @@ export default function ExploreScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const { tag: tagParam } = useLocalSearchParams<{ tag?: string }>();
-  const { data: idioms = [] } = useIdioms();
+  const { data: idioms = [], isLoading, isError, refetch } = useIdioms();
   const { languages } = useUserLanguages();
   const selectedLanguageCodes = useExploreFiltersStore(
     (s) => s.selectedLanguageCodes,
@@ -124,110 +130,142 @@ export default function ExploreScreen() {
         onClearTags={clearTags}
       />
 
-      {/* Results count */}
-      <View style={styles.resultsHeader}>
-        <Typography variant="caption" style={{ color: theme.colors.textMuted }}>
-          {t("explore.resultsCount", { count: filtered.length })}
-        </Typography>
-      </View>
-
-      {/* Idiom list */}
-      <ScrollView
-        style={styles.list}
-        contentContainerStyle={[
-          styles.listContent,
-          { paddingBottom: Math.max(insets.bottom, 8) + 24 },
-        ]}
-        showsVerticalScrollIndicator={false}
-      >
-        {filtered.length === 0 ? (
-          <View style={styles.empty}>
-            <Ionicons
-              name="search-outline"
-              size={40}
-              color={theme.colors.textMuted}
-            />
+      {isLoading ? (
+        <View style={styles.stateContainer}>
+          <ActivityIndicator color={theme.colors.primary} />
+        </View>
+      ) : isError ? (
+        <Pressable
+          style={styles.stateContainer}
+          onPress={() => refetch()}
+          accessibilityRole="button"
+          accessibilityLabel={t("home.feedError")}
+        >
+          <Typography
+            variant="body"
+            color="error"
+            style={{ textAlign: "center" }}
+          >
+            {t("home.feedError")}
+          </Typography>
+        </Pressable>
+      ) : (
+        <>
+          {/* Results count */}
+          <View style={styles.resultsHeader}>
             <Typography
-              variant="body"
-              style={{ color: theme.colors.textMuted, textAlign: "center" }}
+              variant="caption"
+              style={{ color: theme.colors.textMuted }}
             >
-              {t("explore.noResults")}
+              {t("explore.resultsCount", { count: filtered.length })}
             </Typography>
           </View>
-        ) : (
-          filtered.map((idiom) => (
-            <Pressable
-              key={idiom.id}
-              onPress={() => {
-                router.push(`/(main)/(tabs)/(home)?scrollToId=${idiom.id}`);
-              }}
-              style={({ pressed }) => [
-                styles.idiomCard,
-                {
-                  backgroundColor: theme.colors.card,
-                  borderColor: theme.colors.cardBorder,
-                  opacity: pressed ? 0.8 : 1,
-                },
-              ]}
-            >
-              {Platform.OS !== "android" ? (
-                <BlurView
-                  intensity={40}
-                  tint={isDark ? "dark" : "light"}
-                  style={[StyleSheet.absoluteFillObject, { borderRadius: 20 }]}
-                  pointerEvents="none"
+
+          {/* Idiom list */}
+          <ScrollView
+            style={styles.list}
+            contentContainerStyle={[
+              styles.listContent,
+              { paddingBottom: Math.max(insets.bottom, 8) + 24 },
+            ]}
+            showsVerticalScrollIndicator={false}
+          >
+            {filtered.length === 0 ? (
+              <View style={styles.empty}>
+                <Ionicons
+                  name="search-outline"
+                  size={40}
+                  color={theme.colors.textMuted}
                 />
-              ) : null}
-              <View
-                style={[
-                  styles.langBox,
-                  { backgroundColor: theme.colors.chipBg },
-                ]}
-              >
-                <Typography
-                  variant="caption"
-                  weight="extraBold"
-                  style={{
-                    color: theme.colors.primary,
-                    fontSize: 11,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {idiom.languageCode.slice(0, 2).toUpperCase()}
-                </Typography>
-              </View>
-              <View style={styles.idiomText}>
                 <Typography
                   variant="body"
-                  weight="bold"
-                  style={{ color: theme.colors.text, fontSize: 15 }}
+                  style={{ color: theme.colors.textMuted, textAlign: "center" }}
                 >
-                  {idiom.expression}
+                  {t("explore.noResults")}
                 </Typography>
-                <Typography
-                  variant="caption"
-                  style={{ color: theme.colors.textSecondary, lineHeight: 18 }}
-                  numberOfLines={1}
-                >
-                  {idiom.idiomaticMeaning}
-                </Typography>
-                {idiom.tags.length > 0 && (
-                  <View style={styles.tagRow}>
-                    {idiom.tags.map((tag) => (
-                      <CategoryChip key={tag.key} label={tag.label} />
-                    ))}
-                  </View>
-                )}
               </View>
-              <DirectionalIcon
-                name="chevron-forward"
-                size={16}
-                color={theme.colors.textMuted}
-              />
-            </Pressable>
-          ))
-        )}
-      </ScrollView>
+            ) : (
+              filtered.map((idiom) => (
+                <Pressable
+                  key={idiom.id}
+                  onPress={() => {
+                    router.push(`/(main)/(tabs)/(home)?scrollToId=${idiom.id}`);
+                  }}
+                  style={({ pressed }) => [
+                    styles.idiomCard,
+                    {
+                      backgroundColor: theme.colors.card,
+                      borderColor: theme.colors.cardBorder,
+                      opacity: pressed ? 0.8 : 1,
+                    },
+                  ]}
+                >
+                  {Platform.OS !== "android" ? (
+                    <BlurView
+                      intensity={40}
+                      tint={isDark ? "dark" : "light"}
+                      style={[
+                        StyleSheet.absoluteFillObject,
+                        { borderRadius: 20 },
+                      ]}
+                      pointerEvents="none"
+                    />
+                  ) : null}
+                  <View
+                    style={[
+                      styles.langBox,
+                      { backgroundColor: theme.colors.chipBg },
+                    ]}
+                  >
+                    <Typography
+                      variant="caption"
+                      weight="extraBold"
+                      style={{
+                        color: theme.colors.primary,
+                        fontSize: 11,
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {idiom.languageCode.slice(0, 2).toUpperCase()}
+                    </Typography>
+                  </View>
+                  <View style={styles.idiomText}>
+                    <Typography
+                      variant="body"
+                      weight="bold"
+                      style={{ color: theme.colors.text, fontSize: 15 }}
+                    >
+                      {idiom.expression}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      style={{
+                        color: theme.colors.textSecondary,
+                        lineHeight: 18,
+                      }}
+                      numberOfLines={1}
+                    >
+                      {idiom.idiomaticMeaning}
+                    </Typography>
+                    {idiom.tags.length > 0 && (
+                      <View style={styles.tagRow}>
+                        {idiom.tags.map((tag) => (
+                          <CategoryChip key={tag.key} label={tag.label} />
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                  <DirectionalIcon
+                    name="chevron-forward"
+                    size={16}
+                    color={theme.colors.textMuted}
+                  />
+                </Pressable>
+              ))
+            )}
+          </ScrollView>
+        </>
+      )}
     </View>
   );
 }
@@ -279,6 +317,13 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 60,
+    gap: theme.spacing.md,
+  },
+  stateContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: theme.spacing.lg,
     gap: theme.spacing.md,
   },
 }));

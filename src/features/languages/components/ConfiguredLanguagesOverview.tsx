@@ -105,8 +105,8 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "space-between" as const,
   },
   editButton: {
-    width: 32,
-    height: 32,
+    width: theme.spacing.xl,
+    height: theme.spacing.xl,
     alignItems: "center" as const,
     justifyContent: "center" as const,
   },

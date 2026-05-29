@@ -1,6 +1,4 @@
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import { zustandMMKVStorage } from "@/core/storage/mmkv";
 
 interface ExploreFiltersState {
   selectedLanguageCodes: string[];
@@ -20,31 +18,26 @@ const toggleValue = (values: string[], value: string) =>
 
 const uniqueValues = (values: string[]) => Array.from(new Set(values));
 
-export const useExploreFiltersStore = create<ExploreFiltersState>()(
-  persist(
-    (set) => ({
+// Ephemeral, in-session filters for narrowing the Explore list. NOT persisted:
+// the durable, cross-device content scope lives server-side in user_languages.
+// These are just transient narrowing within a single Explore visit.
+export const useExploreFiltersStore = create<ExploreFiltersState>()((set) => ({
+  selectedLanguageCodes: [],
+  selectedTagKeys: [],
+  toggleLanguage: (code) =>
+    set((state) => ({
+      selectedLanguageCodes: toggleValue(state.selectedLanguageCodes, code),
+    })),
+  toggleTag: (key) =>
+    set((state) => ({
+      selectedTagKeys: toggleValue(state.selectedTagKeys, key),
+    })),
+  setTags: (keys) => set({ selectedTagKeys: uniqueValues(keys) }),
+  clearLanguages: () => set({ selectedLanguageCodes: [] }),
+  clearTags: () => set({ selectedTagKeys: [] }),
+  clearAll: () =>
+    set({
       selectedLanguageCodes: [],
       selectedTagKeys: [],
-      toggleLanguage: (code) =>
-        set((state) => ({
-          selectedLanguageCodes: toggleValue(state.selectedLanguageCodes, code),
-        })),
-      toggleTag: (key) =>
-        set((state) => ({
-          selectedTagKeys: toggleValue(state.selectedTagKeys, key),
-        })),
-      setTags: (keys) => set({ selectedTagKeys: uniqueValues(keys) }),
-      clearLanguages: () => set({ selectedLanguageCodes: [] }),
-      clearTags: () => set({ selectedTagKeys: [] }),
-      clearAll: () =>
-        set({
-          selectedLanguageCodes: [],
-          selectedTagKeys: [],
-        }),
     }),
-    {
-      name: "explore-filters-storage",
-      storage: createJSONStorage(() => zustandMMKVStorage),
-    },
-  ),
-);
+}));

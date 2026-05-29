@@ -1,11 +1,3 @@
-jest.mock("@/core/storage/mmkv", () => ({
-  zustandMMKVStorage: {
-    getItem: jest.fn(() => null),
-    setItem: jest.fn(),
-    removeItem: jest.fn(),
-  },
-}));
-
 import { useExploreFiltersStore } from "../exploreFilters.store";
 
 describe("useExploreFiltersStore", () => {

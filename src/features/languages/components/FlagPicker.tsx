@@ -69,7 +69,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   cellActive: {
     borderColor: theme.colors.primary,
-    backgroundColor: `${theme.colors.primary}15`,
+    backgroundColor: theme.colors.chipBg,
   },
   glyph: {
     fontSize: theme.typography.sizes["2xl"],
