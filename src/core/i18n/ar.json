@@ -70,5 +70,22 @@
   "common.unlike": "إلغاء الإعجاب",
   "likes.count": "{{count}} إعجاب",
   "common.close": "إغلاق",
-  "home.shuffle": "تشغيل الترتيب العشوائي"
+  "home.shuffle": "تشغيل الترتيب العشوائي",
+  "settings.uiLanguage": "لغة التطبيق",
+  "settings.userSettings": "إعدادات المستخدم",
+  "settings.appearance": "المظهر",
+  "settings.exploreLanguages": "لغات التعبيرات",
+  "languages.title": "لغات التعبيرات",
+  "languages.subtitle": "اختر لغات لاستكشافها",
+  "languages.intro": "اختر اللغات التي تريد استكشافها. لكل لغة لون وعلم يمكنك تخصيصهما.",
+  "languages.noneConfigured": "لم يتم إعداد أي لغة بعد",
+  "languages.add": "إضافة لغات",
+  "languages.editConfigured": "تعديل اللغات المُعدّة",
+  "languages.empty": "لا توجد لغات متاحة بعد.",
+  "languages.error": "تعذّر تحميل اللغات. اسحب لإعادة المحاولة.",
+  "languages.configuredSection": "اللغات المُعدّة",
+  "languages.availableSection": "اللغات المتاحة",
+  "languages.pickColor": "اختر لونًا",
+  "languages.pickFlag": "اختر علمًا",
+  "languages.dragToReorder": "اسحب لإعادة الترتيب"
 }

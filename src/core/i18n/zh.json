@@ -65,5 +65,22 @@
   "common.unlike": "取消点赞",
   "likes.count": "{{count}} 个赞",
   "common.close": "关闭",
-  "home.shuffle": "随机播放开启"
+  "home.shuffle": "随机播放开启",
+  "settings.uiLanguage": "应用语言",
+  "settings.userSettings": "用户设置",
+  "settings.appearance": "外观",
+  "settings.exploreLanguages": "习语语言",
+  "languages.title": "习语语言",
+  "languages.subtitle": "选择要探索的语言",
+  "languages.intro": "选择你想探索的语言。每种语言都有可自定义的颜色和旗帜。",
+  "languages.noneConfigured": "尚未配置语言",
+  "languages.add": "添加语言",
+  "languages.editConfigured": "编辑已配置的语言",
+  "languages.empty": "暂无可用语言。",
+  "languages.error": "无法加载语言。下拉以重试。",
+  "languages.configuredSection": "已配置的语言",
+  "languages.availableSection": "可用语言",
+  "languages.pickColor": "选择颜色",
+  "languages.pickFlag": "选择旗帜",
+  "languages.dragToReorder": "拖动以重新排序"
 }
