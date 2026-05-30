@@ -23,7 +23,10 @@ npm run verify -- [--lang <...>] [--source <ai_mined|all>] [--concurrency <n>] [
 
 # Backups
 npm run db:backup                       # snapshot corpus → pipeline/backups/<ts>.dump
-npm run db:restore -- <dump-file>       # populate clean DB from dump (truncate + pg_restore)
+npm run db:restore -- <dump-file>       # populate DB from dump (truncate + pg_restore)
+npm run db:restore -- --dry-run <file>  # simulate restore, report counts, roll back
+npm run db:share -- encrypt <file>      # AES-256 encrypt a dump for sharing → <file>.gpg
+npm run db:share -- decrypt <file.gpg>  # decrypt a received dump
 
 npm run lint            # biome check
 npm run lint:fix        # biome check --write
@@ -178,10 +181,31 @@ queries use the `(language_code, frequency)` index on `public.idioms`.
 
 ### Backups
 
-`scripts/db-backup.sh` produces a timestamped data-only dump (excludes `idiom_likes`,
-which is user-coupled). `scripts/db-restore.sh` truncates corpus tables and restores via
-`pg_restore --data-only` — schema must already exist (run `supabase db reset` first if
-rebuilding from scratch). Dumps live in `pipeline/backups/` (gitignored).
+`scripts/db-backup.sh` produces a timestamped data-only dump (excludes the
+user-coupled `idiom_likes` and `user_languages`). `scripts/db-restore.sh` truncates
+corpus tables and restores via `pg_restore --data-only` — schema must already exist
+(run `supabase db reset` first if rebuilding from scratch). Dumps live in
+`pipeline/backups/` (gitignored).
+
+`db-restore.sh` flags:
+
+- `--dry-run` — run the truncate + restore inside a transaction and `ROLLBACK`,
+  printing before → after row counts. Writes nothing; use it to preview a restore.
+- `--allow-remote` — required when `DATABASE_URL` host is not local (a guard against
+  accidentally pointing a restore at prod).
+- `--force` — skip the interactive confirm; **required** for a real (non-dry-run)
+  restore to a remote target.
+
+Restore targets whatever `DATABASE_URL` points at, so populating another DB (e.g.
+prod) is a matter of pointing `DATABASE_URL` at it and passing `--allow-remote`
+(+ `--force` for the real run). Note `idiom_likes`/`user_languages` are not in the
+dump, so a restore never touches real user data.
+
+`scripts/db-share.sh` is the separate transfer/security layer: `encrypt`/`decrypt` a
+dump with AES-256 (symmetric, gpg) for sending to a teammate. Chain it around
+backup/restore — `db:backup` → `db:share encrypt` → send → `db:share decrypt` →
+`db:restore`. Pass the passphrase via `DUMP_PASSPHRASE` (or let gpg prompt); always
+share it over a different channel than the file.
 
 ### Normalization (CRITICAL)
 
