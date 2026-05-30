@@ -90,6 +90,28 @@ Flag concrete violations:
 - React Query consumers not handling `isLoading` / `isError` (and no opt-out comment)
 - New Zustand stores or custom hooks without a colocated `__tests__/*.test.ts(x)`
 
+**i18n Parity** — rules in CLAUDE.md > *i18n Pattern* and the `/add-translation` skill (keys go in **all** language files)
+
+New translation keys must be added to **every** locale file in `src/core/i18n/`, not just `en.json`. The app ships many locales (`en, es, de, fr, it, pt, zh, hi, ar, ja, ko` at time of writing) — never assume there are only two. A key present in `en.json` but missing elsewhere falls back to English at runtime (`fallbackLng: "en"`), so it won't crash, but it silently ships an untranslated string in that locale.
+
+- **Enumerate the locale files first** — don't hardcode the list:
+  ```bash
+  ls src/core/i18n/*.json
+  ```
+- If the diff adds keys to any `src/core/i18n/*.json`, confirm the **same keys** exist in all the others. Mechanical check, looping over every locale against `en.json`:
+  ```bash
+  for f in src/core/i18n/*.json; do
+    [ "$f" = src/core/i18n/en.json ] && continue
+    missing=$(comm -23 \
+      <(jq -r 'keys[]' src/core/i18n/en.json | sort) \
+      <(jq -r 'keys[]' "$f" | sort))
+    [ -n "$missing" ] && printf '%s missing:\n%s\n' "$f" "$missing"
+  done
+  ```
+- Flag every key the **PR adds** that is missing from any locale as `**[Must Fix]**`, and name all the files that need it.
+- Distinguish **PR-introduced** gaps (a key this diff adds to one file but not the others — must fix here) from **pre-existing** drift (locales already behind before this PR — note it, but it's out of scope unless the PR claims to fix i18n).
+- Also flag the reverse: a key removed/renamed in one file but left dangling in another.
+
 **Pattern Adherence** — verify against CLAUDE.md > *File Conventions*, *Common Pitfalls*, *Tech Stack* version-specific notes. CLAUDE.md is authoritative; do not duplicate the list here. Common ones to spot-check: default vs named exports, `StyleSheet` import source, store naming, no `AsyncStorage`, no FlashList `estimatedItemSize`, native module mocks in tests.
 
 ### 4. Post inline comments
