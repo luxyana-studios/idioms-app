@@ -91,6 +91,8 @@ export default function WelcomeScreen() {
         <View style={styles.footer}>
           <Pressable
             onPress={() => router.push("/(onboarding)/goal")}
+            accessibilityRole="button"
+            accessibilityLabel={t("onboarding.getStarted")}
             style={({ pressed }) => [
               styles.cta,
               {

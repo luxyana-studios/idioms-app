@@ -17,7 +17,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const segments = useSegments();
   const { session, initialized } = useAuthStore();
-  const { completed: onboardingCompleted } = useOnboardingStore();
+  const onboardingCompleted = useOnboardingStore((s) => s.completed);
 
   useEffect(() => {
     if (!initialized) return;
