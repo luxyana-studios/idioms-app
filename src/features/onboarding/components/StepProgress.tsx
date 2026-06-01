@@ -6,14 +6,13 @@ interface StepProgressProps {
   current: number;
 }
 
-const SEGMENT_KEYS = [0, 1, 2, 3] as const;
-
 export function StepProgress({ total, current }: StepProgressProps) {
   const { theme } = useUnistyles();
+  const keys = Array.from({ length: total }, (_, i) => i);
 
   return (
     <View style={styles.row}>
-      {SEGMENT_KEYS.slice(0, total).map((key) => (
+      {keys.map((key) => (
         <View
           key={key}
           style={[

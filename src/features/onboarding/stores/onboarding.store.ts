@@ -2,9 +2,9 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
 
-// Flip to false when the onboarding flow is ready for production.
-// While true, the welcome flow shows every time the app starts.
-export const DEV_ALWAYS_SHOW_ONBOARDING = true;
+// When true, the welcome flow shows every app launch (dev builds only).
+// Automatically false in production builds via __DEV__.
+export const DEV_ALWAYS_SHOW_ONBOARDING = __DEV__;
 
 interface OnboardingState {
   completed: boolean;
