@@ -159,6 +159,8 @@ const mockIdiom: Idiom = {
   explanation: "Origin story here",
   examples: ["He kicked the bucket last year."],
   tags: [{ key: "death", facet: "theme", label: "Death" }],
+  translations: [],
+  equivalents: [],
   source: "human",
   status: "published",
   likesCount: 0,

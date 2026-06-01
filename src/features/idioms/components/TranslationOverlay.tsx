@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useIdiomTranslations } from "@/features/idioms/hooks/useIdiomTranslations";
 import type { Idiom } from "@/features/idioms/types";
 import { GlassView } from "@/shared/components/GlassView";
 import { Typography } from "@/shared/components/Typography";
@@ -25,7 +24,6 @@ export function TranslationOverlay({
 }: TranslationOverlayProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
-  const { data: translations = [], isLoading } = useIdiomTranslations(idiom.id);
 
   const opacity = useSharedValue(0);
 
@@ -37,7 +35,7 @@ export function TranslationOverlay({
 
   const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
-  const firstTranslation = translations[0];
+  const firstTranslation = idiom.translations[0];
 
   return (
     <Animated.View
@@ -62,9 +60,7 @@ export function TranslationOverlay({
           {t("home.translation").toUpperCase()}
         </Typography>
 
-        {isLoading ? (
-          <ActivityIndicator color={theme.colors.primary} />
-        ) : firstTranslation ? (
+        {firstTranslation ? (
           <View style={styles.content}>
             <View style={styles.row}>
               <Typography

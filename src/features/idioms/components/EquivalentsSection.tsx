@@ -3,14 +3,13 @@ import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { LANG_KEY } from "@/features/idioms/constants";
-import { useIdiomEquivalents } from "@/features/idioms/hooks/useIdiomEquivalents";
 import type { IdiomEquivalent } from "@/features/idioms/types";
 import { DirectionalIcon } from "@/shared/components/DirectionalIcon";
 import { Typography } from "@/shared/components/Typography";
 import { IdiomInfoCard } from "./IdiomInfoCard";
 
 interface EquivalentsSectionProps {
-  idiomId: string;
+  equivalents: IdiomEquivalent[];
 }
 
 function EquivalentCard({ equiv }: { equiv: IdiomEquivalent }) {
@@ -56,12 +55,11 @@ function EquivalentCard({ equiv }: { equiv: IdiomEquivalent }) {
   );
 }
 
-export function EquivalentsSection({ idiomId }: EquivalentsSectionProps) {
+export function EquivalentsSection({ equivalents }: EquivalentsSectionProps) {
   const { t } = useTranslation();
-  const { data: equivalents = [], isError } = useIdiomEquivalents(idiomId);
 
-  // Equivalents are supplementary — a failed fetch should not degrade the main idiom detail view.
-  if (isError || equivalents.length === 0) return null;
+  // Equivalents are supplementary — absence should not degrade the main idiom detail view.
+  if (equivalents.length === 0) return null;
 
   const byLanguage = equivalents.reduce<Record<string, IdiomEquivalent[]>>(
     (acc, equiv) => {

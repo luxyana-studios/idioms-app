@@ -156,8 +156,11 @@ export default function DetailScreen() {
           </IdiomInfoCard>
         )}
 
-        <TranslationSection idiomId={idiom.id} />
-        <EquivalentsSection idiomId={idiom.id} />
+        <TranslationSection
+          idiomId={idiom.id}
+          translations={idiom.translations}
+        />
+        <EquivalentsSection equivalents={idiom.equivalents} />
       </ScrollView>
     </View>
   );
