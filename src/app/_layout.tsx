@@ -6,6 +6,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProviders } from "@/core/providers/AppProviders";
 import { useLoadFonts } from "@/core/theme/fonts";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
+import {
+  DEV_ALWAYS_SHOW_ONBOARDING,
+  useOnboardingStore,
+} from "@/features/onboarding/stores/onboarding.store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -13,18 +17,27 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const segments = useSegments();
   const { session, initialized } = useAuthStore();
+  const { completed: onboardingCompleted } = useOnboardingStore();
 
   useEffect(() => {
     if (!initialized) return;
 
-    const inAuth = segments[0] === "(auth)";
+    const segment = segments[0] as string;
+    const inAuth = segment === "(auth)";
+    const inOnboarding = segment === "(onboarding)";
 
     if (!session && !inAuth) {
       router.replace("/(auth)/login");
     } else if (session && inAuth) {
+      router.replace(
+        onboardingCompleted ? "/(main)/(tabs)/(home)" : "/(onboarding)",
+      );
+    } else if (session && !onboardingCompleted && !inOnboarding) {
+      router.replace("/(onboarding)");
+    } else if (session && onboardingCompleted && inOnboarding) {
       router.replace("/(main)/(tabs)/(home)");
     }
-  }, [session, initialized, segments, router.replace]);
+  }, [session, initialized, onboardingCompleted, segments, router.replace]);
 
   return <>{children}</>;
 }
@@ -45,10 +58,14 @@ export default function RootLayout() {
   const initialize = useAuthStore((s) => s.initialize);
   const initialized = useAuthStore((s) => s.initialized);
   const { fontsLoaded, fontError } = useLoadFonts();
+  const resetOnboarding = useOnboardingStore((s) => s.reset);
 
   useEffect(() => {
+    if (DEV_ALWAYS_SHOW_ONBOARDING) {
+      resetOnboarding();
+    }
     initialize();
-  }, [initialize]);
+  }, [initialize, resetOnboarding]);
 
   useEffect(() => {
     if (initialized && (fontsLoaded || fontError)) {
