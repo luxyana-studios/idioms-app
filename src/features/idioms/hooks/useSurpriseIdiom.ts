@@ -1,8 +1,10 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/core/supabase/client";
 import type { Idiom, IdiomTag } from "../types";
+
+const BATCH_SIZE = 20;
 
 type TagsJoin = Array<{
   tags: {
@@ -64,72 +66,92 @@ function mapRow(row: RandomIdiomRow, uiLanguage: string): Idiom {
     explanation: row.explanation ?? undefined,
     examples: row.examples ?? undefined,
     tags: resolveTags(row.idiom_tags, uiLanguage),
+    translations: [],
+    equivalents: [],
     source: row.source as Idiom["source"],
     status: row.status as Idiom["status"],
   };
 }
 
-async function fetchRandomIdiom(
+async function fetchBatch(
   excludeIds: string[],
+  batchSize: number,
   uiLanguage: string,
-): Promise<Idiom> {
+): Promise<Idiom[]> {
   const { data, error } = await supabase
-    .rpc("get_random_idiom", { exclude_ids: excludeIds })
-    .select(IDIOM_SELECT)
-    .maybeSingle();
+    .rpc("get_random_idioms", {
+      batch_size: batchSize,
+      exclude_ids: [...excludeIds],
+    })
+    .select(IDIOM_SELECT);
 
   if (error) throw error;
+  if (!data || data.length === 0) return [];
 
-  // All recent idioms excluded — clear history and fetch without exclusions.
-  if (!data) {
-    const { data: fallback, error: fallbackError } = await supabase
-      .rpc("get_random_idiom", { exclude_ids: [] })
-      .select(IDIOM_SELECT)
-      .maybeSingle();
-
-    if (fallbackError) throw fallbackError;
-    if (!fallback) throw new Error("No idioms available");
-
-    return mapRow(fallback as unknown as RandomIdiomRow, uiLanguage);
-  }
-
-  return mapRow(data as unknown as RandomIdiomRow, uiLanguage);
+  return (data as unknown as RandomIdiomRow[]).map((row) =>
+    mapRow(row, uiLanguage),
+  );
 }
 
 export function useSurpriseIdiom() {
   const { i18n } = useTranslation();
-  const queryClient = useQueryClient();
-  const recentIds = useRef<string[]>([]);
+  const [deckVersion, setDeckVersion] = useState(0);
+  const [cursor, setCursor] = useState(0);
+  const seenIds = useRef<string[]>([]);
 
-  // Stable key — language-scoped so a locale change fetches fresh data.
-  // Each roll is triggered by invalidating this key, not by a counter in the key,
-  // which avoids unbounded cache growth.
-  const queryKey = ["random-idiom", i18n.language] as const;
+  // Language change: reset history so the new-language deck starts fresh.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: i18n.language is the trigger, not consumed in the body
+  useEffect(() => {
+    seenIds.current = [];
+    setCursor(0);
+  }, [i18n.language]);
+
+  // New deck loaded: reset cursor to first card.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: deckVersion is the trigger, not consumed in the body
+  useEffect(() => {
+    setCursor(0);
+  }, [deckVersion]);
 
   const {
-    data: idiom,
+    data: deck = [],
     isLoading,
     isError,
-    refetch,
   } = useQuery({
-    queryKey,
+    queryKey: ["surprise-deck", i18n.language, deckVersion],
     queryFn: async () => {
-      const result = await fetchRandomIdiom(recentIds.current, i18n.language);
-      recentIds.current = [
-        result.id,
-        ...recentIds.current.filter((id) => id !== result.id),
-      ].slice(0, 10);
-      return result;
+      let batch = await fetchBatch(seenIds.current, BATCH_SIZE, i18n.language);
+
+      // All published idioms exhausted — clear history and start over.
+      if (batch.length === 0) {
+        seenIds.current = [];
+        batch = await fetchBatch([], BATCH_SIZE, i18n.language);
+        if (batch.length === 0) throw new Error("No idioms available");
+      }
+
+      for (const idiom of batch) {
+        if (!seenIds.current.includes(idiom.id)) seenIds.current.push(idiom.id);
+      }
+      return batch;
     },
-    // Keep showing the previous idiom while the next one loads.
-    placeholderData: (prev) => prev,
     staleTime: Number.POSITIVE_INFINITY,
+    // Keep showing the current card while the next batch loads.
+    placeholderData: (prev) => prev ?? [],
   });
 
   const rollAgain = useCallback(() => {
-    queryClient.removeQueries({ queryKey });
-    refetch();
-  }, [queryClient, queryKey, refetch]);
+    const next = cursor + 1;
+    if (next < deck.length) {
+      setCursor(next);
+    } else {
+      setDeckVersion((v) => v + 1);
+    }
+  }, [cursor, deck.length]);
 
-  return { idiom: idiom ?? null, isLoading, isError, rollAgain };
+  return {
+    idiom: deck[cursor] ?? null,
+    // Only show a loading spinner on the very first fetch (empty deck).
+    isLoading: isLoading && deck.length === 0,
+    isError,
+    rollAgain,
+  };
 }
