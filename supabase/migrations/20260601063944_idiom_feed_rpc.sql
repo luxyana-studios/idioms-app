@@ -111,6 +111,8 @@ as $$
         or tr.language_code = any(p_language_codes)
       )
   ) translations on true
+  -- TODO(#126): only direct (1-hop) edges are returned. Transitive clusters
+  -- (cross-language siblings linked through a hub idiom) are not surfaced yet.
   left join lateral (
     select jsonb_agg(
       jsonb_build_object(
