@@ -12,7 +12,6 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { Idiom } from "@/features/idioms/types";
-import { BOTTOM_NAV_EXTRA_PADDING } from "@/shared/components/BottomNav";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { useDoubleTap } from "../hooks/useDoubleTap";
 import { useFeedGesture } from "../hooks/useFeedGesture";
@@ -77,14 +76,22 @@ export function FeedCard({
     opacity: glowOpacity.value,
   }));
 
-  const expressionSize = Math.min(
+  const baseExpressionSize = Math.min(
     screenWidth * 0.2,
     theme.feed.headerSlotWidth,
   );
-  const trayPaddingBottom =
-    Math.max(insets.bottom, theme.spacing.md) +
-    theme.spacing.md +
-    BOTTOM_NAV_EXTRA_PADDING;
+  // Scale down for long expressions so they stay in the lower portion of the card
+  // instead of creeping up toward the header.
+  const expr = currentVariant.expression;
+  const expressionSize =
+    expr.length > 30
+      ? baseExpressionSize * 0.65
+      : expr.length > 20
+        ? baseExpressionSize * 0.8
+        : baseExpressionSize;
+
+  // Clear the floating nav pill only — no extra double-counting of insets.
+  const trayPaddingBottom = Math.max(insets.bottom, 8) + 8 + 60 + 4;
 
   return (
     <Animated.View
@@ -127,7 +134,6 @@ export function FeedCard({
               expression={currentVariant.expression}
               expressionSize={expressionSize}
               color={theme.colors.primary}
-              safeTop={insets.top + 56}
             />
 
             <LinearGradient
