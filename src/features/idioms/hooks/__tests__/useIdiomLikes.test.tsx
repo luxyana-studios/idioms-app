@@ -48,6 +48,8 @@ const makeIdiom = (id: string, likesCount = 0): Idiom => ({
   idiomaticMeaning: "x",
   likesCount,
   tags: [],
+  translations: [],
+  equivalents: [],
   source: "human",
   status: "published",
 });

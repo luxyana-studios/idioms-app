@@ -120,12 +120,12 @@ export const useToggleIdiomLike = () => {
         }
       },
       onSettled: async () => {
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: ["idiom-likes", user?.id],
-          }),
-          queryClient.invalidateQueries({ queryKey: ["idioms"] }),
-        ]);
+        // Only refetch the small likes cache. likesCount in the idioms catalog
+        // is patched optimistically (and rolled back on error), so the heavier
+        // enriched feed is not re-downloaded on every like toggle.
+        await queryClient.invalidateQueries({
+          queryKey: ["idiom-likes", user?.id],
+        });
       },
     },
   );

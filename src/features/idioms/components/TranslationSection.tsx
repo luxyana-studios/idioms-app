@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { LANG_KEY } from "@/features/idioms/constants";
-import { useIdiomTranslations } from "@/features/idioms/hooks/useIdiomTranslations";
 import type { IdiomTranslation } from "@/features/idioms/types";
 import { Typography } from "@/shared/components/Typography";
 import { IdiomInfoCard } from "./IdiomInfoCard";
@@ -54,7 +53,15 @@ function TranslationContent({
   );
 }
 
-export function TranslationSection({ idiomId }: { idiomId: string }) {
+interface TranslationSectionProps {
+  idiomId: string;
+  translations: IdiomTranslation[];
+}
+
+export function TranslationSection({
+  idiomId,
+  translations,
+}: TranslationSectionProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
@@ -66,10 +73,8 @@ export function TranslationSection({ idiomId }: { idiomId: string }) {
     setSelectedLang(null);
   }, [idiomId]);
 
-  const { data: translations = [], isError } = useIdiomTranslations(idiomId);
-
-  // Silently absent — failed fetch or no translations should not degrade the detail view.
-  if (isError || translations.length === 0) return null;
+  // Silently absent — no translations should not degrade the detail view.
+  if (translations.length === 0) return null;
 
   const selected =
     translations.find((tr) => tr.languageCode === selectedLang) ?? null;

@@ -7,7 +7,7 @@ jest.mock("react-i18next", () => ({
 }));
 
 jest.mock("@/core/supabase/client", () => ({
-  supabase: { from: jest.fn() },
+  supabase: { rpc: jest.fn() },
 }));
 
 const mockUseUserLanguages = jest.fn();
@@ -18,19 +18,7 @@ jest.mock("@/features/languages/hooks/useUserLanguages", () => ({
 import { supabase } from "@/core/supabase/client";
 import { useIdioms } from "../useIdioms";
 
-const mockFrom = supabase.from as jest.Mock;
-
-function makeChain(result: { data: unknown; error: unknown }) {
-  const promise = Promise.resolve(result) as Promise<typeof result> & {
-    select: jest.Mock;
-    in: jest.Mock;
-    order: jest.Mock;
-  };
-  promise.select = jest.fn(() => promise);
-  promise.in = jest.fn(() => promise);
-  promise.order = jest.fn(() => promise);
-  return promise;
-}
+const mockRpc = supabase.rpc as unknown as jest.Mock;
 
 function makeWrapper() {
   const queryClient = new QueryClient({
@@ -49,7 +37,8 @@ const language = (languageCode: string) => ({ languageCode });
 
 describe("useIdioms", () => {
   beforeEach(() => {
-    mockFrom.mockReset();
+    mockRpc.mockReset();
+    mockRpc.mockResolvedValue({ data: [], error: null });
     mockUseUserLanguages.mockReturnValue({
       languages: [language("es"), language("fr")],
       isLoading: false,
@@ -57,27 +46,25 @@ describe("useIdioms", () => {
     });
   });
 
-  it("scopes idiom fetches to effective language codes", async () => {
-    const chain = makeChain({ data: [], error: null });
-    mockFrom.mockReturnValueOnce(chain);
-
+  it("calls get_idiom_feed with the ordered language scope and UI language", async () => {
     const { result } = renderHook(() => useIdioms(), {
       wrapper: makeWrapper(),
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(chain.in).toHaveBeenCalledWith("language_code", ["es", "fr"]);
+    expect(mockRpc).toHaveBeenCalledWith("get_idiom_feed", {
+      p_language_codes: ["es", "fr"],
+      p_ui_language: "en",
+    });
   });
 
-  it("does not apply a language filter when no effective languages exist", async () => {
+  it("passes an empty language array when no languages are configured", async () => {
     mockUseUserLanguages.mockReturnValue({
       languages: [],
       isLoading: false,
       isError: false,
     });
-    const chain = makeChain({ data: [], error: null });
-    mockFrom.mockReturnValueOnce(chain);
 
     const { result } = renderHook(() => useIdioms(), {
       wrapper: makeWrapper(),
@@ -85,7 +72,10 @@ describe("useIdioms", () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    expect(chain.in).not.toHaveBeenCalled();
+    expect(mockRpc).toHaveBeenCalledWith("get_idiom_feed", {
+      p_language_codes: [],
+      p_ui_language: "en",
+    });
   });
 
   it("waits while language state is loading", () => {
@@ -100,33 +90,50 @@ describe("useIdioms", () => {
     });
 
     expect(result.current.fetchStatus).toBe("idle");
-    expect(mockFrom).not.toHaveBeenCalled();
+    expect(mockRpc).not.toHaveBeenCalled();
   });
 
-  it("maps idiom rows to app types", async () => {
-    const rows = [
-      {
-        id: "idiom-1",
-        expression: "pan comido",
-        language_code: "es",
-        idiomatic_meaning: "algo fácil",
-        likes_count: 3,
-        explanation: null,
-        examples: ["Es pan comido."],
-        source: "ai_mined",
-        status: "published",
-        idiom_tags: [
-          {
-            tags: {
-              key: "ease",
-              facet: "meaning",
-              tag_translations: [{ language_code: "en", label: "Ease" }],
+  it("maps RPC rows, including nested tags, translations, and equivalents", async () => {
+    mockRpc.mockResolvedValue({
+      data: [
+        {
+          id: "idiom-1",
+          expression: "pan comido",
+          language_code: "es",
+          idiomatic_meaning: "algo fácil",
+          likes_count: 3,
+          explanation: null,
+          examples: ["Es pan comido."],
+          source: "ai_mined",
+          status: "published",
+          created_at: "2026-01-01T00:00:00Z",
+          tags: [{ key: "ease", facet: "meaning", label: "Ease" }],
+          translations: [
+            {
+              id: "tr-1",
+              idiomId: "idiom-1",
+              languageCode: "en",
+              literalTranslation: "eaten bread",
+              idiomaticMeaning: "a piece of cake",
+              explanation: null,
+              source: "ai_mined",
             },
-          },
-        ],
-      },
-    ];
-    mockFrom.mockReturnValueOnce(makeChain({ data: rows, error: null }));
+          ],
+          equivalents: [
+            {
+              edgeId: "edge-1",
+              equivalentId: "idiom-2",
+              expression: "a piece of cake",
+              languageCode: "en",
+              idiomaticMeaning: "very easy",
+              similarityScore: "0.90",
+              verified: true,
+            },
+          ],
+        },
+      ],
+      error: null,
+    });
 
     const { result } = renderHook(() => useIdioms(), {
       wrapper: makeWrapper(),
@@ -145,45 +152,67 @@ describe("useIdioms", () => {
       source: "ai_mined",
       status: "published",
     });
+    expect(result.current.data?.[0].translations).toEqual([
+      {
+        id: "tr-1",
+        idiomId: "idiom-1",
+        languageCode: "en",
+        literalTranslation: "eaten bread",
+        idiomaticMeaning: "a piece of cake",
+        explanation: undefined,
+        source: "ai_mined",
+      },
+    ]);
+    // numeric similarity_score arrives as a string and is coerced to a number.
+    expect(result.current.data?.[0].equivalents[0]).toMatchObject({
+      edgeId: "edge-1",
+      equivalentId: "idiom-2",
+      similarityScore: 0.9,
+      verified: true,
+    });
   });
 
-  it("sorts mapped idioms by effective language order", async () => {
+  it("preserves the order returned by the RPC", async () => {
     mockUseUserLanguages.mockReturnValue({
       languages: [language("fr"), language("es")],
       isLoading: false,
       isError: false,
     });
-    mockFrom.mockReturnValueOnce(
-      makeChain({
-        data: [
-          {
-            id: "es-1",
-            expression: "pan comido",
-            language_code: "es",
-            idiomatic_meaning: "fácil",
-            likes_count: 0,
-            explanation: null,
-            examples: null,
-            source: "ai_mined",
-            status: "published",
-            idiom_tags: [],
-          },
-          {
-            id: "fr-1",
-            expression: "c'est du gâteau",
-            language_code: "fr",
-            idiomatic_meaning: "facile",
-            likes_count: 0,
-            explanation: null,
-            examples: null,
-            source: "ai_mined",
-            status: "published",
-            idiom_tags: [],
-          },
-        ],
-        error: null,
-      }),
-    );
+    mockRpc.mockResolvedValue({
+      data: [
+        {
+          id: "fr-1",
+          expression: "c'est du gâteau",
+          language_code: "fr",
+          idiomatic_meaning: "facile",
+          likes_count: 0,
+          explanation: null,
+          examples: null,
+          source: "ai_mined",
+          status: "published",
+          created_at: "2026-01-01T00:00:00Z",
+          tags: [],
+          translations: [],
+          equivalents: [],
+        },
+        {
+          id: "es-1",
+          expression: "pan comido",
+          language_code: "es",
+          idiomatic_meaning: "fácil",
+          likes_count: 0,
+          explanation: null,
+          examples: null,
+          source: "ai_mined",
+          status: "published",
+          created_at: "2026-01-01T00:00:00Z",
+          tags: [],
+          translations: [],
+          equivalents: [],
+        },
+      ],
+      error: null,
+    });
 
     const { result } = renderHook(() => useIdioms(), {
       wrapper: makeWrapper(),

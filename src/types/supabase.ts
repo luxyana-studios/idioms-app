@@ -336,10 +336,36 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      idiom_equivalent_edges: {
+        Row: {
+          edge_id: string | null;
+          equivalent_id: string | null;
+          idiom_id: string | null;
+          similarity_score: number | null;
+          verified: boolean | null;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
-      [_ in never]: never;
+      get_idiom_feed: {
+        Args: { p_language_codes: string[]; p_ui_language?: string };
+        Returns: {
+          created_at: string;
+          equivalents: Json;
+          examples: string[];
+          explanation: string;
+          expression: string;
+          id: string;
+          idiomatic_meaning: string;
+          language_code: string;
+          likes_count: number;
+          source: string;
+          status: string;
+          tags: Json;
+          translations: Json;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;

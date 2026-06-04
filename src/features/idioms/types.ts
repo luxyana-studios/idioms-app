@@ -18,6 +18,8 @@ export interface Idiom {
   explanation?: string;
   examples?: string[];
   tags: IdiomTag[];
+  translations: IdiomTranslation[];
+  equivalents: IdiomEquivalent[];
   source: IdiomSource;
   status: IdiomStatus;
 }

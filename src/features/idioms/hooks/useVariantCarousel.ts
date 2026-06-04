@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Idiom, IdiomTag } from "@/features/idioms/types";
-import { useIdiomEquivalents } from "./useIdiomEquivalents";
 
 export type Variant = {
   id: string;
@@ -11,8 +10,6 @@ export type Variant = {
 };
 
 export function useVariantCarousel(idiom: Idiom) {
-  const { data: equivalents = [] } = useIdiomEquivalents(idiom.id);
-
   const variants = useMemo<Variant[]>(
     () => [
       {
@@ -22,7 +19,7 @@ export function useVariantCarousel(idiom: Idiom) {
         idiomaticMeaning: idiom.idiomaticMeaning,
         tags: idiom.tags,
       },
-      ...equivalents.map((eq) => ({
+      ...idiom.equivalents.map((eq) => ({
         id: eq.equivalentId,
         expression: eq.expression,
         languageCode: eq.languageCode,
@@ -30,7 +27,7 @@ export function useVariantCarousel(idiom: Idiom) {
         tags: [] as IdiomTag[],
       })),
     ],
-    [idiom, equivalents],
+    [idiom],
   );
 
   const [variantIndex, setVariantIndex] = useState(0);
