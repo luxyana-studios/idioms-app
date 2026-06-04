@@ -1,6 +1,6 @@
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -40,6 +40,11 @@ export default function HomeScreen() {
   const likedIdsSet = likedIds ?? new Set<string>();
   const toggleIdiomLike = useToggleIdiomLike();
 
+  // Measured height of the FlatList container — the single source of truth for
+  // card height, snap interval, and getItemLayout. Using screenHeight alone can
+  // be off on Android because it includes system-bar pixels the layout doesn't own.
+  const [cardHeight, setCardHeight] = useState(screenHeight);
+
   const flatListRef = useRef<FlatList<Idiom>>(null);
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 });
 
@@ -74,11 +79,11 @@ export default function HomeScreen() {
 
   const getItemLayout = useCallback(
     (_: ArrayLike<Idiom> | null | undefined, index: number) => ({
-      length: screenHeight,
-      offset: screenHeight * index,
+      length: cardHeight,
+      offset: cardHeight * index,
       index,
     }),
-    [screenHeight],
+    [cardHeight],
   );
 
   const renderItem = useCallback<ListRenderItem<Idiom>>(
@@ -90,9 +95,10 @@ export default function HomeScreen() {
         likedIds={likedIdsSet}
         onLike={handleLike}
         onExpand={(idiomId) => router.push(`/(main)/(tabs)/(home)/${idiomId}`)}
+        cardHeight={cardHeight}
       />
     ),
-    [idioms.length, likedIdsSet, handleLike, router],
+    [idioms.length, likedIdsSet, handleLike, router, cardHeight],
   );
 
   if (isLoading) {
@@ -130,14 +136,16 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={styles.root}>
+    <View
+      style={styles.root}
+      onLayout={(e) => setCardHeight(e.nativeEvent.layout.height)}
+    >
       <FlatList
         ref={flatListRef}
         data={idioms}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        pagingEnabled
-        snapToInterval={screenHeight}
+        snapToInterval={cardHeight}
         snapToAlignment="start"
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}

@@ -28,6 +28,7 @@ interface FeedCardProps {
   likedIds: Set<string>;
   onLike: (idiomId: string, isLiked: boolean) => void;
   onExpand: (idiomId: string) => void;
+  cardHeight?: number;
 }
 
 export function FeedCard({
@@ -37,10 +38,12 @@ export function FeedCard({
   likedIds,
   onLike,
   onExpand,
+  cardHeight,
 }: FeedCardProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const height = cardHeight ?? screenHeight;
   const insets = useSafeAreaInsets();
   const [showTranslation, setShowTranslation] = useState(false);
 
@@ -56,7 +59,7 @@ export function FeedCard({
     () => onLike(currentVariant.id, isCurrentSaved),
   );
 
-  const entryY = useSharedValue(screenHeight * 0.06);
+  const entryY = useSharedValue(height * 0.06);
   useEffect(() => {
     entryY.value = withTiming(0, {
       duration: 280,
@@ -98,7 +101,7 @@ export function FeedCard({
       style={[
         {
           width: screenWidth,
-          height: screenHeight,
+          height,
           backgroundColor: theme.colors.background,
         },
         entryStyle,
