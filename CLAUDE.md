@@ -248,8 +248,9 @@ A component file is too big when any of these is true. Cut early — don't wait 
 - **Auth storage**: MMKV (30x faster than AsyncStorage, synchronous)
 - **Database types**: `src/types/supabase.ts` — generated from local schema, NOT hand-written.
   Regenerate after any migration with: `npx supabase gen types typescript --local > src/types/supabase.ts`
-- **Column naming**: Postgres uses `snake_case` (e.g., `users_learned`), TypeScript uses `camelCase`.
-  Mapping happens in the Zustand store's fetch method (see `idioms.store.ts`)
+- **Column naming**: Postgres uses `snake_case` (e.g., `likes_count`), TypeScript uses `camelCase`.
+  Mapping happens in the React Query fetch hook for the feature (see `fetchIdioms` in
+  `src/features/idioms/hooks/useIdioms.ts`), not in the Zustand store
 - **RLS**: all tables must have Row Level Security enabled with explicit policies
 - **Local credentials**: `npx supabase start` prints the API URL and anon key. These are deterministic
   (same every time for the same project) — set them once in `.env`
