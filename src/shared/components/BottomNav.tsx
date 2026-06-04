@@ -137,11 +137,16 @@ export function BottomNav() {
   const activeTab = segments[2] as string | undefined;
   const isOnFeed = activeTab === "(home)" && segments[3] === undefined;
 
+  const isOnSurprise = activeTab === "(home)" && segments[3] === "surprise";
+
   const handlePress = useCallback(
     (item: NavItemDef) => {
       if (item.segment === "(home)") {
-        // Tap from feed → launch surprise mode; tap from elsewhere → go to feed
-        if (isOnFeed) {
+        if (isOnSurprise) {
+          // Already on surprise: replace with fresh screen so the hook remounts
+          // and fetches a new random batch.
+          router.replace("/(main)/(tabs)/(home)/surprise");
+        } else if (isOnFeed) {
           router.push("/(main)/(tabs)/(home)/surprise");
         } else {
           router.navigate("/(main)/(tabs)/(home)");
@@ -152,7 +157,7 @@ export function BottomNav() {
         );
       }
     },
-    [isOnFeed, router],
+    [isOnFeed, isOnSurprise, router],
   );
 
   const GlassLayer =
