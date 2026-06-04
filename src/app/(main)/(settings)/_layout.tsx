@@ -1,5 +1,5 @@
-import { DrawerToggleButton } from "@react-navigation/drawer";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useNavigation, useRouter } from "expo-router";
+import { DrawerActions } from "expo-router/react-navigation";
 import { useTranslation } from "react-i18next";
 import { useUnistyles } from "react-native-unistyles";
 import { IconButton } from "@/shared/components/IconButton";
@@ -8,6 +8,7 @@ export default function SettingsLayout() {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
   const router = useRouter();
+  const navigation = useNavigation();
 
   return (
     <Stack
@@ -18,7 +19,14 @@ export default function SettingsLayout() {
           borderBottomColor: theme.colors.border,
         } as unknown as { backgroundColor: string },
         headerTintColor: theme.colors.text,
-        headerLeft: () => <DrawerToggleButton tintColor={theme.colors.text} />,
+        headerLeft: () => (
+          <IconButton
+            icon="menu"
+            variant="bare"
+            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+            accessibilityLabel={t("common.openMenu")}
+          />
+        ),
       }}
     >
       <Stack.Screen name="index" options={{ title: t("settings.title") }} />
