@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ScrollView, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { EquivalentsSection } from "@/features/idioms/components/EquivalentsSection";
@@ -24,7 +24,7 @@ export default function DetailScreen() {
   const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { data: idioms = [] } = useIdioms();
+  const { data: idioms = [], isLoading, isError, refetch } = useIdioms();
   const { data: likedIds } = useLikedIdiomIds();
   const toggleIdiomLike = useToggleIdiomLike();
 
@@ -34,6 +34,33 @@ export default function DetailScreen() {
     !!idiom &&
     toggleIdiomLike.isPending &&
     toggleIdiomLike.variables?.idiomId === idiom.id;
+
+  // The whole detail view (idiom + its translations/equivalents) is gated on the
+  // single useIdioms feed query, so surface its loading/error states before the
+  // not-found fallback — otherwise a cold deep-link flashes "not found" mid-fetch.
+  if (isLoading) {
+    return (
+      <View style={[styles.root, styles.centered, { paddingTop: insets.top }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={[styles.root, styles.centered, { paddingTop: insets.top }]}>
+        <Pressable
+          onPress={() => refetch()}
+          accessibilityRole="button"
+          accessibilityLabel={t("home.feedError")}
+        >
+          <Typography variant="body" style={{ color: theme.colors.textMuted }}>
+            {t("home.feedError")}
+          </Typography>
+        </Pressable>
+      </View>
+    );
+  }
 
   if (!idiom) {
     return (
@@ -170,6 +197,10 @@ const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  centered: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   notFound: {
     flex: 1,

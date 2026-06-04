@@ -61,7 +61,9 @@ const mapEquivalents = (value: unknown): IdiomEquivalent[] =>
     languageCode: eq.languageCode,
     idiomaticMeaning: eq.idiomaticMeaning,
     // numeric(3,2) is serialized as a string over the wire — coerce to number.
-    similarityScore: Number(eq.similarityScore),
+    // Fall back to 0 so a malformed/absent value can't become NaN and corrupt
+    // the score-desc ordering downstream.
+    similarityScore: Number(eq.similarityScore ?? 0),
     verified: eq.verified,
   }));
 
