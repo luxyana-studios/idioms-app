@@ -6,15 +6,20 @@ interface FeedCardHeroProps {
   expression: string;
   expressionSize: number;
   color: string;
+  safeTop: number;
 }
 
 export function FeedCardHero({
   expression,
   expressionSize,
   color,
+  safeTop,
 }: FeedCardHeroProps) {
   return (
-    <View style={styles.heroArea} pointerEvents="none">
+    <View
+      style={[styles.heroArea, { paddingTop: safeTop }]}
+      pointerEvents="none"
+    >
       <Typography
         variant="display"
         weight="extraBold"

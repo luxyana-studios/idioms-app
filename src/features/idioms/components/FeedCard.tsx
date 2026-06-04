@@ -127,6 +127,7 @@ export function FeedCard({
               expression={currentVariant.expression}
               expressionSize={expressionSize}
               color={theme.colors.primary}
+              safeTop={insets.top + 56}
             />
 
             <LinearGradient
