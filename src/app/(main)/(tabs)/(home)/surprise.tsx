@@ -31,7 +31,7 @@ export default function SurpriseScreen() {
     [toggleIdiomLike],
   );
 
-  if (isLoading) {
+  if (isLoading || (!idiom && !isError)) {
     return (
       <View style={[styles.root, styles.centered]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -49,7 +49,6 @@ export default function SurpriseScreen() {
     );
   }
 
-  // Narrowing: after the guards above, idiom is always present.
   if (!idiom) return null;
 
   return (
