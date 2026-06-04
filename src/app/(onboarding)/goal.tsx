@@ -21,13 +21,7 @@ export default function GoalScreen() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const router = useRouter();
-  const { goals, setGoals } = useOnboardingStore();
-
-  const toggle = (id: string) => {
-    setGoals(
-      goals.includes(id) ? goals.filter((g) => g !== id) : [...goals, id],
-    );
-  };
+  const { goals, toggleGoal } = useOnboardingStore();
 
   return (
     <ScreenContainer>
@@ -53,7 +47,7 @@ export default function GoalScreen() {
               emoji={emoji}
               label={t(`onboarding.goal_${id}`)}
               selected={goals.includes(id)}
-              onPress={() => toggle(id)}
+              onPress={() => toggleGoal(id)}
             />
           ))}
         </View>

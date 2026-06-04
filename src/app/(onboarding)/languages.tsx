@@ -28,16 +28,7 @@ export default function LanguagesScreen() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const router = useRouter();
-  const { selectedLanguageCodes, setSelectedLanguageCodes } =
-    useOnboardingStore();
-
-  const toggle = (code: string) => {
-    setSelectedLanguageCodes(
-      selectedLanguageCodes.includes(code)
-        ? selectedLanguageCodes.filter((c) => c !== code)
-        : [...selectedLanguageCodes, code],
-    );
-  };
+  const { selectedLanguageCodes, toggleLanguage } = useOnboardingStore();
 
   return (
     <ScreenContainer>
@@ -67,7 +58,7 @@ export default function LanguagesScreen() {
               flag={LANGUAGE_FLAGS[code] ?? "🏳️"}
               label={t(`lang.${code}`)}
               selected={selectedLanguageCodes.includes(code)}
-              onPress={() => toggle(code)}
+              onPress={() => toggleLanguage(code)}
             />
           ))}
         </ScrollView>
