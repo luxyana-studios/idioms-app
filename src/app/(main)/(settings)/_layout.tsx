@@ -22,6 +22,7 @@ export default function SettingsLayout() {
         headerLeft: () => (
           <IconButton
             icon="menu"
+            variant="bare"
             onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
             accessibilityLabel={t("common.openMenu")}
           />
