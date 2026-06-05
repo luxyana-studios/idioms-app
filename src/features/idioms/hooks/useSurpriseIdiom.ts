@@ -99,7 +99,7 @@ export function useSurpriseIdiom() {
   const [cursor, setCursor] = useState(0);
   const seenIds = useRef<string[]>([]);
   // Unique per mount so each screen visit gets its own cache slot.
-  const sessionId = useRef(Math.random().toString(36).slice(2)).current;
+  const sessionId = useRef(crypto.randomUUID()).current;
 
   // Language change: reset history so the new-language deck starts fresh.
   // biome-ignore lint/correctness/useExhaustiveDependencies: i18n.language is the trigger, not consumed in the body
