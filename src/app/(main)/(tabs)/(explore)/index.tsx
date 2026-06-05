@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { DrawerActions } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { DrawerActions } from "expo-router/react-navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {

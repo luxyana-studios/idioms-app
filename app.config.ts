@@ -9,11 +9,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: "./assets/icon.png",
   scheme: "idiomdeck",
   userInterfaceStyle: "automatic",
-  splash: {
-    image: "./assets/splash-icon.png",
-    resizeMode: "contain",
-    backgroundColor: "#16130e",
-  },
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.luxyana.idiomdeck",
@@ -36,6 +31,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     ["expo-router", { root: "./src/app" }],
+    [
+      "expo-splash-screen",
+      {
+        image: "./assets/splash-icon.png",
+        resizeMode: "contain",
+        backgroundColor: "#16130e",
+      },
+    ],
     "expo-localization",
     "expo-web-browser",
     "expo-font",

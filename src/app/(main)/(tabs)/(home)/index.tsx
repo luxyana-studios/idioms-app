@@ -1,5 +1,5 @@
-import { DrawerActions, useNavigation } from "@react-navigation/native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { DrawerActions } from "expo-router/react-navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {

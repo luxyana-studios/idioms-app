@@ -1,9 +1,10 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { BlurView } from "expo-blur";
 import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import type { Drawer } from "expo-router/drawer";
+import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, Pressable, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,6 +18,13 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { Button } from "@/shared/components/Button";
 import { Typography } from "@/shared/components/Typography";
+
+// SDK 56 vendored react-navigation into expo-router, so the drawer content
+// props type must come from the expo-router Drawer rather than from
+// @react-navigation/drawer (the two are structurally incompatible).
+type DrawerContentComponentProps = Parameters<
+  NonNullable<ComponentProps<typeof Drawer>["drawerContent"]>
+>[0];
 
 export function DrawerContent({ navigation }: DrawerContentComponentProps) {
   const { t } = useTranslation();
