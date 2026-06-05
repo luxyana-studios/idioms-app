@@ -130,11 +130,13 @@ export function BottomNav() {
   const isDark = UnistylesRuntime.themeName === "dark";
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const segments = useSegments();
+  // Cast to string[] — typedRoutes narrows useSegments() to a union of
+  // fixed-length tuples, causing out-of-bounds errors on deeper index access.
+  const segments = useSegments() as readonly string[];
 
   // segments[2] is the active tab group: "(home)", "(explore)", "(saved)", etc.
   // segments[3] exists when we're on a sub-route (surprise, [id], …)
-  const activeTab = segments[2] as string | undefined;
+  const activeTab = segments[2];
   const isOnFeed = activeTab === "(home)" && segments[3] === undefined;
 
   const isOnSurprise = activeTab === "(home)" && segments[3] === "surprise";
