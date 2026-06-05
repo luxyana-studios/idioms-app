@@ -40,15 +40,23 @@ const makeRpcChainError = (error: unknown) => {
   return chain;
 };
 
+let queryClient: QueryClient;
+
 function wrapper({ children }: { children: React.ReactNode }) {
-  const client = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
 }
 
 beforeEach(() => {
+  queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   jest.clearAllMocks();
+});
+
+afterEach(() => {
+  queryClient.clear();
 });
 
 describe("useSurpriseIdiom", () => {
