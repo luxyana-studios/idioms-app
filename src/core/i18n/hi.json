@@ -103,5 +103,17 @@
   "onboarding.completeSubtitle": "अपना शब्द भंडार बनाना शुरू करने का समय",
   "onboarding.continue": "जारी रखें",
   "onboarding.skip": "अभी के लिए छोड़ें",
-  "onboarding.startExploring": "खोजना शुरू करें"
+  "onboarding.startExploring": "खोजना शुरू करें",
+  "home.surprise": "आश्चर्य",
+  "home.surpriseMe": "मुझे चौंकाओ",
+  "home.rollAgain": "फिर से रोल करें",
+  "home.idiomCount": "{{current}} of {{total}}",
+  "home.unsaveIdiom": "Remove from saved",
+  "home.feedError": "Couldn't load the feed. Tap to retry.",
+  "home.translation": "Translation",
+  "home.expandIdiom": "Expand idiom",
+  "home.emptyFeed": "No idioms available",
+  "home.saveIdiom": "Save idiom",
+  "home.holdToTranslate": "Hold to translate",
+  "home.noTranslation": "No translation available"
 }

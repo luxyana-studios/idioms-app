@@ -28,6 +28,7 @@ interface FeedCardProps {
   likedIds: Set<string>;
   onLike: (idiomId: string, isLiked: boolean) => void;
   onExpand: (idiomId: string) => void;
+  cardHeight?: number;
 }
 
 export function FeedCard({
@@ -37,10 +38,12 @@ export function FeedCard({
   likedIds,
   onLike,
   onExpand,
+  cardHeight,
 }: FeedCardProps) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const height = cardHeight ?? screenHeight;
   const insets = useSafeAreaInsets();
   const [showTranslation, setShowTranslation] = useState(false);
 
@@ -56,7 +59,7 @@ export function FeedCard({
     () => onLike(currentVariant.id, isCurrentSaved),
   );
 
-  const entryY = useSharedValue(screenHeight * 0.06);
+  const entryY = useSharedValue(height * 0.06);
   useEffect(() => {
     entryY.value = withTiming(0, {
       duration: 280,
@@ -76,16 +79,33 @@ export function FeedCard({
     opacity: glowOpacity.value,
   }));
 
-  const expressionSize = Math.min(
+  const baseExpressionSize = Math.min(
     screenWidth * 0.2,
     theme.feed.headerSlotWidth,
   );
-  const trayPaddingBottom =
-    Math.max(insets.bottom, theme.spacing.md) + theme.spacing.md;
+  // Scale down for long expressions so they stay in the lower portion of the card
+  // instead of creeping up toward the header.
+  const expr = currentVariant.expression;
+  const expressionSize =
+    expr.length > 30
+      ? baseExpressionSize * 0.65
+      : expr.length > 20
+        ? baseExpressionSize * 0.8
+        : baseExpressionSize;
+
+  // Clear the floating nav pill only — no extra double-counting of insets.
+  const trayPaddingBottom = Math.max(insets.bottom, 8) + 8 + 60 + 4;
 
   return (
     <Animated.View
-      style={[{ width: screenWidth, height: screenHeight }, entryStyle]}
+      style={[
+        {
+          width: screenWidth,
+          height,
+          backgroundColor: theme.colors.background,
+        },
+        entryStyle,
+      ]}
     >
       <GestureDetector gesture={panGesture}>
         <Animated.View style={[{ flex: 1 }, animatedCardStyle]}>

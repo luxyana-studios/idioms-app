@@ -1,8 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { DrawerActions } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRouter } from "expo-router";
+import { DrawerActions } from "expo-router/react-navigation";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -22,6 +22,7 @@ import {
   useToggleIdiomLike,
 } from "@/features/idioms/hooks/useIdiomLikes";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
+import { BOTTOM_NAV_EXTRA_PADDING } from "@/shared/components/BottomNav";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { IconButton } from "@/shared/components/IconButton";
 import { ScreenHeader } from "@/shared/components/ScreenHeader";
@@ -144,7 +145,10 @@ export default function SavedScreen() {
           style={styles.list}
           contentContainerStyle={[
             styles.listContent,
-            { paddingBottom: Math.max(insets.bottom, 8) + 24 },
+            {
+              paddingBottom:
+                Math.max(insets.bottom, 8) + 24 + BOTTOM_NAV_EXTRA_PADDING,
+            },
           ]}
           showsVerticalScrollIndicator={false}
         >

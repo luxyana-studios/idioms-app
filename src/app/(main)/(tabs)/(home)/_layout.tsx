@@ -14,6 +14,7 @@ export default function HomeLayout() {
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name="surprise" />
       <Stack.Screen
         name="[id]"
         options={{

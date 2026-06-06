@@ -102,5 +102,18 @@
   "onboarding.completeSubtitle": "語彙を広げる旅を始めましょう",
   "onboarding.continue": "続ける",
   "onboarding.skip": "後で",
-  "onboarding.startExploring": "探索を始める"
+  "onboarding.startExploring": "探索を始める",
+  "home.surprise": "サプライズ",
+  "home.surpriseMe": "サプライズ",
+  "home.rollAgain": "もう一度",
+  "home.idiomCount": "{{current}} of {{total}}",
+  "home.unsaveIdiom": "Remove from saved",
+  "home.feedError": "Couldn't load the feed. Tap to retry.",
+  "home.translation": "Translation",
+  "home.expandIdiom": "Expand idiom",
+  "home.emptyFeed": "No idioms available",
+  "home.saveIdiom": "Save idiom",
+  "home.holdToTranslate": "Hold to translate",
+  "home.noTranslation": "No translation available",
+  "byLanguage.idiomCount_one": "{{count}} idiom"
 }

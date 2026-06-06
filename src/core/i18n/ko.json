@@ -102,5 +102,18 @@
   "onboarding.completeSubtitle": "어휘를 늘려가는 여정을 시작하세요",
   "onboarding.continue": "계속",
   "onboarding.skip": "지금은 건너뛰기",
-  "onboarding.startExploring": "탐색 시작"
+  "onboarding.startExploring": "탐색 시작",
+  "home.surprise": "서프라이즈",
+  "home.surpriseMe": "깜짝 놀라게 해줘",
+  "home.rollAgain": "다시 굴리기",
+  "home.idiomCount": "{{current}} of {{total}}",
+  "home.unsaveIdiom": "Remove from saved",
+  "home.feedError": "Couldn't load the feed. Tap to retry.",
+  "home.translation": "Translation",
+  "home.expandIdiom": "Expand idiom",
+  "home.emptyFeed": "No idioms available",
+  "home.saveIdiom": "Save idiom",
+  "home.holdToTranslate": "Hold to translate",
+  "home.noTranslation": "No translation available",
+  "byLanguage.idiomCount_one": "{{count}} idiom"
 }

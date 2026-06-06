@@ -112,5 +112,8 @@
   "onboarding.completeSubtitle": "Il est temps de commencer à enrichir votre lexique",
   "onboarding.continue": "Continuer",
   "onboarding.skip": "Passer pour l'instant",
-  "onboarding.startExploring": "Commencer à explorer"
+  "onboarding.startExploring": "Commencer à explorer",
+  "home.surprise": "Surprise",
+  "home.surpriseMe": "Surprends-moi",
+  "home.rollAgain": "Relancer"
 }

@@ -103,5 +103,17 @@
   "onboarding.completeSubtitle": "Está na hora de começar a construir o teu léxico",
   "onboarding.continue": "Continuar",
   "onboarding.skip": "Saltar por agora",
-  "onboarding.startExploring": "Começar a explorar"
+  "onboarding.startExploring": "Começar a explorar",
+  "home.surprise": "Surpresa",
+  "home.surpriseMe": "Me surpreenda",
+  "home.rollAgain": "Jogar novamente",
+  "home.idiomCount": "{{current}} of {{total}}",
+  "home.unsaveIdiom": "Remove from saved",
+  "home.feedError": "Couldn't load the feed. Tap to retry.",
+  "home.translation": "Translation",
+  "home.expandIdiom": "Expand idiom",
+  "home.emptyFeed": "No idioms available",
+  "home.saveIdiom": "Save idiom",
+  "home.holdToTranslate": "Hold to translate",
+  "home.noTranslation": "No translation available"
 }

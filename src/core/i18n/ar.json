@@ -107,5 +107,17 @@
   "onboarding.completeSubtitle": "حان الوقت لبدء بناء مفرداتك",
   "onboarding.continue": "متابعة",
   "onboarding.skip": "تخطّ في الوقت الحالي",
-  "onboarding.startExploring": "ابدأ الاستكشاف"
+  "onboarding.startExploring": "ابدأ الاستكشاف",
+  "home.surprise": "مفاجأة",
+  "home.surpriseMe": "فاجئني",
+  "home.rollAgain": "لف مجدداً",
+  "home.idiomCount": "{{current}} of {{total}}",
+  "home.unsaveIdiom": "Remove from saved",
+  "home.feedError": "Couldn't load the feed. Tap to retry.",
+  "home.translation": "Translation",
+  "home.expandIdiom": "Expand idiom",
+  "home.emptyFeed": "No idioms available",
+  "home.saveIdiom": "Save idiom",
+  "home.holdToTranslate": "Hold to translate",
+  "home.noTranslation": "No translation available"
 }

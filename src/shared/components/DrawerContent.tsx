@@ -1,9 +1,10 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { BlurView } from "expo-blur";
 import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import type { Drawer } from "expo-router/drawer";
+import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, Pressable, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,6 +18,13 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { Button } from "@/shared/components/Button";
 import { Typography } from "@/shared/components/Typography";
+
+// SDK 56 vendored react-navigation into expo-router, so the drawer content
+// props type must come from the expo-router Drawer rather than from
+// @react-navigation/drawer (the two are structurally incompatible).
+type DrawerContentComponentProps = Parameters<
+  NonNullable<ComponentProps<typeof Drawer>["drawerContent"]>
+>[0];
 
 export function DrawerContent({ navigation }: DrawerContentComponentProps) {
   const { t } = useTranslation();
@@ -155,7 +163,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
               color={theme.colors.primary}
             />
           </View>
-          <Typography variant="body" weight="semibold">
+          <Typography variant="body" weight="semibold" style={styles.navLabel}>
             {t("home.title")}
           </Typography>
         </Pressable>
@@ -174,7 +182,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
               color={theme.colors.textSecondary}
             />
           </View>
-          <Typography variant="body" weight="semibold">
+          <Typography variant="body" weight="semibold" style={styles.navLabel}>
             {t("explore.title")}
           </Typography>
         </Pressable>
@@ -193,7 +201,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
               color={theme.colors.textSecondary}
             />
           </View>
-          <Typography variant="body" weight="semibold">
+          <Typography variant="body" weight="semibold" style={styles.navLabel}>
             {t("saved.title")}
           </Typography>
         </Pressable>
@@ -212,7 +220,7 @@ export function DrawerContent({ navigation }: DrawerContentComponentProps) {
               color={theme.colors.textSecondary}
             />
           </View>
-          <Typography variant="body" weight="semibold">
+          <Typography variant="body" weight="semibold" style={styles.navLabel}>
             {t("settings.title")}
           </Typography>
         </Pressable>
@@ -276,6 +284,9 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.sm,
     borderRadius: theme.radius.lg,
+  },
+  navLabel: {
+    flex: 1,
   },
   navItemPressed: {
     backgroundColor: theme.colors.surfaceContainerHigh,
