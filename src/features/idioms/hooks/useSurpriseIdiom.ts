@@ -6,6 +6,8 @@ import type { Idiom, IdiomTag } from "../types";
 
 const BATCH_SIZE = 20;
 
+let mountCounter = 0;
+
 type TagsJoin = Array<{
   tags: {
     key: string;
@@ -99,7 +101,8 @@ export function useSurpriseIdiom() {
   const [cursor, setCursor] = useState(0);
   const seenIds = useRef<string[]>([]);
   // Unique per mount so each screen visit gets its own cache slot.
-  const sessionId = useRef(crypto.randomUUID()).current;
+  // Unique per mount — gives each screen visit its own React Query cache slot.
+  const sessionId = useRef(`s${++mountCounter}`).current;
 
   // Language change: reset history so the new-language deck starts fresh.
   // biome-ignore lint/correctness/useExhaustiveDependencies: i18n.language is the trigger, not consumed in the body
