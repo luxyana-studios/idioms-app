@@ -87,5 +87,8 @@
   "languages.availableSection": "اللغات المتاحة",
   "languages.pickColor": "اختر لونًا",
   "languages.pickFlag": "اختر علمًا",
-  "languages.dragToReorder": "اسحب لإعادة الترتيب"
+  "languages.dragToReorder": "اسحب لإعادة الترتيب",
+  "home.surprise": "مفاجأة",
+  "home.surpriseMe": "فاجئني",
+  "home.rollAgain": "لف مجدداً"
 }

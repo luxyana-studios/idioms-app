@@ -12,6 +12,7 @@ import {
 } from "@/features/idioms/hooks/useIdiomLikes";
 import { useIdioms } from "@/features/idioms/hooks/useIdioms";
 import type { IdiomTag } from "@/features/idioms/types";
+import { BOTTOM_NAV_EXTRA_PADDING } from "@/shared/components/BottomNav";
 import { CategoryChip } from "@/shared/components/CategoryChip";
 import { GlowBackground } from "@/shared/components/GlowBackground";
 import { IconButton } from "@/shared/components/IconButton";
@@ -114,7 +115,10 @@ export default function DetailScreen() {
         style={styles.scroll}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: Math.max(insets.bottom, 8) + 24 },
+          {
+            paddingBottom:
+              Math.max(insets.bottom, 8) + 24 + BOTTOM_NAV_EXTRA_PADDING,
+          },
         ]}
         showsVerticalScrollIndicator={false}
       >

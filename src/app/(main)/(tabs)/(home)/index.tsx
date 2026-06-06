@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { DrawerActions } from "expo-router/react-navigation";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -14,7 +14,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { FeedCard } from "@/features/idioms/components/FeedCard";
-import { ShuffleButton } from "@/features/idioms/components/ShuffleButton";
 import { useFeedList } from "@/features/idioms/hooks/useFeedList";
 import {
   useLikedIdiomIds,
@@ -33,23 +32,18 @@ export default function HomeScreen() {
   const { height: screenHeight } = useWindowDimensions();
   const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
-  const {
-    idioms,
-    allIdiomIds,
-    isLoading,
-    isError,
-    refetch,
-    currentIndex,
-    setCurrentIndex,
-    enableShuffle,
-    currentIdiomId,
-    shuffleKey,
-  } = useFeedList();
+  const { idioms, isLoading, isError, refetch, currentIndex, setCurrentIndex } =
+    useFeedList();
   // isError intentionally not handled — likes failing silently is acceptable;
   // the feed still shows and hearts render as unsaved until the query recovers.
   const { data: likedIds } = useLikedIdiomIds();
   const likedIdsSet = likedIds ?? new Set<string>();
   const toggleIdiomLike = useToggleIdiomLike();
+
+  // Measured height of the FlatList container — the single source of truth for
+  // card height, snap interval, and getItemLayout. Using screenHeight alone can
+  // be off on Android because it includes system-bar pixels the layout doesn't own.
+  const [cardHeight, setCardHeight] = useState(screenHeight);
 
   const flatListRef = useRef<FlatList<Idiom>>(null);
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 });
@@ -83,28 +77,13 @@ export default function HomeScreen() {
     [toggleIdiomLike],
   );
 
-  // Scroll to top AFTER React re-renders the new shuffled data, not before.
-  const isMounted = useRef(false);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: shuffleKey is an intentional trigger, not a value used inside the effect
-  useEffect(() => {
-    if (!isMounted.current) {
-      isMounted.current = true;
-      return;
-    }
-    flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
-  }, [shuffleKey]);
-
-  const handleShuffle = useCallback(() => {
-    enableShuffle(allIdiomIds, currentIdiomId);
-  }, [enableShuffle, allIdiomIds, currentIdiomId]);
-
   const getItemLayout = useCallback(
     (_: ArrayLike<Idiom> | null | undefined, index: number) => ({
-      length: screenHeight,
-      offset: screenHeight * index,
+      length: cardHeight,
+      offset: cardHeight * index,
       index,
     }),
-    [screenHeight],
+    [cardHeight],
   );
 
   const renderItem = useCallback<ListRenderItem<Idiom>>(
@@ -116,9 +95,10 @@ export default function HomeScreen() {
         likedIds={likedIdsSet}
         onLike={handleLike}
         onExpand={(idiomId) => router.push(`/(main)/(tabs)/(home)/${idiomId}`)}
+        cardHeight={cardHeight}
       />
     ),
-    [idioms.length, likedIdsSet, handleLike, router],
+    [idioms.length, likedIdsSet, handleLike, router, cardHeight],
   );
 
   if (isLoading) {
@@ -156,14 +136,16 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={styles.root}>
+    <View
+      style={styles.root}
+      onLayout={(e) => setCardHeight(e.nativeEvent.layout.height)}
+    >
       <FlatList
         ref={flatListRef}
         data={idioms}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        pagingEnabled
-        snapToInterval={screenHeight}
+        snapToInterval={cardHeight}
         snapToAlignment="start"
         decelerationRate="fast"
         showsVerticalScrollIndicator={false}
@@ -184,17 +166,6 @@ export default function HomeScreen() {
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
           accessibilityLabel={t("common.openMenu")}
         />
-        <View style={styles.headerActions}>
-          <ShuffleButton
-            onPress={handleShuffle}
-            accessibilityLabel={t("home.shuffle")}
-          />
-          <IconButton
-            icon="search"
-            onPress={() => router.push("/(main)/(tabs)/(explore)")}
-            accessibilityLabel={t("explore.title")}
-          />
-        </View>
       </View>
     </View>
   );
@@ -204,6 +175,7 @@ const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    overflow: "hidden" as const,
   },
   centered: {
     justifyContent: "center",
@@ -220,10 +192,5 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.lg,
     paddingBottom: theme.spacing.sm,
     zIndex: 20,
-  },
-  headerActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.xs,
   },
 }));
