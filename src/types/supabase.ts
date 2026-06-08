@@ -34,6 +34,36 @@ export type Database = {
   };
   public: {
     Tables: {
+      global_language_config: {
+        Row: {
+          color: string;
+          created_at: string;
+          enabled: boolean;
+          flag: string;
+          language_code: string;
+          position: number;
+          updated_at: string;
+        };
+        Insert: {
+          color: string;
+          created_at?: string;
+          enabled?: boolean;
+          flag: string;
+          language_code: string;
+          position?: number;
+          updated_at?: string;
+        };
+        Update: {
+          color?: string;
+          created_at?: string;
+          enabled?: boolean;
+          flag?: string;
+          language_code?: string;
+          position?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       idiom_equivalents: {
         Row: {
           created_at: string;
@@ -297,36 +327,6 @@ export type Database = {
           id?: string;
           is_browsable?: boolean;
           key?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      global_language_config: {
-        Row: {
-          color: string;
-          created_at: string;
-          enabled: boolean;
-          flag: string;
-          language_code: string;
-          position: number;
-          updated_at: string;
-        };
-        Insert: {
-          color: string;
-          created_at?: string;
-          enabled?: boolean;
-          flag: string;
-          language_code: string;
-          position?: number;
-          updated_at?: string;
-        };
-        Update: {
-          color?: string;
-          created_at?: string;
-          enabled?: boolean;
-          flag?: string;
-          language_code?: string;
-          position?: number;
           updated_at?: string;
         };
         Relationships: [];
