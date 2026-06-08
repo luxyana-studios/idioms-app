@@ -82,5 +82,7 @@
   "languages.availableSection": "사용 가능한 언어",
   "languages.pickColor": "색상 선택",
   "languages.pickFlag": "깃발 선택",
-  "languages.dragToReorder": "드래그하여 순서 변경"
+  "languages.dragToReorder": "드래그하여 순서 변경",
+  "languages.lastLanguageTitle": "언어 하나 유지",
+  "languages.lastLanguageGuard": "최소 한 개의 언어가 필요합니다. 이 언어를 제거하기 전에 다른 언어를 추가하세요."
 }

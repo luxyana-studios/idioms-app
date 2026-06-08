@@ -83,5 +83,7 @@
   "languages.availableSection": "Idiomas disponíveis",
   "languages.pickColor": "Escolha uma cor",
   "languages.pickFlag": "Escolha uma bandeira",
-  "languages.dragToReorder": "Arraste para reordenar"
+  "languages.dragToReorder": "Arraste para reordenar",
+  "languages.lastLanguageTitle": "Mantenha um idioma",
+  "languages.lastLanguageGuard": "Você precisa de pelo menos um idioma. Adicione outro antes de remover este."
 }

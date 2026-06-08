@@ -82,5 +82,7 @@
   "languages.availableSection": "可用语言",
   "languages.pickColor": "选择颜色",
   "languages.pickFlag": "选择旗帜",
-  "languages.dragToReorder": "拖动以重新排序"
+  "languages.dragToReorder": "拖动以重新排序",
+  "languages.lastLanguageTitle": "保留一种语言",
+  "languages.lastLanguageGuard": "至少需要一种语言。请先添加其他语言再移除此项。"
 }

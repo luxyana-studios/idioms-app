@@ -87,5 +87,7 @@
   "languages.availableSection": "اللغات المتاحة",
   "languages.pickColor": "اختر لونًا",
   "languages.pickFlag": "اختر علمًا",
-  "languages.dragToReorder": "اسحب لإعادة الترتيب"
+  "languages.dragToReorder": "اسحب لإعادة الترتيب",
+  "languages.lastLanguageTitle": "احتفظ بلغة واحدة",
+  "languages.lastLanguageGuard": "تحتاج إلى لغة واحدة على الأقل. أضف لغة أخرى قبل إزالة هذه."
 }

@@ -301,6 +301,36 @@ export type Database = {
         };
         Relationships: [];
       };
+      global_language_config: {
+        Row: {
+          color: string;
+          created_at: string;
+          enabled: boolean;
+          flag: string;
+          language_code: string;
+          position: number;
+          updated_at: string;
+        };
+        Insert: {
+          color: string;
+          created_at?: string;
+          enabled?: boolean;
+          flag: string;
+          language_code: string;
+          position?: number;
+          updated_at?: string;
+        };
+        Update: {
+          color?: string;
+          created_at?: string;
+          enabled?: boolean;
+          flag?: string;
+          language_code?: string;
+          position?: number;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       user_languages: {
         Row: {
           color: string;
@@ -343,6 +373,18 @@ export type Database = {
           idiom_id: string | null;
           similarity_score: number | null;
           verified: boolean | null;
+        };
+        Relationships: [];
+      };
+      user_language_catalog: {
+        Row: {
+          color: string | null;
+          flag: string | null;
+          in_global: boolean | null;
+          is_active: boolean | null;
+          is_configured: boolean | null;
+          language_code: string | null;
+          position: number | null;
         };
         Relationships: [];
       };

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { Typography } from "@/shared/components/Typography";
 import {
@@ -31,6 +31,16 @@ export function LanguageConfigList() {
   const handleToggle = useCallback(
     (code: string) => {
       if (configuredByCode.has(code)) {
+        // Keep at least one configured language. Removing the last one would
+        // drop the user back to zero rows, which silently re-bootstraps the
+        // full default catalog — a surprising jump, so block it instead.
+        if (configuredLanguages.length <= 1) {
+          Alert.alert(
+            t("languages.lastLanguageTitle"),
+            t("languages.lastLanguageGuard"),
+          );
+          return;
+        }
         removeLanguage.mutate(code);
       } else {
         const language = availableLanguages.find(
@@ -51,6 +61,7 @@ export function LanguageConfigList() {
       availableLanguages,
       addLanguage,
       removeLanguage,
+      t,
     ],
   );
 
