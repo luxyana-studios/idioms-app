@@ -10,7 +10,7 @@ export const userLanguagesKey = (userId?: string) =>
 // One row of the user_language_catalog view: the server-merged result of the
 // global default catalog overlaid with the user's own config. The view owns the
 // override + bootstrap policy; the client only reads the resulting flags.
-interface CatalogRow {
+export interface CatalogRow {
   languageCode: string;
   color: string;
   flag: string;
