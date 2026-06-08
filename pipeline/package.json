@@ -13,6 +13,7 @@
     "verify": "tsx src/cli.ts verify",
     "db:backup": "bash scripts/db-backup.sh",
     "db:restore": "bash scripts/db-restore.sh",
+    "db:share": "bash scripts/db-share.sh",
     "lint": "biome check src/",
     "lint:fix": "biome check --write src/",
     "typecheck": "tsc --noEmit"
