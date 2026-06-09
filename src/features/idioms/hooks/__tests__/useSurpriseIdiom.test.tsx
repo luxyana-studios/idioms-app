@@ -53,10 +53,14 @@ beforeEach(() => {
     defaultOptions: { queries: { retry: false } },
   });
   jest.clearAllMocks();
+  // Deterministic shuffle: Math.random() → 0.9999 makes j = i in Fisher-Yates,
+  // so no elements are swapped and insertion order is preserved.
+  jest.spyOn(Math, "random").mockReturnValue(0.9999);
 });
 
 afterEach(() => {
   queryClient.clear();
+  jest.restoreAllMocks();
 });
 
 describe("useSurpriseIdiom", () => {
@@ -99,47 +103,25 @@ describe("useSurpriseIdiom", () => {
     expect(mockRpc.mock.calls.length).toBe(callsBefore); // no new network call
   });
 
-  it("fetches a new batch when the deck is exhausted", async () => {
-    mockRpc
-      .mockReturnValueOnce(makeRpcChain([makeIdiomRow("id-1")]))
-      .mockReturnValueOnce(makeRpcChain([makeIdiomRow("id-2")]));
+  it("reshuffles in memory when the deck is exhausted — no DB call", async () => {
+    mockRpc.mockReturnValue(makeRpcChain([makeIdiomRow("id-1")]));
 
     const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
     await waitFor(() => expect(result.current.idiom?.id).toBe("id-1"));
 
+    const callsBefore = mockRpc.mock.calls.length;
+
     await act(async () => {
-      result.current.rollAgain();
+      result.current.rollAgain(); // deck exhausted → reshuffle in memory
     });
 
-    await waitFor(() => expect(result.current.idiom?.id).toBe("id-2"));
-    expect(mockRpc).toHaveBeenCalledTimes(2);
-    expect(mockRpc).toHaveBeenLastCalledWith(
-      "get_random_idioms",
-      expect.objectContaining({
-        exclude_ids: expect.arrayContaining(["id-1"]),
-      }),
-    );
+    // Still shows an idiom from the local deck; no new network call.
+    expect(result.current.idiom?.id).toBe("id-1");
+    expect(mockRpc.mock.calls.length).toBe(callsBefore);
   });
 
-  it("clears seen IDs and retries when batch returns empty", async () => {
-    mockRpc
-      .mockReturnValueOnce(makeRpcChain([]))
-      .mockReturnValueOnce(makeRpcChain([makeIdiomRow("id-fresh")]));
-
-    const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
-    await waitFor(() => expect(result.current.idiom?.id).toBe("id-fresh"));
-
-    expect(mockRpc).toHaveBeenCalledTimes(2);
-    expect(mockRpc).toHaveBeenNthCalledWith(2, "get_random_idioms", {
-      batch_size: 20,
-      exclude_ids: [],
-    });
-  });
-
-  it("surfaces error state when both fetches fail", async () => {
-    mockRpc
-      .mockReturnValueOnce(makeRpcChain([]))
-      .mockReturnValueOnce(makeRpcChainError({ message: "db error" }));
+  it("surfaces error state when the fetch fails", async () => {
+    mockRpc.mockReturnValue(makeRpcChainError({ message: "db error" }));
 
     const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
     await waitFor(() => expect(result.current.isError).toBe(true));

@@ -5,7 +5,6 @@ import { supabase } from "@/core/supabase/client";
 import type { Idiom, IdiomTag } from "../types";
 
 const BATCH_SIZE = 20;
-const MAX_SEEN = 50;
 
 let mountCounter = 0;
 
@@ -76,20 +75,28 @@ function mapRow(row: RandomIdiomRow, uiLanguage: string): Idiom {
   };
 }
 
+function shuffleArray<T>(arr: T[]): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 async function fetchBatch(
-  excludeIds: string[],
   batchSize: number,
   uiLanguage: string,
 ): Promise<Idiom[]> {
   const { data, error } = await supabase
     .rpc("get_random_idioms", {
       batch_size: batchSize,
-      exclude_ids: [...excludeIds],
+      exclude_ids: [],
     })
     .select(IDIOM_SELECT);
 
   if (error) throw error;
-  if (!data || data.length === 0) return [];
+  if (!data || data.length === 0) throw new Error("No idioms available");
 
   return (data as unknown as RandomIdiomRow[]).map((row) =>
     mapRow(row, uiLanguage),
@@ -98,78 +105,44 @@ async function fetchBatch(
 
 export function useSurpriseIdiom() {
   const { i18n } = useTranslation();
-  const [deckVersion, setDeckVersion] = useState(0);
   const [cursor, setCursor] = useState(0);
-  const seenIds = useRef<string[]>([]);
+  const [localDeck, setLocalDeck] = useState<Idiom[]>([]);
   // Unique per mount — gives each screen visit its own React Query cache slot.
   const sessionId = useRef(`s${++mountCounter}`).current;
-  // Tracks the previous deck reference so cursor resets only when new data
-  // actually arrives (not on deckVersion bump while placeholderData is active).
-  const prevDeckRef = useRef<Idiom[]>([]);
-
-  // Language change: reset history so the new-language deck starts fresh.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: i18n.language is the trigger, not consumed in the body
-  useEffect(() => {
-    seenIds.current = [];
-    setCursor(0);
-  }, [i18n.language]);
 
   const {
-    data: deck = [],
+    data: fetchedDeck,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["surprise-deck", i18n.language, sessionId, deckVersion],
-    queryFn: async () => {
-      let batch = await fetchBatch(seenIds.current, BATCH_SIZE, i18n.language);
-
-      // All published idioms exhausted — clear history and start over.
-      if (batch.length === 0) {
-        seenIds.current = [];
-        batch = await fetchBatch([], BATCH_SIZE, i18n.language);
-        if (batch.length === 0) throw new Error("No idioms available");
-      }
-
-      for (const idiom of batch) {
-        if (!seenIds.current.includes(idiom.id)) seenIds.current.push(idiom.id);
-      }
-      // Cap to avoid sending an ever-growing exclude_ids array to the RPC.
-      if (seenIds.current.length > MAX_SEEN) {
-        seenIds.current = seenIds.current.slice(-MAX_SEEN);
-      }
-      return batch;
-    },
+    queryKey: ["surprise-deck", i18n.language, sessionId],
+    queryFn: () => fetchBatch(BATCH_SIZE, i18n.language),
     staleTime: Number.POSITIVE_INFINITY,
-    // Keep showing the current card while the next batch loads.
-    placeholderData: (prev) => prev ?? [],
   });
 
-  // Reset cursor only when the deck reference changes (new batch arrived), not
-  // on deckVersion bump — so the previous card stays visible during the fetch.
+  // When a new batch arrives from the server, shuffle it and reset to card 0.
   useEffect(() => {
-    if (
-      deck !== prevDeckRef.current &&
-      deck.length > 0 &&
-      prevDeckRef.current.length > 0
-    ) {
+    if (fetchedDeck && fetchedDeck.length > 0) {
+      setLocalDeck(shuffleArray(fetchedDeck));
       setCursor(0);
     }
-    prevDeckRef.current = deck;
-  }, [deck]);
+  }, [fetchedDeck]);
 
   const rollAgain = useCallback(() => {
     const next = cursor + 1;
-    if (next < deck.length) {
+    if (next < localDeck.length) {
       setCursor(next);
     } else {
-      setDeckVersion((v) => v + 1);
+      // Deck exhausted — reshuffle in memory, no DB call.
+      setLocalDeck((prev) => shuffleArray(prev));
+      setCursor(0);
     }
-  }, [cursor, deck.length]);
+  }, [cursor, localDeck.length]);
 
   return {
-    idiom: deck[cursor] ?? null,
-    // Only show a loading spinner on the very first fetch (empty deck).
-    isLoading: isLoading && deck.length === 0,
+    idiom: localDeck[cursor] ?? null,
+    // Only show a loading spinner on the very first fetch (empty local deck).
+    isLoading: isLoading && localDeck.length === 0,
     isError,
     rollAgain,
   };
