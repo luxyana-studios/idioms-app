@@ -27,8 +27,8 @@ const makeSelectChain = (result: { data: unknown; error: unknown }) => {
   return promise;
 };
 
-const makeInsertChain = (result: { error: unknown }) => ({
-  insert: jest.fn(() => Promise.resolve(result)),
+const makeUpsertChain = (result: { error: unknown }) => ({
+  upsert: jest.fn(() => Promise.resolve(result)),
 });
 
 const makeDeleteChain = (result: { error: unknown }) => {
@@ -127,7 +127,7 @@ describe("useToggleIdiomLike", () => {
     queryClient.setQueryData(["idiom-likes", "user-1"], new Set<string>());
     queryClient.setQueryData(["idioms", "en"], [makeIdiom("idiom-1", 3)]);
 
-    mockFrom.mockImplementation(() => makeInsertChain({ error: null }));
+    mockFrom.mockImplementation(() => makeUpsertChain({ error: null }));
 
     const { result } = renderHook(() => useToggleIdiomLike(), {
       wrapper: makeWrapper(queryClient),
@@ -189,7 +189,7 @@ describe("useToggleIdiomLike", () => {
     queryClient.setQueryData(["idioms", "en"], initialIdioms);
 
     mockFrom.mockImplementation(() =>
-      makeInsertChain({ error: { message: "boom" } }),
+      makeUpsertChain({ error: { message: "boom" } }),
     );
 
     const { result } = renderHook(() => useToggleIdiomLike(), {

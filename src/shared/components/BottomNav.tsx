@@ -136,31 +136,13 @@ export function BottomNav() {
   const segments = useSegments() as readonly string[];
 
   // segments[2] is the active tab group: "(home)", "(explore)", "(saved)", etc.
-  // segments[3] exists when we're on a sub-route (surprise, [id], …)
   const activeTab = segments[2];
-  const isOnFeed = activeTab === "(home)" && segments[3] === undefined;
-
-  const isOnSurprise = activeTab === "(home)" && segments[3] === "surprise";
 
   const handlePress = useCallback(
     (item: NavItemDef) => {
-      if (item.segment === "(home)") {
-        if (isOnSurprise) {
-          // Already on surprise: replace with fresh screen so the hook remounts
-          // and fetches a new random batch.
-          router.replace("/(main)/(tabs)/(home)/surprise");
-        } else if (isOnFeed) {
-          router.push("/(main)/(tabs)/(home)/surprise");
-        } else {
-          router.navigate("/(main)/(tabs)/(home)");
-        }
-      } else {
-        router.navigate(
-          item.navigateTo as Parameters<typeof router.navigate>[0],
-        );
-      }
+      router.navigate(item.navigateTo as Parameters<typeof router.navigate>[0]);
     },
-    [isOnFeed, isOnSurprise, router],
+    [router],
   );
 
   const GlassLayer =
