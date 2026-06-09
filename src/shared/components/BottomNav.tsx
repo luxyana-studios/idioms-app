@@ -16,6 +16,7 @@ import {
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
+import { useFeedList } from "@/features/idioms/hooks/useFeedList";
 
 // Extra scroll padding screens should add so content clears the floating nav.
 // = pill height (60) + bottom margin (8) + safe-area gap (8) = 76
@@ -62,10 +63,16 @@ const NAV_ITEMS: NavItemDef[] = [
 interface NavItemProps {
   item: NavItemDef;
   isActive: boolean;
+  iconOverride?: React.ComponentProps<typeof Ionicons>["name"];
   onPress: () => void;
 }
 
-function NavItemComponent({ item, isActive, onPress }: NavItemProps) {
+function NavItemComponent({
+  item,
+  isActive,
+  iconOverride,
+  onPress,
+}: NavItemProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
 
@@ -117,7 +124,7 @@ function NavItemComponent({ item, isActive, onPress }: NavItemProps) {
       />
       <Animated.View style={iconStyle}>
         <Ionicons
-          name={isActive ? item.icon : item.iconOutline}
+          name={iconOverride ?? (isActive ? item.icon : item.iconOutline)}
           size={24}
           color={color}
         />
@@ -137,12 +144,22 @@ export function BottomNav() {
 
   // segments[2] is the active tab group: "(home)", "(explore)", "(saved)", etc.
   const activeTab = segments[2];
+  const isOnHome = activeTab === "(home)";
+
+  const { enableShuffle, allIdiomIds, currentIdiomId, isShuffled } =
+    useFeedList();
 
   const handlePress = useCallback(
     (item: NavItemDef) => {
-      router.navigate(item.navigateTo as Parameters<typeof router.navigate>[0]);
+      if (item.segment === "(home)" && isOnHome) {
+        enableShuffle(allIdiomIds, currentIdiomId);
+      } else {
+        router.navigate(
+          item.navigateTo as Parameters<typeof router.navigate>[0],
+        );
+      }
     },
-    [router],
+    [isOnHome, enableShuffle, allIdiomIds, currentIdiomId, router],
   );
 
   const GlassLayer =
@@ -184,6 +201,9 @@ export function BottomNav() {
               key={item.segment}
               item={item}
               isActive={item.segment === activeTab}
+              iconOverride={
+                item.segment === "(home)" && isShuffled ? item.icon : undefined
+              }
               onPress={() => handlePress(item)}
             />
           ))}

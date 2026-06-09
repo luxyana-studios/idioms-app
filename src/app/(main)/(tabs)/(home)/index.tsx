@@ -39,11 +39,7 @@ export default function HomeScreen() {
     refetch,
     currentIndex,
     setCurrentIndex,
-    enableShuffle,
-    allIdiomIds,
-    currentIdiomId,
     shuffleKey,
-    isShuffled,
   } = useFeedList();
   // isError intentionally not handled — likes failing silently is acceptable;
   // the feed still shows and hearts render as unsaved until the query recovers.
@@ -184,12 +180,6 @@ export default function HomeScreen() {
           icon="menu"
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
           accessibilityLabel={t("common.openMenu")}
-        />
-        <IconButton
-          icon={isShuffled ? "dice" : "dice-outline"}
-          onPress={() => enableShuffle(allIdiomIds, currentIdiomId)}
-          accessibilityLabel={t("home.shuffle")}
-          iconColor={isShuffled ? theme.colors.primary : undefined}
         />
       </View>
     </View>
