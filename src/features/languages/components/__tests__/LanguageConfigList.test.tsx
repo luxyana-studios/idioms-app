@@ -1,4 +1,5 @@
 import { fireEvent, render } from "@testing-library/react-native";
+import { Alert } from "react-native";
 
 jest.mock("react-native-unistyles", () => ({
   StyleSheet: {
@@ -130,10 +131,32 @@ describe("LanguageConfigList", () => {
     });
   });
 
-  it("removes an already-selected language", () => {
+  it("removes an already-selected language when more than one is configured", () => {
+    mockUseUserLanguages.mockReturnValue(
+      languageState({
+        configured: [
+          language("es", "#C96F4A", "🇪🇸"),
+          language("fr", "#5B4B8A", "🇫🇷", 1),
+        ],
+        available: [],
+      }),
+    );
     const { getByTestId } = render(<LanguageConfigList />);
     fireEvent.press(getByTestId("toggle-es"));
     expect(mockRemoveMutate).toHaveBeenCalledWith("es");
+  });
+
+  it("blocks removing the last configured language", () => {
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+    // Default state has a single configured language (es).
+    const { getByTestId } = render(<LanguageConfigList />);
+    fireEvent.press(getByTestId("toggle-es"));
+    expect(mockRemoveMutate).not.toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalledWith(
+      "languages.lastLanguageTitle",
+      "languages.lastLanguageGuard",
+    );
+    alertSpy.mockRestore();
   });
 
   it("updates color via the update mutation", () => {
