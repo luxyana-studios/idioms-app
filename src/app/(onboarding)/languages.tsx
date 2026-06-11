@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUserLanguages } from "@/features/languages/hooks/useUserLanguages";
-import { LanguageChip } from "@/features/onboarding/components/LanguageChip";
 import { StepProgress } from "@/features/onboarding/components/StepProgress";
 import { useOnboardingStore } from "@/features/onboarding/stores/onboarding.store";
 import { Button } from "@/shared/components/Button";
+import { LanguageChip } from "@/shared/components/LanguageChip";
 import { ScreenContainer } from "@/shared/components/ScreenContainer";
 import { Typography } from "@/shared/components/Typography";
 
