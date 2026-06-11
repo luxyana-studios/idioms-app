@@ -32,8 +32,15 @@ export default function HomeScreen() {
   const { height: screenHeight } = useWindowDimensions();
   const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
-  const { idioms, isLoading, isError, refetch, currentIndex, setCurrentIndex } =
-    useFeedList();
+  const {
+    idioms,
+    isLoading,
+    isError,
+    refetch,
+    currentIndex,
+    setCurrentIndex,
+    shuffleKey,
+  } = useFeedList();
   // isError intentionally not handled — likes failing silently is acceptable;
   // the feed still shows and hearts render as unsaved until the query recovers.
   const { data: likedIds } = useLikedIdiomIds();
@@ -47,6 +54,12 @@ export default function HomeScreen() {
 
   const flatListRef = useRef<FlatList<Idiom>>(null);
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 60 });
+
+  useEffect(() => {
+    if (shuffleKey > 0) {
+      flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
+    }
+  }, [shuffleKey]);
 
   useEffect(() => {
     if (!scrollToId || idioms.length === 0) {
@@ -72,7 +85,9 @@ export default function HomeScreen() {
 
   const handleLike = useCallback(
     (idiomId: string, isLiked: boolean) => {
-      toggleIdiomLike.mutate({ idiomId, isLiked });
+      if (!toggleIdiomLike.isPending) {
+        toggleIdiomLike.mutate({ idiomId, isLiked });
+      }
     },
     [toggleIdiomLike],
   );

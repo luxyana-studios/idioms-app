@@ -88,11 +88,16 @@
   "languages.editConfigured": "Modifier les langues configurées",
   "languages.empty": "Aucune langue disponible pour l'instant.",
   "languages.error": "Impossible de charger les langues. Tirez pour réessayer.",
+  "languages.lastLanguageTitle": "Gardez une langue",
+  "languages.lastLanguageGuard": "Il vous faut au moins une langue. Ajoutez-en une autre avant de retirer celle-ci.",
   "languages.configuredSection": "Langues configurées",
   "languages.availableSection": "Langues disponibles",
   "languages.pickColor": "Choisir une couleur",
   "languages.pickFlag": "Choisir un drapeau",
   "languages.dragToReorder": "Glissez pour réorganiser",
+  "home.surprise": "Surprise",
+  "home.surpriseMe": "Surprends-moi",
+  "home.rollAgain": "Relancer",
   "onboarding.welcomeTagline": "Découvrez l'âme d'une langue à travers ses expressions",
   "onboarding.pillLanguages": "11 langues",
   "onboarding.pillContexts": "Contexte réel",
@@ -112,8 +117,5 @@
   "onboarding.completeSubtitle": "Il est temps de commencer à enrichir votre lexique",
   "onboarding.continue": "Continuer",
   "onboarding.skip": "Passer pour l'instant",
-  "onboarding.startExploring": "Commencer à explorer",
-  "home.surprise": "Surprise",
-  "home.surpriseMe": "Surprends-moi",
-  "home.rollAgain": "Relancer"
+  "onboarding.startExploring": "Commencer à explorer"
 }

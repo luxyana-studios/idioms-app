@@ -52,3 +52,4 @@ google-service-account.json
 
 # Supabase CLI per-machine state
 supabase/.temp/
+coverage/

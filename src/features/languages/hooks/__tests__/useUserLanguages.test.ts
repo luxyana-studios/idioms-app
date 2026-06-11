@@ -16,6 +16,35 @@ import { useUserLanguages } from "../useUserLanguages";
 
 const mockFrom = supabase.from as jest.Mock;
 
+// A row of the user_language_catalog view (the server-side merge of global
+// defaults with the user's own config).
+const catalogRow = (
+  code: string,
+  {
+    color = "#C96F4A",
+    flag = "🇪🇸",
+    position = 0,
+    isConfigured = false,
+    inGlobal = true,
+    isActive = false,
+  }: {
+    color?: string;
+    flag?: string;
+    position?: number;
+    isConfigured?: boolean;
+    inGlobal?: boolean;
+    isActive?: boolean;
+  } = {},
+) => ({
+  language_code: code,
+  color,
+  flag,
+  position,
+  is_configured: isConfigured,
+  in_global: inGlobal,
+  is_active: isActive,
+});
+
 const makeSelectChain = (result: { data: unknown; error: unknown }) => {
   const promise = Promise.resolve(result) as Promise<typeof result> & {
     select: jest.Mock;
@@ -68,10 +97,22 @@ describe("useUserLanguages", () => {
     expect(mockFrom).not.toHaveBeenCalled();
   });
 
-  it("maps rows and uses configured rows as the effective scope", async () => {
+  it("uses configured rows as the effective scope", async () => {
     const rows = [
-      { language_code: "es", color: "#C96F4A", flag: "🇪🇸", position: 0 },
-      { language_code: "fr", color: "#3B5BA5", flag: "🇫🇷", position: 1 },
+      catalogRow("es", {
+        color: "#C96F4A",
+        flag: "🇪🇸",
+        position: 0,
+        isConfigured: true,
+        isActive: true,
+      }),
+      catalogRow("fr", {
+        color: "#3B5BA5",
+        flag: "🇫🇷",
+        position: 1,
+        isConfigured: true,
+        isActive: true,
+      }),
     ];
     mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
@@ -110,29 +151,42 @@ describe("useUserLanguages", () => {
     });
   });
 
-  it("returns default effective languages when the user has configured nothing", async () => {
-    mockFrom.mockReturnValueOnce(makeSelectChain({ data: [], error: null }));
+  it("bootstraps to the global catalog when the user has configured nothing", async () => {
+    // With zero user rows the view returns the enabled global defaults, all
+    // active and none configured.
+    const rows = [
+      catalogRow("en", {
+        color: "#3B5BA5",
+        flag: "🇬🇧",
+        position: 0,
+        isActive: true,
+      }),
+      catalogRow("es", {
+        color: "#C96F4A",
+        flag: "🇪🇸",
+        position: 1,
+        isActive: true,
+      }),
+      catalogRow("de", {
+        color: "#5E6B73",
+        flag: "🇩🇪",
+        position: 2,
+        isActive: true,
+      }),
+    ];
+    mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
     const { result } = renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toEqual([]);
     expect(result.current.configuredLanguages).toEqual([]);
     expect(result.current.hasUserConfiguration).toBe(false);
     expect(result.current.languages.map((lang) => lang.languageCode)).toEqual([
       "en",
       "es",
       "de",
-      "fr",
-      "it",
-      "pt",
-      "zh",
-      "hi",
-      "ar",
-      "ja",
-      "ko",
     ]);
     expect(
       result.current.languages.every((lang) => lang.source === "default"),
@@ -145,15 +199,46 @@ describe("useUserLanguages", () => {
     });
   });
 
-  it("exposes default languages not configured by the user as available", async () => {
-    mockFrom.mockReturnValueOnce(
-      makeSelectChain({
-        data: [
-          { language_code: "es", color: "#C96F4A", flag: "🇪🇸", position: 0 },
-        ],
-        error: null,
+  it("exposes global languages not configured by the user as available", async () => {
+    const rows = [
+      catalogRow("es", {
+        position: 0,
+        isConfigured: true,
+        isActive: true,
       }),
+      catalogRow("fr", { color: "#3B5BA5", flag: "🇫🇷", position: 1 }),
+    ];
+    mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
+
+    const { result } = renderHook(() => useUserLanguages(), {
+      wrapper: makeWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    const availableCodes = result.current.availableLanguages.map(
+      (lang) => lang.languageCode,
     );
+    expect(availableCodes).toContain("fr");
+    expect(availableCodes).not.toContain("es");
+    // fr is in the global catalog but not active while the user has config.
+    expect(result.current.languages.map((lang) => lang.languageCode)).toEqual([
+      "es",
+    ]);
+  });
+
+  it("keeps a configured language that is no longer in the global catalog", async () => {
+    const rows = [
+      catalogRow("eo", {
+        color: "#7A8450",
+        flag: "🏳️",
+        position: 0,
+        isConfigured: true,
+        inGlobal: false,
+        isActive: true,
+      }),
+    ];
+    mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
     const { result } = renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
@@ -162,11 +247,10 @@ describe("useUserLanguages", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(
-      result.current.availableLanguages.map((lang) => lang.languageCode),
-    ).not.toContain("es");
-    expect(
-      result.current.availableLanguages.map((lang) => lang.languageCode),
-    ).toContain("fr");
+      result.current.configuredLanguages.map((l) => l.languageCode),
+    ).toEqual(["eo"]);
+    // Not offered as "available to add" since it is not in the global catalog.
+    expect(result.current.availableLanguages).toEqual([]);
   });
 
   it("propagates database errors", async () => {

@@ -12,14 +12,13 @@ jest.mock("@/features/auth/hooks/useAuth", () => ({
 }));
 
 import { supabase } from "@/core/supabase/client";
-import type { UserLanguage } from "../../types";
 import {
   useAddUserLanguage,
   useRemoveUserLanguage,
   useReorderUserLanguages,
   useUpdateUserLanguage,
 } from "../useUserLanguageMutations";
-import { userLanguagesKey } from "../useUserLanguages";
+import { type CatalogRow, userLanguagesKey } from "../useUserLanguages";
 
 const mockFrom = supabase.from as jest.Mock;
 
@@ -32,11 +31,17 @@ const makeUpdateChain = (sink: Array<Record<string, unknown>>) => ({
   }),
 });
 
-const lang = (overrides: Partial<UserLanguage>): UserLanguage => ({
+// A cached catalog row (the user_language_catalog view shape). Defaults to a
+// configured global default; override `isConfigured`/`inGlobal` for the
+// available/user-only buckets.
+const row = (overrides: Partial<CatalogRow>): CatalogRow => ({
   languageCode: "es",
   color: "#C96F4A",
   flag: "🇪🇸",
   position: 0,
+  isConfigured: true,
+  inGlobal: true,
+  isActive: true,
   ...overrides,
 });
 
@@ -51,6 +56,24 @@ const makeWrapper = () => {
       children,
     );
   };
+};
+
+// Wrapper that exposes its query client and seeds the cached catalog, so
+// optimistic-update tests can inspect the cache before/after a mutation.
+const makeSeededWrapper = (initial: CatalogRow[]) => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  queryClient.setQueryData<CatalogRow[]>(userLanguagesKey("u-1"), initial);
+  const wrapper = ({ children }: { children: React.ReactNode }) =>
+    React.createElement(QueryClientProvider, { client: queryClient }, children);
+  const rows = () =>
+    queryClient.getQueryData<CatalogRow[]>(userLanguagesKey("u-1"));
+  const configuredCodes = () =>
+    rows()
+      ?.filter((r) => r.isConfigured)
+      .map((r) => r.languageCode);
+  return { queryClient, wrapper, rows, configuredCodes };
 };
 
 describe("user language mutations", () => {
@@ -158,38 +181,121 @@ describe("useReorderUserLanguages", () => {
     ]);
   });
 
-  it("optimistically reorders the cached list", async () => {
+  it("optimistically repositions the configured rows in place", async () => {
     const positions: Array<Record<string, unknown>> = [];
     mockFrom.mockReturnValue(makeUpdateChain(positions));
 
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: { retry: false },
-        mutations: { retry: false },
-      },
-    });
-    queryClient.setQueryData<UserLanguage[]>(userLanguagesKey("u-1"), [
-      lang({ languageCode: "es", position: 0 }),
-      lang({ languageCode: "fr", position: 1 }),
+    const { wrapper, rows } = makeSeededWrapper([
+      row({ languageCode: "es", position: 0 }),
+      row({ languageCode: "fr", position: 1 }),
     ]);
-
-    const wrapper = ({ children }: { children: React.ReactNode }) =>
-      React.createElement(
-        QueryClientProvider,
-        { client: queryClient },
-        children,
-      );
 
     const { result } = renderHook(() => useReorderUserLanguages(), { wrapper });
 
     result.current.mutate(["fr", "es"]);
 
+    // Positions flip immediately; the selector sorts by position downstream,
+    // so the cache array itself stays in place (available rows aren't dropped).
     await waitFor(() =>
       expect(
-        queryClient
-          .getQueryData<UserLanguage[]>(userLanguagesKey("u-1"))
-          ?.map((l) => l.languageCode),
-      ).toEqual(["fr", "es"]),
+        Object.fromEntries(
+          rows()?.map((r) => [r.languageCode, r.position]) ?? [],
+        ),
+      ).toEqual({ fr: 0, es: 1 }),
     );
+  });
+});
+
+describe("optimistic add / update / remove", () => {
+  beforeEach(() => {
+    mockFrom.mockReset();
+    mockUseAuth.mockReturnValue({ user: { id: "u-1" }, initialized: true });
+  });
+
+  it("flips an available language to configured before the request settles", async () => {
+    let resolveUpsert: (value: { error: null }) => void = () => {};
+    mockFrom.mockReturnValue({
+      upsert: jest.fn(
+        () =>
+          new Promise<{ error: null }>((resolve) => {
+            resolveUpsert = resolve;
+          }),
+      ),
+    });
+    const { wrapper, rows, configuredCodes } = makeSeededWrapper([
+      row({ languageCode: "es" }),
+      // "fr" is an available global default, not yet configured.
+      row({ languageCode: "fr", isConfigured: false, isActive: false }),
+    ]);
+
+    const { result } = renderHook(() => useAddUserLanguage(), { wrapper });
+    result.current.mutate({
+      languageCode: "fr",
+      color: "#3B5BA5",
+      flag: "🇫🇷",
+      position: 1,
+    });
+
+    // The row flips configured/active immediately, while the request is pending.
+    await waitFor(() => expect(configuredCodes()).toEqual(["es", "fr"]));
+    const fr = rows()?.find((r) => r.languageCode === "fr");
+    expect(fr).toMatchObject({ isActive: true, color: "#3B5BA5", flag: "🇫🇷" });
+
+    resolveUpsert({ error: null });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
+  it("flips a removed global default back to available, keeping the row", async () => {
+    const eq2 = jest.fn(() => Promise.resolve({ error: null }));
+    mockFrom.mockReturnValue({
+      delete: () => ({ eq: () => ({ eq: eq2 }) }),
+    });
+    const { wrapper, rows, configuredCodes } = makeSeededWrapper([
+      row({ languageCode: "es" }),
+      row({ languageCode: "fr" }),
+    ]);
+
+    const { result } = renderHook(() => useRemoveUserLanguage(), { wrapper });
+    result.current.mutate("es");
+
+    // "es" stays in the catalog (it's a global default) but drops out of the
+    // configured set so it reappears in the available bucket.
+    await waitFor(() => expect(configuredCodes()).toEqual(["fr"]));
+    expect(rows()?.map((r) => r.languageCode)).toEqual(["es", "fr"]);
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
+  it("merges color/flag patches into the cached row", async () => {
+    mockFrom.mockReturnValue({
+      update: () => ({
+        eq: () => ({ eq: () => Promise.resolve({ error: null }) }),
+      }),
+    });
+    const { wrapper, rows } = makeSeededWrapper([
+      row({ languageCode: "es", color: "#C96F4A" }),
+    ]);
+
+    const { result } = renderHook(() => useUpdateUserLanguage(), { wrapper });
+    result.current.mutate({ languageCode: "es", patch: { color: "#3B5BA5" } });
+
+    await waitFor(() => expect(rows()?.[0]?.color).toBe("#3B5BA5"));
+  });
+
+  it("rolls the cache back when the request fails", async () => {
+    mockFrom.mockReturnValue({
+      delete: () => ({
+        eq: () => ({ eq: () => Promise.resolve({ error: new Error("boom") }) }),
+      }),
+    });
+    const { wrapper, configuredCodes } = makeSeededWrapper([
+      row({ languageCode: "es" }),
+      row({ languageCode: "fr" }),
+    ]);
+
+    const { result } = renderHook(() => useRemoveUserLanguage(), { wrapper });
+    result.current.mutate("es");
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(configuredCodes()).toEqual(["es", "fr"]);
   });
 });

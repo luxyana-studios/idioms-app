@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { defaultEffectiveLanguage } from "@/features/languages/constants";
 import { useAddUserLanguage } from "@/features/languages/hooks/useUserLanguageMutations";
+import { useUserLanguages } from "@/features/languages/hooks/useUserLanguages";
 import { useOnboardingStore } from "@/features/onboarding/stores/onboarding.store";
 import { Button } from "@/shared/components/Button";
 import { GlassView } from "@/shared/components/GlassView";
@@ -18,15 +18,25 @@ export default function CompleteScreen() {
   const router = useRouter();
   const { selectedLanguageCodes, complete } = useOnboardingStore();
   const { mutateAsync: addLanguage } = useAddUserLanguage();
+  const { availableLanguages, configuredLanguages } = useUserLanguages();
   const [saving, setSaving] = useState(false);
+
+  const catalogByCode = new Map(
+    [...availableLanguages, ...configuredLanguages].map((l) => [
+      l.languageCode,
+      l,
+    ]),
+  );
 
   const handleStart = async () => {
     setSaving(true);
     try {
       await Promise.allSettled(
-        selectedLanguageCodes.map((code, index) =>
-          addLanguage(defaultEffectiveLanguage(code, index)),
-        ),
+        selectedLanguageCodes.map((code, index) => {
+          const lang = catalogByCode.get(code);
+          if (!lang) return Promise.resolve();
+          return addLanguage({ ...lang, position: index });
+        }),
       );
     } finally {
       complete();

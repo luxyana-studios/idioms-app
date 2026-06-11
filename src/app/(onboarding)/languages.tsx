@@ -1,11 +1,8 @@
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ScrollView, View } from "react-native";
+import { ActivityIndicator, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import {
-  DEFAULT_IDIOM_LANGUAGE_CODES,
-  LANGUAGE_FLAGS,
-} from "@/features/languages/constants";
+import { useUserLanguages } from "@/features/languages/hooks/useUserLanguages";
 import { LanguageChip } from "@/features/onboarding/components/LanguageChip";
 import { StepProgress } from "@/features/onboarding/components/StepProgress";
 import { useOnboardingStore } from "@/features/onboarding/stores/onboarding.store";
@@ -18,6 +15,14 @@ export default function LanguagesScreen() {
   const { theme } = useUnistyles();
   const router = useRouter();
   const { selectedLanguageCodes, toggleLanguage } = useOnboardingStore();
+  const { availableLanguages, configuredLanguages, isLoading } =
+    useUserLanguages();
+
+  // Combine all catalog languages (configured + available) sorted by position
+  // so the user can pick or re-pick regardless of prior configuration state.
+  const catalogLanguages = [...configuredLanguages, ...availableLanguages].sort(
+    (a, b) => a.position - b.position,
+  );
 
   return (
     <ScreenContainer>
@@ -36,21 +41,27 @@ export default function LanguagesScreen() {
           </Typography>
         </View>
 
-        <ScrollView
-          style={styles.scrollArea}
-          contentContainerStyle={styles.grid}
-          showsVerticalScrollIndicator={false}
-        >
-          {DEFAULT_IDIOM_LANGUAGE_CODES.map((code) => (
-            <LanguageChip
-              key={code}
-              flag={LANGUAGE_FLAGS[code] ?? "🏳️"}
-              label={t(`lang.${code}`)}
-              selected={selectedLanguageCodes.includes(code)}
-              onPress={() => toggleLanguage(code)}
-            />
-          ))}
-        </ScrollView>
+        {isLoading ? (
+          <View style={styles.loading}>
+            <ActivityIndicator color={theme.colors.primary} />
+          </View>
+        ) : (
+          <ScrollView
+            style={styles.scrollArea}
+            contentContainerStyle={styles.grid}
+            showsVerticalScrollIndicator={false}
+          >
+            {catalogLanguages.map((lang) => (
+              <LanguageChip
+                key={lang.languageCode}
+                flag={lang.flag}
+                label={t(`lang.${lang.languageCode}`)}
+                selected={selectedLanguageCodes.includes(lang.languageCode)}
+                onPress={() => toggleLanguage(lang.languageCode)}
+              />
+            ))}
+          </ScrollView>
+        )}
 
         <View style={styles.actions}>
           <Button
@@ -79,6 +90,11 @@ const styles = StyleSheet.create((theme) => ({
   },
   header: {
     gap: 6,
+  },
+  loading: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   scrollArea: {
     flex: 1,

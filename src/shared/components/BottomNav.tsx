@@ -16,6 +16,7 @@ import {
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
+import { useFeedList } from "@/features/idioms/hooks/useFeedList";
 
 // Extra scroll padding screens should add so content clears the floating nav.
 // = pill height (60) + bottom margin (8) + safe-area gap (8) = 76
@@ -62,10 +63,16 @@ const NAV_ITEMS: NavItemDef[] = [
 interface NavItemProps {
   item: NavItemDef;
   isActive: boolean;
+  iconOverride?: React.ComponentProps<typeof Ionicons>["name"];
   onPress: () => void;
 }
 
-function NavItemComponent({ item, isActive, onPress }: NavItemProps) {
+function NavItemComponent({
+  item,
+  isActive,
+  iconOverride,
+  onPress,
+}: NavItemProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
 
@@ -100,7 +107,8 @@ function NavItemComponent({ item, isActive, onPress }: NavItemProps) {
     <Pressable
       onPress={onPress}
       style={styles.item}
-      accessibilityRole="button"
+      accessibilityRole="tab"
+      accessibilityState={{ selected: isActive }}
       accessibilityLabel={t(item.labelKey)}
       hitSlop={4}
     >
@@ -116,7 +124,7 @@ function NavItemComponent({ item, isActive, onPress }: NavItemProps) {
       />
       <Animated.View style={iconStyle}>
         <Ionicons
-          name={isActive ? item.icon : item.iconOutline}
+          name={iconOverride ?? (isActive ? item.icon : item.iconOutline)}
           size={24}
           color={color}
         />
@@ -135,31 +143,23 @@ export function BottomNav() {
   const segments = useSegments() as readonly string[];
 
   // segments[2] is the active tab group: "(home)", "(explore)", "(saved)", etc.
-  // segments[3] exists when we're on a sub-route (surprise, [id], …)
   const activeTab = segments[2];
-  const isOnFeed = activeTab === "(home)" && segments[3] === undefined;
+  const isOnHome = activeTab === "(home)";
 
-  const isOnSurprise = activeTab === "(home)" && segments[3] === "surprise";
+  const { enableShuffle, allIdiomIds, currentIdiomId, isShuffled } =
+    useFeedList();
 
   const handlePress = useCallback(
     (item: NavItemDef) => {
-      if (item.segment === "(home)") {
-        if (isOnSurprise) {
-          // Already on surprise: replace with fresh screen so the hook remounts
-          // and fetches a new random batch.
-          router.replace("/(main)/(tabs)/(home)/surprise");
-        } else if (isOnFeed) {
-          router.push("/(main)/(tabs)/(home)/surprise");
-        } else {
-          router.navigate("/(main)/(tabs)/(home)");
-        }
+      if (item.segment === "(home)" && isOnHome) {
+        enableShuffle(allIdiomIds, currentIdiomId);
       } else {
         router.navigate(
           item.navigateTo as Parameters<typeof router.navigate>[0],
         );
       }
     },
-    [isOnFeed, isOnSurprise, router],
+    [isOnHome, enableShuffle, allIdiomIds, currentIdiomId, router],
   );
 
   const GlassLayer =
@@ -180,25 +180,34 @@ export function BottomNav() {
 
   return (
     <View style={[styles.wrapper, { bottom: Math.max(insets.bottom, 8) + 8 }]}>
+      {/* Outer view carries the shadow — must NOT have overflow:hidden or iOS drops the shadow. */}
       <View
         style={[
-          styles.pill,
-          {
-            borderColor: theme.colors.glassBtnBorder,
-            shadowColor: isDark ? theme.colors.shadow : theme.colors.primary,
-          },
+          styles.pillShadow,
+          { shadowColor: isDark ? theme.colors.shadow : theme.colors.primary },
         ]}
       >
-        {GlassLayer}
+        {/* Inner view clips the BlurView to the pill shape. */}
+        <View
+          style={[
+            styles.pillClip,
+            { borderColor: theme.colors.glassBtnBorder },
+          ]}
+        >
+          {GlassLayer}
 
-        {NAV_ITEMS.map((item) => (
-          <NavItemComponent
-            key={item.segment}
-            item={item}
-            isActive={item.segment === activeTab}
-            onPress={() => handlePress(item)}
-          />
-        ))}
+          {NAV_ITEMS.map((item) => (
+            <NavItemComponent
+              key={item.segment}
+              item={item}
+              isActive={item.segment === activeTab}
+              iconOverride={
+                item.segment === "(home)" && isShuffled ? item.icon : undefined
+              }
+              onPress={() => handlePress(item)}
+            />
+          ))}
+        </View>
       </View>
     </View>
   );
@@ -212,20 +221,25 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     zIndex: 100,
   },
-  pill: {
-    flexDirection: "row",
-    alignItems: "center",
+  // Shadow lives here — overflow:hidden on the same view kills iOS shadows.
+  pillShadow: {
     height: PILL_HEIGHT,
     width: "88%",
     maxWidth: PILL_MAX_WIDTH,
     borderRadius: theme.radius.full,
-    borderWidth: 1,
-    overflow: "hidden",
-    // Warm shadow
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.18,
     shadowRadius: 24,
     elevation: 16,
+  },
+  // Clip lives here — overflow:hidden rounds the BlurView without breaking shadow.
+  pillClip: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: theme.radius.full,
+    borderWidth: 1,
+    overflow: "hidden",
   },
   item: {
     flex: 1,

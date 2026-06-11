@@ -88,11 +88,16 @@
   "languages.editConfigured": "Konfigurierte Sprachen bearbeiten",
   "languages.empty": "Noch keine Sprachen verfügbar.",
   "languages.error": "Sprachen konnten nicht geladen werden. Zum Wiederholen ziehen.",
+  "languages.lastLanguageTitle": "Eine Sprache behalten",
+  "languages.lastLanguageGuard": "Du brauchst mindestens eine Sprache. Füge eine andere hinzu, bevor du diese entfernst.",
   "languages.configuredSection": "Konfigurierte Sprachen",
   "languages.availableSection": "Verfügbare Sprachen",
   "languages.pickColor": "Farbe auswählen",
   "languages.pickFlag": "Flagge auswählen",
   "languages.dragToReorder": "Zum Neuordnen ziehen",
+  "home.surprise": "Überraschung",
+  "home.surpriseMe": "Überrasch mich",
+  "home.rollAgain": "Nochmal würfeln",
   "onboarding.welcomeTagline": "Entdecke die Seele einer Sprache durch ihre Redewendungen",
   "onboarding.pillLanguages": "11 Sprachen",
   "onboarding.pillContexts": "Realer Kontext",
@@ -112,8 +117,5 @@
   "onboarding.completeSubtitle": "Zeit, deinen Wortschatz zu erweitern",
   "onboarding.continue": "Weiter",
   "onboarding.skip": "Jetzt überspringen",
-  "onboarding.startExploring": "Erkunden beginnen",
-  "home.surprise": "Überraschung",
-  "home.surpriseMe": "Überrasch mich",
-  "home.rollAgain": "Nochmal würfeln"
+  "onboarding.startExploring": "Erkunden beginnen"
 }
