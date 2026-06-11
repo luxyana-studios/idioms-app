@@ -88,6 +88,8 @@
   "languages.editConfigured": "Modifier les langues configurées",
   "languages.empty": "Aucune langue disponible pour l'instant.",
   "languages.error": "Impossible de charger les langues. Tirez pour réessayer.",
+  "languages.lastLanguageTitle": "Gardez une langue",
+  "languages.lastLanguageGuard": "Il vous faut au moins une langue. Ajoutez-en une autre avant de retirer celle-ci.",
   "languages.configuredSection": "Langues configurées",
   "languages.availableSection": "Langues disponibles",
   "languages.pickColor": "Choisir une couleur",

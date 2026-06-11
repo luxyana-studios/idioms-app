@@ -90,5 +90,7 @@
   "languages.dragToReorder": "اسحب لإعادة الترتيب",
   "home.surprise": "مفاجأة",
   "home.surpriseMe": "فاجئني",
-  "home.rollAgain": "لف مجدداً"
+  "home.rollAgain": "لف مجدداً",
+  "languages.lastLanguageTitle": "احتفظ بلغة واحدة",
+  "languages.lastLanguageGuard": "تحتاج إلى لغة واحدة على الأقل. أضف لغة أخرى قبل إزالة هذه."
 }

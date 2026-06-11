@@ -88,6 +88,8 @@
   "languages.editConfigured": "Edit configured languages",
   "languages.empty": "No languages are available yet.",
   "languages.error": "Couldn't load languages. Pull to retry.",
+  "languages.lastLanguageTitle": "Keep one language",
+  "languages.lastLanguageGuard": "You need at least one language. Add another before removing this one.",
   "languages.configuredSection": "Configured languages",
   "languages.availableSection": "Available languages",
   "languages.pickColor": "Pick a color",

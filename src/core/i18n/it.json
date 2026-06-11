@@ -86,5 +86,7 @@
   "languages.dragToReorder": "Trascina per riordinare",
   "home.surprise": "Sorpresa",
   "home.surpriseMe": "Sorprendimi",
-  "home.rollAgain": "Lancia di nuovo"
+  "home.rollAgain": "Lancia di nuovo",
+  "languages.lastLanguageTitle": "Tieni una lingua",
+  "languages.lastLanguageGuard": "Serve almeno una lingua. Aggiungine un'altra prima di rimuovere questa."
 }

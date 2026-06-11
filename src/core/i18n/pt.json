@@ -86,5 +86,7 @@
   "languages.dragToReorder": "Arraste para reordenar",
   "home.surprise": "Surpresa",
   "home.surpriseMe": "Me surpreenda",
-  "home.rollAgain": "Jogar novamente"
+  "home.rollAgain": "Jogar novamente",
+  "languages.lastLanguageTitle": "Mantenha um idioma",
+  "languages.lastLanguageGuard": "Você precisa de pelo menos um idioma. Adicione outro antes de remover este."
 }

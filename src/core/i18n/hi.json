@@ -86,5 +86,7 @@
   "languages.dragToReorder": "पुनः क्रमित करने के लिए खींचें",
   "home.surprise": "आश्चर्य",
   "home.surpriseMe": "मुझे चौंकाओ",
-  "home.rollAgain": "फिर से रोल करें"
+  "home.rollAgain": "फिर से रोल करें",
+  "languages.lastLanguageTitle": "एक भाषा रखें",
+  "languages.lastLanguageGuard": "आपको कम से कम एक भाषा चाहिए। इसे हटाने से पहले कोई और जोड़ें।"
 }

@@ -85,5 +85,7 @@
   "languages.dragToReorder": "拖动以重新排序",
   "home.surprise": "惊喜",
   "home.surpriseMe": "给我惊喜",
-  "home.rollAgain": "再来一次"
+  "home.rollAgain": "再来一次",
+  "languages.lastLanguageTitle": "保留一种语言",
+  "languages.lastLanguageGuard": "至少需要一种语言。请先添加其他语言再移除此项。"
 }
