@@ -83,6 +83,9 @@
   "languages.pickColor": "色を選択",
   "languages.pickFlag": "国旗を選択",
   "languages.dragToReorder": "ドラッグして並べ替え",
+  "home.surprise": "サプライズ",
+  "home.surpriseMe": "サプライズ",
+  "home.rollAgain": "もう一度",
   "languages.lastLanguageTitle": "言語を1つ残す",
   "languages.lastLanguageGuard": "少なくとも1つの言語が必要です。これを削除する前に別の言語を追加してください。"
 }

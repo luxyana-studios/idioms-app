@@ -94,5 +94,8 @@
   "languages.availableSection": "Verfügbare Sprachen",
   "languages.pickColor": "Farbe auswählen",
   "languages.pickFlag": "Flagge auswählen",
-  "languages.dragToReorder": "Zum Neuordnen ziehen"
+  "languages.dragToReorder": "Zum Neuordnen ziehen",
+  "home.surprise": "Überraschung",
+  "home.surpriseMe": "Überrasch mich",
+  "home.rollAgain": "Nochmal würfeln"
 }

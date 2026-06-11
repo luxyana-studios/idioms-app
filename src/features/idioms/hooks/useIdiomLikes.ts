@@ -76,10 +76,12 @@ export const useToggleIdiomLike = () => {
           return;
         }
 
-        const { error } = await supabase.from("idiom_likes").insert({
-          user_id: user.id,
-          idiom_id: idiomId,
-        });
+        const { error } = await supabase
+          .from("idiom_likes")
+          .upsert(
+            { user_id: user.id, idiom_id: idiomId },
+            { onConflict: "user_id,idiom_id", ignoreDuplicates: true },
+          );
 
         if (error) throw error;
       },
