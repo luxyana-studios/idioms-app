@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
@@ -11,7 +12,9 @@ import Animated, {
 } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Button } from "@/shared/components/Button";
-import { GlassView } from "@/shared/components/GlassView";
+import { CategoryChip } from "@/shared/components/CategoryChip";
+import { GlowBackground } from "@/shared/components/GlowBackground";
+import { IconButton } from "@/shared/components/IconButton";
 import { Typography } from "@/shared/components/Typography";
 
 const EQUIVALENTS = [
@@ -32,29 +35,26 @@ export function HowItWorksSlide({ width, height, isActive, onNext }: Props) {
   const { theme } = useUnistyles();
 
   const cardOpacity = useSharedValue(0);
-  const cardY = useSharedValue(28);
+  const cardY = useSharedValue(24);
   const equivOpacity = useSharedValue(0);
-  const equivY = useSharedValue(12);
-  const originOpacity = useSharedValue(0);
+  const equivY = useSharedValue(14);
 
   useEffect(() => {
     if (isActive) {
-      cardOpacity.value = withDelay(80, withTiming(1, { duration: 380 }));
+      cardOpacity.value = withDelay(80, withTiming(1, { duration: 400 }));
       cardY.value = withDelay(
         80,
         withSpring(0, { damping: 16, stiffness: 120 }),
       );
-      equivOpacity.value = withDelay(420, withTiming(1, { duration: 320 }));
-      equivY.value = withDelay(420, withSpring(0, { damping: 18 }));
-      originOpacity.value = withDelay(660, withTiming(1, { duration: 320 }));
+      equivOpacity.value = withDelay(480, withTiming(1, { duration: 360 }));
+      equivY.value = withDelay(480, withSpring(0, { damping: 18 }));
     } else {
       cardOpacity.value = 0;
-      cardY.value = 28;
+      cardY.value = 24;
       equivOpacity.value = 0;
-      equivY.value = 12;
-      originOpacity.value = 0;
+      equivY.value = 14;
     }
-  }, [isActive, cardOpacity, cardY, equivOpacity, equivY, originOpacity]);
+  }, [isActive, cardOpacity, cardY, equivOpacity, equivY]);
 
   const cardAnim = useAnimatedStyle(() => ({
     opacity: cardOpacity.value,
@@ -64,139 +64,132 @@ export function HowItWorksSlide({ width, height, isActive, onNext }: Props) {
     opacity: equivOpacity.value,
     transform: [{ translateY: equivY.value }],
   }));
-  const originAnim = useAnimatedStyle(() => ({ opacity: originOpacity.value }));
 
   return (
     <View style={[styles.slide, { width, height }]}>
       <View style={styles.inner}>
-        <View style={styles.header}>
-          <Typography variant="title" weight="bold" style={styles.centered}>
+        <View style={styles.titleBlock}>
+          <Typography variant="heading" weight="bold" style={styles.centered}>
             {t("onboarding.howItWorksTitle")}
-          </Typography>
-          <Typography
-            variant="body"
-            color="textSecondary"
-            style={styles.centered}
-          >
-            {t("onboarding.howItWorksSubtitle")}
           </Typography>
         </View>
 
+        {/* Mock FeedCard — replicates FeedCardHero + FeedCardTray */}
         <Animated.View style={[styles.cardWrap, cardAnim]}>
-          <GlassView
-            style={[styles.card, { borderRadius: theme.radius["2xl"] }]}
+          <View
+            style={[
+              styles.mockCard,
+              { backgroundColor: theme.colors.background },
+            ]}
           >
-            {/* Lang badge + expression */}
-            <View style={styles.langRow}>
-              <View
-                style={[
-                  styles.langBadge,
-                  {
-                    backgroundColor: theme.colors.chipBg,
-                    borderColor: theme.colors.chipBorder,
-                  },
-                ]}
+            {/* Ambient glow — same as real feed */}
+            <GlowBackground subtle />
+
+            {/* Hero area — expression large + primary, matches FeedCardHero */}
+            <View style={styles.heroArea}>
+              <Typography
+                variant="display"
+                weight="extraBold"
+                style={[styles.expression, { color: theme.colors.primary }]}
               >
-                <Typography variant="caption" weight="semibold">
-                  🇬🇧 English
-                </Typography>
-              </View>
+                {t("onboarding.idiomExample")}
+              </Typography>
             </View>
 
-            <Typography variant="title" weight="bold" style={styles.phrase}>
-              {t("onboarding.idiomExample")}
-            </Typography>
+            {/* Gradient scrim — identical to real FeedCard */}
+            <LinearGradient
+              colors={[
+                theme.colors.feedCardScrimStart,
+                theme.colors.feedCardScrimEnd,
+              ]}
+              style={styles.scrim}
+              pointerEvents="none"
+            />
 
-            <View style={styles.meaningRow}>
-              <Ionicons
-                name="book-outline"
-                size={13}
-                color={theme.colors.primary}
-              />
+            {/* Tray — matches FeedCardTray layout exactly */}
+            <View
+              style={[
+                styles.tray,
+                { backgroundColor: theme.colors.feedTrayBg },
+              ]}
+            >
               <Typography
                 variant="body"
-                color="textSecondary"
-                style={styles.meaningText}
+                weight="medium"
+                style={[styles.meaning, { color: theme.colors.textSecondary }]}
+                numberOfLines={2}
               >
                 {t("onboarding.idiomMeaning")}
               </Typography>
+              <View style={styles.tagsActions}>
+                <View style={styles.tagsRow}>
+                  <CategoryChip label="EN" />
+                  <CategoryChip label="INFORMAL" />
+                </View>
+                <View style={styles.actions}>
+                  <IconButton
+                    icon="chevron-forward"
+                    onPress={() => {}}
+                    variant="bare"
+                    iconSize={20}
+                    containerSize={40}
+                    borderRadius={theme.radius.full}
+                    accessibilityLabel={t("home.expandIdiom")}
+                  />
+                  <IconButton
+                    icon="heart-outline"
+                    onPress={() => {}}
+                    variant="primary"
+                    iconSize={22}
+                    containerSize={44}
+                    borderRadius={theme.radius.full}
+                    accessibilityLabel={t("home.saveIdiom")}
+                  />
+                </View>
+              </View>
             </View>
+          </View>
+        </Animated.View>
 
-            {/* Equivalents in other languages */}
-            <Animated.View
+        {/* Equivalents — matches EquivalentsSection style */}
+        <Animated.View style={[styles.equivSection, equivAnim]}>
+          <View style={styles.equivHeader}>
+            <Ionicons
+              name="earth-outline"
+              size={13}
+              color={theme.colors.accent}
+            />
+            <Typography
+              variant="caption"
+              weight="extraBold"
+              style={[styles.equivLabel, { color: theme.colors.accent }]}
+            >
+              {t("detail.equivalents").toUpperCase()}
+            </Typography>
+          </View>
+          {EQUIVALENTS.map(({ flag, expression }) => (
+            <View
+              key={expression}
               style={[
-                styles.section,
-                { borderTopColor: theme.colors.outlineVariant },
-                equivAnim,
+                styles.equivCard,
+                {
+                  backgroundColor: theme.colors.surfaceContainerLow,
+                  borderColor: theme.colors.border,
+                },
               ]}
             >
-              <View style={styles.sectionRow}>
-                <Ionicons
-                  name="earth-outline"
-                  size={13}
-                  color={theme.colors.accent}
-                />
-                <Typography
-                  variant="caption"
-                  weight="semibold"
-                  style={{ color: theme.colors.accent }}
-                >
-                  {t("detail.equivalents")}
-                </Typography>
-              </View>
-              <View style={styles.equivChips}>
-                {EQUIVALENTS.map(({ flag, expression }) => (
-                  <View
-                    key={expression}
-                    style={[
-                      styles.equivChip,
-                      {
-                        backgroundColor: theme.colors.chipBg,
-                        borderColor: theme.colors.chipBorder,
-                      },
-                    ]}
-                  >
-                    <Typography variant="caption" weight="semibold">
-                      {flag} {expression}
-                    </Typography>
-                  </View>
-                ))}
-              </View>
-            </Animated.View>
-
-            {/* Origin snippet */}
-            <Animated.View
-              style={[
-                styles.section,
-                { borderTopColor: theme.colors.outlineVariant },
-                originAnim,
-              ]}
-            >
-              <View style={styles.sectionRow}>
-                <Ionicons
-                  name="layers-outline"
-                  size={13}
-                  color={theme.colors.primary}
-                />
-                <Typography
-                  variant="caption"
-                  weight="semibold"
-                  color="primary"
-                  style={styles.sectionTitle}
-                >
-                  {t("detail.originLabel")}
-                </Typography>
-              </View>
-              <Typography
-                variant="body"
-                color="textSecondary"
-                style={styles.originText}
-                numberOfLines={2}
-              >
-                {t("onboarding.idiomOriginText")}
+              <Typography variant="body" weight="bold">
+                {flag}
+                {"  "}
+                {expression}
               </Typography>
-            </Animated.View>
-          </GlassView>
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color={theme.colors.textSecondary}
+              />
+            </View>
+          ))}
         </Animated.View>
 
         <View style={styles.spacer} />
@@ -218,14 +211,13 @@ const styles = StyleSheet.create((theme) => ({
   inner: {
     flex: 1,
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing["2xl"],
+    paddingTop: theme.spacing.xl,
     paddingBottom: theme.spacing.lg,
     alignItems: "center",
   },
-  header: {
+  titleBlock: {
     alignItems: "center",
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.xl,
+    marginBottom: theme.spacing.md,
   },
   centered: {
     textAlign: "center",
@@ -233,61 +225,80 @@ const styles = StyleSheet.create((theme) => ({
   cardWrap: {
     width: "100%",
   },
-  card: {
+  mockCard: {
     width: "100%",
-    padding: theme.spacing.lg,
+    borderRadius: theme.radius["2xl"],
     overflow: "hidden",
-    gap: theme.spacing.xs,
+    height: 218,
   },
-  langRow: {
-    marginBottom: theme.spacing.xs,
-  },
-  langBadge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 4,
-    borderRadius: theme.radius.chip,
-    borderWidth: 1,
-  },
-  phrase: {
-    marginBottom: theme.spacing.xs,
-  },
-  meaningRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 6,
-  },
-  meaningText: {
+  heroArea: {
     flex: 1,
-    lineHeight: 22,
+    justifyContent: "flex-end",
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.sm,
   },
-  section: {
-    borderTopWidth: 1,
-    paddingTop: theme.spacing.sm,
-    marginTop: theme.spacing.sm,
+  expression: {
+    fontSize: 34,
+    lineHeight: 40,
+    letterSpacing: -1.5,
+  },
+  scrim: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 120,
+  },
+  tray: {
+    borderTopLeftRadius: theme.radius["2xl"],
+    borderTopRightRadius: theme.radius["2xl"],
+    paddingTop: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
+    gap: theme.spacing.sm,
+    zIndex: 2,
+  },
+  meaning: {
+    lineHeight: 22,
+    letterSpacing: 0.1,
+  },
+  tagsActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+  },
+  tagsRow: {
+    flex: 1,
+    flexDirection: "row",
     gap: theme.spacing.xs,
   },
-  sectionRow: {
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.xs,
+  },
+  equivSection: {
+    width: "100%",
+    marginTop: theme.spacing.md,
+    gap: theme.spacing.xs,
+  },
+  equivHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+    marginBottom: 2,
   },
-  sectionTitle: {
-    letterSpacing: 0.8,
+  equivLabel: {
+    letterSpacing: 1.2,
   },
-  equivChips: {
+  equivCard: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    gap: theme.spacing.xs,
-  },
-  equivChip: {
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 4,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
     borderRadius: theme.radius.chip,
     borderWidth: 1,
-  },
-  originText: {
-    lineHeight: 20,
   },
   spacer: {
     flex: 1,
