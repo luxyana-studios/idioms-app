@@ -43,6 +43,28 @@ describe("useOnboardingStore", () => {
     expect(useOnboardingStore.getState().completed).toBe(true);
   });
 
+  it("toggleGoal adds a goal when not present", () => {
+    useOnboardingStore.getState().toggleGoal("fun");
+    expect(useOnboardingStore.getState().goals).toEqual(["fun"]);
+  });
+
+  it("toggleGoal removes a goal when already present", () => {
+    useOnboardingStore.setState({ goals: ["fun", "travel"] });
+    useOnboardingStore.getState().toggleGoal("fun");
+    expect(useOnboardingStore.getState().goals).toEqual(["travel"]);
+  });
+
+  it("toggleLanguage adds a code when not present", () => {
+    useOnboardingStore.getState().toggleLanguage("en");
+    expect(useOnboardingStore.getState().selectedLanguageCodes).toEqual(["en"]);
+  });
+
+  it("toggleLanguage removes a code when already present", () => {
+    useOnboardingStore.setState({ selectedLanguageCodes: ["en", "es"] });
+    useOnboardingStore.getState().toggleLanguage("en");
+    expect(useOnboardingStore.getState().selectedLanguageCodes).toEqual(["es"]);
+  });
+
   it("reset restores defaults", () => {
     useOnboardingStore.setState({
       completed: true,

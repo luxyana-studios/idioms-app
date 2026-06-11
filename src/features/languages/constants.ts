@@ -77,6 +77,12 @@ const DEFAULTS: Record<string, { flag: string; color: string }> = {
   ko: { flag: "🇰🇷", color: "#3B5BA5" },
 };
 
+// Default flag emoji per idiom language code. Shared with the onboarding
+// language-selection screen so flags don't need to be hardcoded in two places.
+export const LANGUAGE_FLAGS: Record<string, string> = Object.fromEntries(
+  Object.entries(DEFAULTS).map(([code, { flag }]) => [code, flag]),
+);
+
 // Deterministic swatch for an unknown language code, so two unmapped languages
 // get visually distinct defaults rather than all sharing one color.
 const swatchForCode = (code: string): string => {

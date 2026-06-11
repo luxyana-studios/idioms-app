@@ -2,27 +2,16 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { DEFAULT_IDIOM_LANGUAGE_CODES } from "@/features/languages/constants";
+import {
+  DEFAULT_IDIOM_LANGUAGE_CODES,
+  LANGUAGE_FLAGS,
+} from "@/features/languages/constants";
 import { LanguageChip } from "@/features/onboarding/components/LanguageChip";
 import { StepProgress } from "@/features/onboarding/components/StepProgress";
 import { useOnboardingStore } from "@/features/onboarding/stores/onboarding.store";
 import { Button } from "@/shared/components/Button";
 import { ScreenContainer } from "@/shared/components/ScreenContainer";
 import { Typography } from "@/shared/components/Typography";
-
-const LANGUAGE_FLAGS: Record<string, string> = {
-  en: "🇬🇧",
-  es: "🇪🇸",
-  de: "🇩🇪",
-  fr: "🇫🇷",
-  it: "🇮🇹",
-  pt: "🇵🇹",
-  zh: "🇨🇳",
-  hi: "🇮🇳",
-  ar: "🇸🇦",
-  ja: "🇯🇵",
-  ko: "🇰🇷",
-};
 
 export default function LanguagesScreen() {
   const { t } = useTranslation();
