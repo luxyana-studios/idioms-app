@@ -109,13 +109,6 @@ export function WelcomeSlide({ width, height, onNext }: Props) {
               {t("onboarding.getStarted")}
             </Typography>
           </Pressable>
-          <Typography
-            variant="caption"
-            color="textSecondary"
-            style={styles.footerNote}
-          >
-            {t("onboarding.welcomeNote")}
-          </Typography>
         </View>
       </View>
     </View>
