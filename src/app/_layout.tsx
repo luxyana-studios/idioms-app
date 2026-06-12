@@ -3,6 +3,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { initializePurchases } from "@/core/payments/purchases";
 import { AppProviders } from "@/core/providers/AppProviders";
 import { useLoadFonts } from "@/core/theme/fonts";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
@@ -64,6 +65,7 @@ export default function RootLayout() {
   const completeOnboarding = useOnboardingStore((s) => s.complete);
 
   useEffect(() => {
+    initializePurchases();
     if (DEV_SKIP_ONBOARDING) {
       completeOnboarding();
     } else if (DEV_ALWAYS_SHOW_ONBOARDING) {
