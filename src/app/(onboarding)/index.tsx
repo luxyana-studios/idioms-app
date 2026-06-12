@@ -11,12 +11,11 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { CardDetailSlide } from "@/features/onboarding/components/CardDetailSlide";
 import { CardSwipeSlide } from "@/features/onboarding/components/CardSwipeSlide";
 import { ExploreSlide } from "@/features/onboarding/components/ExploreSlide";
-import { PaywallSlide } from "@/features/onboarding/components/PaywallSlide";
 import { StatsSlide } from "@/features/onboarding/components/StatsSlide";
 import { WelcomeSlide } from "@/features/onboarding/components/WelcomeSlide";
 import { ScreenContainer } from "@/shared/components/ScreenContainer";
 
-const SLIDE_COUNT = 6;
+const SLIDE_COUNT = 5;
 const DOTS_BAR_HEIGHT = 38;
 
 export default function WelcomeScreen() {
@@ -78,9 +77,8 @@ export default function WelcomeScreen() {
         <StatsSlide
           {...slideProps}
           isActive={activeSlide === 4}
-          onNext={nextSlide}
+          onNext={goToGoal}
         />
-        <PaywallSlide {...slideProps} onContinue={goToGoal} />
       </ScrollView>
 
       <View style={styles.dotsBar}>

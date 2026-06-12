@@ -32,11 +32,10 @@ function AuthGate({ children }: { children: React.ReactNode }) {
       // New users go to onboarding; returning users (completed onboarding) go to login.
       router.replace(onboardingCompleted ? "/(auth)/login" : "/(onboarding)");
     } else if (session && inAuth) {
+      // Completed onboarding before → go home. First-time sign-in → still needs paywall.
       router.replace(
-        onboardingCompleted ? "/(main)/(tabs)/(home)" : "/(onboarding)",
+        onboardingCompleted ? "/(main)/(tabs)/(home)" : "/(onboarding)/paywall",
       );
-    } else if (session && !onboardingCompleted && !inOnboarding) {
-      router.replace("/(onboarding)");
     } else if (session && onboardingCompleted && inOnboarding) {
       router.replace("/(main)/(tabs)/(home)");
     }
