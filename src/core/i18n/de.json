@@ -8,8 +8,11 @@
   "auth.signup": "Registrieren",
   "auth.email": "E-Mail",
   "auth.password": "Passwort",
+  "auth.fullName": "Vollständiger Name",
+  "auth.fullNamePlaceholder": "Dein Name",
   "auth.noAccount": "Noch kein Konto?",
   "auth.hasAccount": "Sie haben bereits ein Konto?",
+  "auth.signIn": "Anmelden",
   "home.title": "IdiomDeck",
   "home.dailySelection": "Tägliche Auswahl",
   "home.expandLexicon": "Erweitere deinen Wortschatz",
@@ -174,5 +177,11 @@
   "onboarding.getLifetime": "Lebenslangen Zugang erhalten",
   "onboarding.startMonthly": "Monatsplan starten",
   "onboarding.continueForFree": "Kostenlos fortfahren",
-  "onboarding.paywallNote": "Jederzeit kündbar · Käufe wiederherstellen"
+  "onboarding.paywallNote": "Jederzeit kündbar · Käufe wiederherstellen",
+  "onboarding.restorePurchases": "Käufe wiederherstellen",
+  "onboarding.purchaseError": "Kauf fehlgeschlagen. Bitte versuche es erneut.",
+  "onboarding.accountTitle": "Erstelle dein Konto",
+  "onboarding.accountSubtitle": "Speichere deinen Fortschritt und synchronisiere auf allen Geräten",
+  "onboarding.accountDevMode": "Dev-Modus — Supabase nicht konfiguriert",
+  "onboarding.accountContinueDev": "Weiter (Dev)"
 }

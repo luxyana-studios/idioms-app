@@ -2,9 +2,14 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { zustandMMKVStorage } from "@/core/storage/mmkv";
 
-// When true, the welcome flow shows every app launch (dev builds only).
-// Automatically false in production builds via __DEV__.
-export const DEV_ALWAYS_SHOW_ONBOARDING = __DEV__;
+// Resets onboarding on every dev launch so the flow is always testable.
+// Set EXPO_PUBLIC_DEV_RESET_ONBOARDING=false in .env to persist progress.
+export const DEV_ALWAYS_SHOW_ONBOARDING =
+  __DEV__ && process.env.EXPO_PUBLIC_DEV_RESET_ONBOARDING !== "false";
+
+// Set EXPO_PUBLIC_DEV_SKIP_ONBOARDING=true to jump straight to the main app.
+export const DEV_SKIP_ONBOARDING =
+  __DEV__ && process.env.EXPO_PUBLIC_DEV_SKIP_ONBOARDING === "true";
 
 interface OnboardingState {
   completed: boolean;

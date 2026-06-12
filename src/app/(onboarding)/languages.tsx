@@ -27,7 +27,7 @@ export default function LanguagesScreen() {
   return (
     <ScreenContainer>
       <View style={styles.inner}>
-        <StepProgress total={2} current={2} />
+        <StepProgress total={3} current={2} />
 
         <View style={styles.header}>
           <Typography variant="title" weight="bold">
@@ -67,12 +67,12 @@ export default function LanguagesScreen() {
           <Button
             title={t("onboarding.continue")}
             disabled={selectedLanguageCodes.length === 0}
-            onPress={() => router.push("/(onboarding)/complete")}
+            onPress={() => router.push("/(onboarding)/account")}
           />
           <Button
             title={t("onboarding.skip")}
             variant="ghost"
-            onPress={() => router.push("/(onboarding)/complete")}
+            onPress={() => router.push("/(onboarding)/account")}
           />
         </View>
       </View>

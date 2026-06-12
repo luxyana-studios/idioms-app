@@ -3,5 +3,8 @@
 // so StyleSheet.configure() must execute before any StyleSheet.create().
 import "./core/theme/unistyles";
 import "./core/i18n";
+import { initializePurchases } from "./core/payments/purchases";
+
+initializePurchases();
 
 import "expo-router/entry";

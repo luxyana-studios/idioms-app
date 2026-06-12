@@ -26,7 +26,7 @@ export default function GoalScreen() {
   return (
     <ScreenContainer>
       <View style={styles.inner}>
-        <StepProgress total={2} current={1} />
+        <StepProgress total={3} current={1} />
 
         <View style={styles.header}>
           <Typography variant="title" weight="bold">

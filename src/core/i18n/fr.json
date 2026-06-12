@@ -8,8 +8,11 @@
   "auth.signup": "S'inscrire",
   "auth.email": "E-mail",
   "auth.password": "Mot de passe",
+  "auth.fullName": "Nom complet",
+  "auth.fullNamePlaceholder": "Votre nom",
   "auth.noAccount": "Vous n'avez pas de compte ?",
   "auth.hasAccount": "Vous avez déjà un compte ?",
+  "auth.signIn": "Se connecter",
   "home.title": "IdiomDeck",
   "home.dailySelection": "Sélection du jour",
   "home.expandLexicon": "Enrichissez votre lexique",
@@ -174,5 +177,11 @@
   "onboarding.getLifetime": "Obtenir l'accès à vie",
   "onboarding.startMonthly": "Démarrer le plan mensuel",
   "onboarding.continueForFree": "Continuer gratuitement",
-  "onboarding.paywallNote": "Annulez à tout moment · Restaurer les achats"
+  "onboarding.paywallNote": "Annulez à tout moment · Restaurer les achats",
+  "onboarding.restorePurchases": "Restaurer les achats",
+  "onboarding.purchaseError": "Achat échoué. Veuillez réessayer.",
+  "onboarding.accountTitle": "Créez votre compte",
+  "onboarding.accountSubtitle": "Sauvegardez votre progression et synchronisez sur tous vos appareils",
+  "onboarding.accountDevMode": "Mode dev — Supabase non configuré",
+  "onboarding.accountContinueDev": "Continuer (dev)"
 }

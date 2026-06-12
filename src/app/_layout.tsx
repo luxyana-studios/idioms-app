@@ -8,6 +8,7 @@ import { useLoadFonts } from "@/core/theme/fonts";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import {
   DEV_ALWAYS_SHOW_ONBOARDING,
+  DEV_SKIP_ONBOARDING,
   useOnboardingStore,
 } from "@/features/onboarding/stores/onboarding.store";
 
@@ -26,8 +27,9 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     const inAuth = segment === "(auth)";
     const inOnboarding = segment === "(onboarding)";
 
-    if (!session && !inAuth) {
-      router.replace("/(auth)/login");
+    if (!session && !inAuth && !inOnboarding) {
+      // New users go to onboarding; returning users (completed onboarding) go to login.
+      router.replace(onboardingCompleted ? "/(auth)/login" : "/(onboarding)");
     } else if (session && inAuth) {
       router.replace(
         onboardingCompleted ? "/(main)/(tabs)/(home)" : "/(onboarding)",
@@ -59,13 +61,16 @@ export default function RootLayout() {
   const initialized = useAuthStore((s) => s.initialized);
   const { fontsLoaded, fontError } = useLoadFonts();
   const resetOnboarding = useOnboardingStore((s) => s.reset);
+  const completeOnboarding = useOnboardingStore((s) => s.complete);
 
   useEffect(() => {
-    if (DEV_ALWAYS_SHOW_ONBOARDING) {
+    if (DEV_SKIP_ONBOARDING) {
+      completeOnboarding();
+    } else if (DEV_ALWAYS_SHOW_ONBOARDING) {
       resetOnboarding();
     }
     initialize();
-  }, [initialize, resetOnboarding]);
+  }, [initialize, resetOnboarding, completeOnboarding]);
 
   useEffect(() => {
     if (initialized && (fontsLoaded || fontError)) {
