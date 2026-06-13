@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, TouchableOpacity, View } from "react-native";
+import { Platform, Pressable, TouchableOpacity, View } from "react-native";
 import {
   StyleSheet,
   UnistylesRuntime,
@@ -161,10 +161,12 @@ export function LoginForm() {
           </Typography>
         </TouchableOpacity>
 
-        <Link href="/(auth)/signup" style={styles.link}>
-          <Typography variant="body" color="primary">
-            {t("auth.noAccount")}
-          </Typography>
+        <Link href="/(auth)/signup" asChild>
+          <Pressable style={styles.link}>
+            <Typography variant="body" color="primary">
+              {t("auth.noAccount")}
+            </Typography>
+          </Pressable>
         </Link>
       </View>
     </View>
