@@ -49,9 +49,11 @@ const makeSelectChain = (result: { data: unknown; error: unknown }) => {
   const promise = Promise.resolve(result) as Promise<typeof result> & {
     select: jest.Mock;
     order: jest.Mock;
+    eq: jest.Mock;
   };
   promise.select = jest.fn(() => promise);
   promise.order = jest.fn(() => promise);
+  promise.eq = jest.fn(() => promise);
   return promise;
 };
 
@@ -86,15 +88,27 @@ describe("useUserLanguages", () => {
     expect(mockFrom).not.toHaveBeenCalled();
   });
 
-  it("is disabled when there is no signed-in user", () => {
+  it("fetches the global catalog when there is no signed-in user", async () => {
     mockUseAuth.mockReturnValue({ user: null, initialized: true });
+    const globalRows = [
+      { language_code: "en", color: "#3B5BA5", flag: "🇬🇧", position: 0 },
+      { language_code: "es", color: "#C96F4A", flag: "🇪🇸", position: 1 },
+    ];
+    mockFrom.mockReturnValueOnce(
+      makeSelectChain({ data: globalRows, error: null }),
+    );
 
     const { result } = renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
-    expect(result.current.fetchStatus).toBe("idle");
-    expect(mockFrom).not.toHaveBeenCalled();
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(mockFrom).toHaveBeenCalledWith("global_language_config");
+    expect(result.current.configuredLanguages).toEqual([]);
+    expect(
+      result.current.availableLanguages.map((l) => l.languageCode),
+    ).toEqual(["en", "es"]);
   });
 
   it("uses configured rows as the effective scope", async () => {
