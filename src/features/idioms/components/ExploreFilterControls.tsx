@@ -85,23 +85,12 @@ export function ExploreFilterControls({
         )}
       </View>
 
-      <ChipFilterRow
-        allSelected={selectedLanguageCodes.length === 0}
+      <LanguageFlagRow
+        languages={languages}
+        selectedCodes={selectedLanguageCodes}
+        onToggle={onToggleLanguage}
         onClear={onClearLanguages}
-      >
-        {languages.map((language) => {
-          const code = language.languageCode;
-          const isActive = selectedLanguageCodes.includes(code);
-          return (
-            <FilterChip
-              key={code}
-              label={t(`lang.${code}`, { defaultValue: code.toUpperCase() })}
-              isActive={isActive}
-              onPress={() => onToggleLanguage(code)}
-            />
-          );
-        })}
-      </ChipFilterRow>
+      />
 
       <ChipFilterRow
         allSelected={selectedTagKeys.length === 0}
@@ -117,6 +106,99 @@ export function ExploreFilterControls({
         ))}
       </ChipFilterRow>
     </View>
+  );
+}
+
+interface LanguageFlagRowProps {
+  languages: ExploreFilterControlsProps["languages"];
+  selectedCodes: string[];
+  onToggle: (code: string) => void;
+  onClear: () => void;
+}
+
+function LanguageFlagRow({
+  languages,
+  selectedCodes,
+  onToggle,
+  onClear,
+}: LanguageFlagRowProps) {
+  const { t } = useTranslation();
+  const allSelected = selectedCodes.length === 0;
+
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.chipsScroll}
+      contentContainerStyle={styles.chipsContent}
+    >
+      <FilterChip
+        label={t("explore.filterAll")}
+        isActive={allSelected}
+        onPress={onClear}
+      />
+      {languages.map((language) => (
+        <LangPillChip
+          key={language.languageCode}
+          flag={language.flag}
+          code={language.languageCode.slice(0, 2).toUpperCase()}
+          isActive={selectedCodes.includes(language.languageCode)}
+          onPress={() => onToggle(language.languageCode)}
+          accessibilityLabel={t(`lang.${language.languageCode}`, {
+            defaultValue: language.languageCode.toUpperCase(),
+          })}
+        />
+      ))}
+    </ScrollView>
+  );
+}
+
+interface LangPillChipProps {
+  flag: string;
+  code: string;
+  isActive: boolean;
+  onPress: () => void;
+  accessibilityLabel: string;
+}
+
+function LangPillChip({
+  flag,
+  code,
+  isActive,
+  onPress,
+  accessibilityLabel,
+}: LangPillChipProps) {
+  const { theme } = useUnistyles();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked: isActive }}
+      accessibilityLabel={accessibilityLabel}
+      style={({ pressed }) => [
+        styles.langPill,
+        isActive
+          ? { backgroundColor: theme.colors.primary }
+          : {
+              backgroundColor: theme.colors.chipBg,
+              borderColor: theme.colors.chipBorder,
+            },
+        pressed && { opacity: 0.7 },
+      ]}
+    >
+      <Typography style={styles.langPillFlag}>{flag}</Typography>
+      <Typography
+        variant="caption"
+        weight="bold"
+        style={{
+          color: isActive ? theme.colors.primaryText : theme.colors.primary,
+          fontSize: 12,
+        }}
+      >
+        {code}
+      </Typography>
+    </Pressable>
   );
 }
 
@@ -209,6 +291,20 @@ const styles = StyleSheet.create((theme) => ({
   chipsContent: {
     paddingHorizontal: theme.spacing.lg,
     gap: 8,
+  },
+  langPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: theme.radius.full,
+    borderWidth: 1,
+    borderColor: "transparent",
+  },
+  langPillFlag: {
+    fontSize: 17,
+    lineHeight: 20,
   },
   chip: {
     paddingHorizontal: 16,
