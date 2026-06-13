@@ -1,0 +1,432 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { LinearGradient } from "expo-linear-gradient";
+import type { ComponentProps } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { View } from "react-native";
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Button } from "@/shared/components/Button";
+import { CategoryChip } from "@/shared/components/CategoryChip";
+import { GlowBackground } from "@/shared/components/GlowBackground";
+import { IconButton } from "@/shared/components/IconButton";
+import { Typography } from "@/shared/components/Typography";
+
+type IoniconsName = ComponentProps<typeof Ionicons>["name"];
+
+// Same idiom expressed in 4 languages — demonstrates the core swipe feature
+const VARIANTS = [
+  {
+    lang: "EN",
+    expression: "Break the ice",
+    meaning: "To relieve tension or awkwardness",
+  },
+  {
+    lang: "ES",
+    expression: "Romper el hielo",
+    meaning: "Aliviar la tensión social",
+  },
+  {
+    lang: "DE",
+    expression: "Das Eis brechen",
+    meaning: "Eisige Stimmung auflösen",
+  },
+  {
+    lang: "FR",
+    expression: "Briser la glace",
+    meaning: "Détendre l'atmosphère",
+  },
+] as const;
+
+const GESTURES: {
+  icon: IoniconsName;
+  labelKey: string;
+  descKey: string;
+  usePrimary: boolean;
+}[] = [
+  {
+    icon: "reader-outline",
+    labelKey: "onboarding.tapExpandLabel",
+    descKey: "onboarding.tapExpandDesc",
+    usePrimary: false,
+  },
+  {
+    icon: "heart-outline",
+    labelKey: "onboarding.doubleTapLabel",
+    descKey: "onboarding.doubleTapDesc",
+    usePrimary: true,
+  },
+  {
+    icon: "hand-left-outline",
+    labelKey: "onboarding.holdLabel",
+    descKey: "onboarding.holdDesc",
+    usePrimary: false,
+  },
+];
+
+interface Props {
+  width: number;
+  height: number;
+  isActive: boolean;
+  onNext: () => void;
+}
+
+export function CardSwipeSlide({ width, height, isActive, onNext }: Props) {
+  const { t } = useTranslation();
+  const { theme } = useUnistyles();
+  const [variantIdx, setVariantIdx] = useState(0);
+
+  // Entry animation for the whole card block
+  const wrapOpacity = useSharedValue(0);
+  const wrapY = useSharedValue(20);
+  // Content cycling animation (fade + subtle slide)
+  const contentFade = useSharedValue(1);
+  const contentX = useSharedValue(0);
+  // Gesture list entry
+  const gesturesOpacity = useSharedValue(0);
+  const gesturesY = useSharedValue(12);
+
+  useEffect(() => {
+    if (isActive) {
+      wrapOpacity.value = withDelay(80, withTiming(1, { duration: 380 }));
+      wrapY.value = withDelay(
+        80,
+        withSpring(0, { damping: 16, stiffness: 120 }),
+      );
+      gesturesOpacity.value = withDelay(520, withTiming(1, { duration: 360 }));
+      gesturesY.value = withDelay(520, withSpring(0, { damping: 18 }));
+    } else {
+      wrapOpacity.value = 0;
+      wrapY.value = 20;
+      contentFade.value = 1;
+      contentX.value = 0;
+      gesturesOpacity.value = 0;
+      gesturesY.value = 12;
+      setVariantIdx(0);
+    }
+  }, [
+    isActive,
+    wrapOpacity,
+    wrapY,
+    contentFade,
+    contentX,
+    gesturesOpacity,
+    gesturesY,
+  ]);
+
+  const nextVariant = useCallback(() => {
+    setVariantIdx((i) => (i + 1) % VARIANTS.length);
+  }, []);
+
+  // Auto-cycle through language variants every 2.8s to demonstrate the swipe feature
+  useEffect(() => {
+    if (!isActive) return;
+    const id = setInterval(() => {
+      // Slide out to the left + fade
+      contentX.value = withTiming(-36, { duration: 230 });
+      contentFade.value = withTiming(0, { duration: 210 }, () => {
+        runOnJS(nextVariant)();
+        // Snap to right, animate in from the right
+        contentX.value = 36;
+        contentX.value = withSpring(0, { damping: 16, stiffness: 110 });
+        contentFade.value = withTiming(1, { duration: 270 });
+      });
+    }, 2800);
+    return () => clearInterval(id);
+  }, [isActive, contentX, contentFade, nextVariant]);
+
+  const wrapAnim = useAnimatedStyle(() => ({
+    opacity: wrapOpacity.value,
+    transform: [{ translateY: wrapY.value }],
+  }));
+  const contentAnim = useAnimatedStyle(() => ({
+    opacity: contentFade.value,
+    transform: [{ translateX: contentX.value }],
+  }));
+  const gesturesAnim = useAnimatedStyle(() => ({
+    opacity: gesturesOpacity.value,
+    transform: [{ translateY: gesturesY.value }],
+  }));
+
+  const current = VARIANTS[variantIdx];
+
+  return (
+    <View style={[styles.slide, { width, height }]}>
+      <View style={styles.inner}>
+        <View style={styles.titleBlock}>
+          <Typography variant="heading" weight="bold" style={styles.centered}>
+            {t("onboarding.cardFeedTitle")}
+          </Typography>
+          <Typography
+            variant="body"
+            color="textSecondary"
+            style={styles.centered}
+          >
+            {t("onboarding.cardFeedSubtitle")}
+          </Typography>
+        </View>
+
+        {/* Mock FeedCard — content cycles through language variants */}
+        <Animated.View style={[styles.cardWrap, wrapAnim]}>
+          <View
+            style={[
+              styles.mockCard,
+              { backgroundColor: theme.colors.background },
+            ]}
+          >
+            <GlowBackground subtle />
+            <Animated.View style={[styles.heroArea, contentAnim]}>
+              <Typography
+                variant="display"
+                weight="extraBold"
+                style={[styles.expression, { color: theme.colors.primary }]}
+              >
+                {current.expression}
+              </Typography>
+            </Animated.View>
+            <LinearGradient
+              colors={[
+                theme.colors.feedCardScrimStart,
+                theme.colors.feedCardScrimEnd,
+              ]}
+              style={styles.scrim}
+              pointerEvents="none"
+            />
+            <View
+              style={[
+                styles.tray,
+                { backgroundColor: theme.colors.feedTrayBg },
+              ]}
+            >
+              <Animated.View style={contentAnim}>
+                <Typography
+                  variant="body"
+                  weight="medium"
+                  style={[
+                    styles.meaning,
+                    { color: theme.colors.textSecondary },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {current.meaning}
+                </Typography>
+              </Animated.View>
+              <View style={styles.tagsActions}>
+                <Animated.View style={[styles.tagsRow, contentAnim]}>
+                  <CategoryChip label={current.lang} />
+                  <CategoryChip label="INFORMAL" />
+                </Animated.View>
+                <View style={styles.actions}>
+                  <IconButton
+                    icon="chevron-forward"
+                    onPress={() => {}}
+                    variant="bare"
+                    iconSize={20}
+                    containerSize={36}
+                    borderRadius={theme.radius.full}
+                    accessibilityLabel={t("home.expandIdiom")}
+                  />
+                  <IconButton
+                    icon="heart-outline"
+                    onPress={() => {}}
+                    variant="primary"
+                    iconSize={20}
+                    containerSize={40}
+                    borderRadius={theme.radius.full}
+                    accessibilityLabel={t("home.saveIdiom")}
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Language dots — show which variant is active */}
+          <View style={styles.variantDots}>
+            {VARIANTS.map((v, i) => (
+              <View
+                key={v.lang}
+                style={[
+                  styles.variantDot,
+                  {
+                    backgroundColor:
+                      i === variantIdx
+                        ? theme.colors.primary
+                        : theme.colors.progressTrack,
+                    width: i === variantIdx ? 16 : 5,
+                  },
+                ]}
+              />
+            ))}
+          </View>
+        </Animated.View>
+
+        {/* Gesture guide — 3 real interactions */}
+        <Animated.View style={[styles.gestureList, gesturesAnim]}>
+          {GESTURES.map(({ icon, labelKey, descKey, usePrimary }) => (
+            <View key={labelKey} style={styles.gestureRow}>
+              <View
+                style={[
+                  styles.iconPill,
+                  {
+                    backgroundColor: usePrimary
+                      ? `${theme.colors.primary}18`
+                      : `${theme.colors.accent}18`,
+                    borderColor: usePrimary
+                      ? `${theme.colors.primary}30`
+                      : `${theme.colors.accent}30`,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name={icon}
+                  size={18}
+                  color={
+                    usePrimary ? theme.colors.primary : theme.colors.accent
+                  }
+                />
+              </View>
+              <View style={styles.gestureText}>
+                <Typography variant="body" weight="semibold">
+                  {t(labelKey)}
+                </Typography>
+                <Typography variant="caption" color="textSecondary">
+                  {t(descKey)}
+                </Typography>
+              </View>
+            </View>
+          ))}
+        </Animated.View>
+
+        <View style={styles.spacer} />
+
+        <Button
+          title={t("onboarding.next")}
+          onPress={onNext}
+          style={styles.cta}
+        />
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create((theme) => ({
+  slide: {
+    overflow: "hidden",
+  },
+  inner: {
+    flex: 1,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.xl,
+    paddingBottom: theme.spacing.lg,
+    alignItems: "center",
+  },
+  titleBlock: {
+    alignItems: "center",
+    gap: theme.spacing.xs,
+    marginBottom: theme.spacing.md,
+  },
+  centered: {
+    textAlign: "center",
+  },
+  cardWrap: {
+    width: "100%",
+    gap: theme.spacing.sm,
+  },
+  mockCard: {
+    width: "100%",
+    borderRadius: theme.radius["2xl"],
+    overflow: "hidden",
+    height: 178,
+  },
+  heroArea: {
+    flex: 1,
+    justifyContent: "flex-end",
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.xs,
+  },
+  expression: {
+    fontSize: 30,
+    lineHeight: 36,
+    letterSpacing: -1.5,
+  },
+  scrim: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 110,
+  },
+  tray: {
+    borderTopLeftRadius: theme.radius["2xl"],
+    borderTopRightRadius: theme.radius["2xl"],
+    paddingTop: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.sm,
+    gap: theme.spacing.xs,
+    zIndex: 2,
+  },
+  meaning: {
+    letterSpacing: 0.1,
+  },
+  tagsActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+  },
+  tagsRow: {
+    flex: 1,
+    flexDirection: "row",
+    gap: theme.spacing.xs,
+  },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.xs,
+  },
+  variantDots: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: theme.spacing.xs,
+  },
+  variantDot: {
+    height: 5,
+    borderRadius: theme.radius.full,
+  },
+  gestureList: {
+    width: "100%",
+    marginTop: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  gestureRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.md,
+  },
+  iconPill: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.full,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  gestureText: {
+    flex: 1,
+    gap: 1,
+  },
+  spacer: {
+    flex: 1,
+  },
+  cta: {
+    width: "100%",
+  },
+}));
