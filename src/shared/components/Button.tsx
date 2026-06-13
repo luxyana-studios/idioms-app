@@ -30,6 +30,7 @@ export function Button({
     <Pressable
       style={({ pressed }) => [
         styles.base,
+        isPrimary && styles.primaryBg,
         (disabled || loading) && styles.disabled,
         pressed && styles.pressed,
         typeof style === "function"
@@ -89,6 +90,9 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center" as const,
     justifyContent: "center" as const,
     overflow: "hidden" as const,
+  },
+  primaryBg: {
+    backgroundColor: theme.colors.primary,
   },
   gradient: {
     ...StyleSheet.absoluteFillObject,
