@@ -83,16 +83,7 @@ export const useToggleIdiomLike = () => {
             { onConflict: "user_id,idiom_id", ignoreDuplicates: true },
           );
 
-        // Ignore duplicate-key violations — row already exists, like is already recorded.
-        // PostgREST may surface this as Postgres code "23505" or HTTP status "409".
-        if (error) {
-          const isDuplicate =
-            error.code === "23505" ||
-            error.code === "409" ||
-            error.message?.includes("duplicate key") ||
-            error.message?.includes("unique constraint");
-          if (!isDuplicate) throw error;
-        }
+        if (error) throw error;
       },
       onMutate: async ({ idiomId, isLiked }) => {
         await Promise.all([
