@@ -87,5 +87,8 @@
   "home.surpriseMe": "깜짝 놀라게 해줘",
   "home.rollAgain": "다시 굴리기",
   "languages.lastLanguageTitle": "언어 하나 유지",
-  "languages.lastLanguageGuard": "최소 한 개의 언어가 필요합니다. 이 언어를 제거하기 전에 다른 언어를 추가하세요."
+  "languages.lastLanguageGuard": "최소 한 개의 언어가 필요합니다. 이 언어를 제거하기 전에 다른 언어를 추가하세요.",
+  "auth.fullName": "전체 이름",
+  "auth.fullNamePlaceholder": "이름을 입력하세요",
+  "auth.signIn": "로그인"
 }

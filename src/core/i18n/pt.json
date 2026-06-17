@@ -88,5 +88,8 @@
   "home.surpriseMe": "Me surpreenda",
   "home.rollAgain": "Jogar novamente",
   "languages.lastLanguageTitle": "Mantenha um idioma",
-  "languages.lastLanguageGuard": "Você precisa de pelo menos um idioma. Adicione outro antes de remover este."
+  "languages.lastLanguageGuard": "Você precisa de pelo menos um idioma. Adicione outro antes de remover este.",
+  "auth.fullName": "Nome completo",
+  "auth.fullNamePlaceholder": "Seu nome",
+  "auth.signIn": "Entrar"
 }

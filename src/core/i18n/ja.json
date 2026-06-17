@@ -87,5 +87,8 @@
   "home.surpriseMe": "サプライズ",
   "home.rollAgain": "もう一度",
   "languages.lastLanguageTitle": "言語を1つ残す",
-  "languages.lastLanguageGuard": "少なくとも1つの言語が必要です。これを削除する前に別の言語を追加してください。"
+  "languages.lastLanguageGuard": "少なくとも1つの言語が必要です。これを削除する前に別の言語を追加してください。",
+  "auth.fullName": "フルネーム",
+  "auth.fullNamePlaceholder": "あなたの名前",
+  "auth.signIn": "サインイン"
 }

@@ -87,5 +87,8 @@
   "home.surpriseMe": "给我惊喜",
   "home.rollAgain": "再来一次",
   "languages.lastLanguageTitle": "保留一种语言",
-  "languages.lastLanguageGuard": "至少需要一种语言。请先添加其他语言再移除此项。"
+  "languages.lastLanguageGuard": "至少需要一种语言。请先添加其他语言再移除此项。",
+  "auth.fullName": "全名",
+  "auth.fullNamePlaceholder": "你的名字",
+  "auth.signIn": "登录"
 }
