@@ -25,20 +25,17 @@ const makeIdiomRow = (id: string) => ({
   examples: null,
   source: "common",
   status: "published",
-  idiom_tags: [],
+  tags: [],
+  translations: [],
+  equivalents: [],
+  created_at: "2024-01-01T00:00:00Z",
 });
 
-const makeRpcChain = (rows: unknown[]) => {
-  const chain: Record<string, jest.Mock> = {};
-  chain.select = jest.fn(() => Promise.resolve({ data: rows, error: null }));
-  return chain;
-};
+const makeRpcResolve = (rows: unknown[]) =>
+  Promise.resolve({ data: rows, error: null });
 
-const makeRpcChainError = (error: unknown) => {
-  const chain: Record<string, jest.Mock> = {};
-  chain.select = jest.fn(() => Promise.resolve({ data: null, error }));
-  return chain;
-};
+const makeRpcReject = (error: unknown) =>
+  Promise.resolve({ data: null, error });
 
 let queryClient: QueryClient;
 
@@ -62,7 +59,7 @@ afterEach(() => {
 describe("useSurpriseIdiom", () => {
   it("fetches a batch on mount and shows the first idiom", async () => {
     mockRpc.mockReturnValue(
-      makeRpcChain([makeIdiomRow("id-1"), makeIdiomRow("id-2")]),
+      makeRpcResolve([makeIdiomRow("id-1"), makeIdiomRow("id-2")]),
     );
 
     const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
@@ -74,12 +71,13 @@ describe("useSurpriseIdiom", () => {
     expect(mockRpc).toHaveBeenCalledWith("get_random_idioms", {
       batch_size: 20,
       exclude_ids: [],
+      p_ui_language: "en",
     });
   });
 
   it("advances cursor in memory without a network call", async () => {
     mockRpc.mockReturnValue(
-      makeRpcChain([
+      makeRpcResolve([
         makeIdiomRow("id-1"),
         makeIdiomRow("id-2"),
         makeIdiomRow("id-3"),
@@ -101,8 +99,8 @@ describe("useSurpriseIdiom", () => {
 
   it("fetches a new batch when the deck is exhausted", async () => {
     mockRpc
-      .mockReturnValueOnce(makeRpcChain([makeIdiomRow("id-1")]))
-      .mockReturnValueOnce(makeRpcChain([makeIdiomRow("id-2")]));
+      .mockReturnValueOnce(makeRpcResolve([makeIdiomRow("id-1")]))
+      .mockReturnValueOnce(makeRpcResolve([makeIdiomRow("id-2")]));
 
     const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
     await waitFor(() => expect(result.current.idiom?.id).toBe("id-1"));
@@ -123,8 +121,8 @@ describe("useSurpriseIdiom", () => {
 
   it("clears seen IDs and retries when batch returns empty", async () => {
     mockRpc
-      .mockReturnValueOnce(makeRpcChain([]))
-      .mockReturnValueOnce(makeRpcChain([makeIdiomRow("id-fresh")]));
+      .mockReturnValueOnce(makeRpcResolve([]))
+      .mockReturnValueOnce(makeRpcResolve([makeIdiomRow("id-fresh")]));
 
     const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
     await waitFor(() => expect(result.current.idiom?.id).toBe("id-fresh"));
@@ -133,13 +131,14 @@ describe("useSurpriseIdiom", () => {
     expect(mockRpc).toHaveBeenNthCalledWith(2, "get_random_idioms", {
       batch_size: 20,
       exclude_ids: [],
+      p_ui_language: "en",
     });
   });
 
   it("surfaces error state when both fetches fail", async () => {
     mockRpc
-      .mockReturnValueOnce(makeRpcChain([]))
-      .mockReturnValueOnce(makeRpcChainError({ message: "db error" }));
+      .mockReturnValueOnce(makeRpcResolve([]))
+      .mockReturnValueOnce(makeRpcReject({ message: "db error" }));
 
     const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
     await waitFor(() => expect(result.current.isError).toBe(true));

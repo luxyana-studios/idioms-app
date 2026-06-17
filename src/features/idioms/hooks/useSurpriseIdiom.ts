@@ -2,19 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/core/supabase/client";
-import type { Idiom, IdiomTag } from "../types";
+import type {
+  Idiom,
+  IdiomEquivalent,
+  IdiomTag,
+  IdiomTranslation,
+} from "../types";
 
 const BATCH_SIZE = 20;
 
 let mountCounter = 0;
-
-type TagsJoin = Array<{
-  tags: {
-    key: string;
-    facet: string;
-    tag_translations: Array<{ language_code: string; label: string }>;
-  };
-}>;
 
 type RandomIdiomRow = {
   id: string;
@@ -26,39 +23,28 @@ type RandomIdiomRow = {
   examples: string[] | null;
   source: string;
   status: string;
-  idiom_tags: TagsJoin;
+  tags: IdiomTag[];
+  translations: Array<{
+    id: string;
+    idiomId: string;
+    languageCode: string;
+    literalTranslation: string;
+    idiomaticMeaning: string;
+    explanation: string | null;
+    source: string;
+  }>;
+  equivalents: Array<{
+    edgeId: string;
+    equivalentId: string;
+    expression: string;
+    languageCode: string;
+    idiomaticMeaning: string;
+    similarityScore: number;
+    verified: boolean;
+  }>;
 };
 
-const IDIOM_SELECT = `
-  id,
-  expression,
-  language_code,
-  idiomatic_meaning,
-  likes_count,
-  explanation,
-  examples,
-  source,
-  status,
-  idiom_tags (
-    tags (
-      key,
-      facet,
-      tag_translations ( language_code, label )
-    )
-  )
-`;
-
-function resolveTags(joins: TagsJoin | null, uiLanguage: string): IdiomTag[] {
-  return (joins ?? []).map(({ tags: t }) => {
-    const label =
-      t.tag_translations.find((tr) => tr.language_code === uiLanguage)?.label ??
-      t.tag_translations.find((tr) => tr.language_code === "en")?.label ??
-      t.key;
-    return { key: t.key, facet: t.facet as IdiomTag["facet"], label };
-  });
-}
-
-function mapRow(row: RandomIdiomRow, uiLanguage: string): Idiom {
+function mapRow(row: RandomIdiomRow): Idiom {
   return {
     id: row.id,
     expression: row.expression,
@@ -67,9 +53,29 @@ function mapRow(row: RandomIdiomRow, uiLanguage: string): Idiom {
     likesCount: row.likes_count,
     explanation: row.explanation ?? undefined,
     examples: row.examples ?? undefined,
-    tags: resolveTags(row.idiom_tags, uiLanguage),
-    translations: [],
-    equivalents: [],
+    tags: row.tags as IdiomTag[],
+    translations: row.translations.map(
+      (t): IdiomTranslation => ({
+        id: t.id,
+        idiomId: t.idiomId,
+        languageCode: t.languageCode,
+        literalTranslation: t.literalTranslation,
+        idiomaticMeaning: t.idiomaticMeaning,
+        explanation: t.explanation ?? undefined,
+        source: t.source as IdiomTranslation["source"],
+      }),
+    ),
+    equivalents: row.equivalents.map(
+      (e): IdiomEquivalent => ({
+        edgeId: e.edgeId,
+        equivalentId: e.equivalentId,
+        expression: e.expression,
+        languageCode: e.languageCode,
+        idiomaticMeaning: e.idiomaticMeaning,
+        similarityScore: e.similarityScore,
+        verified: e.verified,
+      }),
+    ),
     source: row.source as Idiom["source"],
     status: row.status as Idiom["status"],
   };
@@ -80,19 +86,16 @@ async function fetchBatch(
   batchSize: number,
   uiLanguage: string,
 ): Promise<Idiom[]> {
-  const { data, error } = await supabase
-    .rpc("get_random_idioms", {
-      batch_size: batchSize,
-      exclude_ids: [...excludeIds],
-    })
-    .select(IDIOM_SELECT);
+  const { data, error } = await supabase.rpc("get_random_idioms", {
+    batch_size: batchSize,
+    exclude_ids: [...excludeIds],
+    p_ui_language: uiLanguage,
+  });
 
   if (error) throw error;
   if (!data || data.length === 0) return [];
 
-  return (data as unknown as RandomIdiomRow[]).map((row) =>
-    mapRow(row, uiLanguage),
-  );
+  return (data as unknown as RandomIdiomRow[]).map(mapRow);
 }
 
 export function useSurpriseIdiom() {
@@ -100,7 +103,6 @@ export function useSurpriseIdiom() {
   const [deckVersion, setDeckVersion] = useState(0);
   const [cursor, setCursor] = useState(0);
   const seenIds = useRef<string[]>([]);
-  // Unique per mount so each screen visit gets its own cache slot.
   // Unique per mount — gives each screen visit its own React Query cache slot.
   const sessionId = useRef(`s${++mountCounter}`).current;
 
