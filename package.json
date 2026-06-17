@@ -68,6 +68,7 @@
     "postcss": "8.5.15",
     "jest-environment-node": "^30.4.1",
     "jest-environment-jsdom": "^30.4.1",
-    "jest-mock": "^30.4.1"
+    "jest-mock": "^30.4.1",
+    "ws": "^7.5.11"
   }
 }
