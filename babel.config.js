@@ -4,7 +4,11 @@ module.exports = function (api) {
     presets: ["babel-preset-expo"],
     plugins: [
       ["react-native-unistyles/plugin", { root: __dirname }],
-      "react-native-reanimated/plugin",
+      // Reanimated plugin requires react-native-worklets (added in 4.4.x) which
+      // is a native module not needed in the Jest environment.
+      ...(process.env.NODE_ENV === "test"
+        ? []
+        : ["react-native-reanimated/plugin"]),
     ],
   };
 };
