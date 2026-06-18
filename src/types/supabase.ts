@@ -431,20 +431,22 @@ export type Database = {
         Args: {
           batch_size?: number;
           exclude_ids?: string[];
+          p_ui_language?: string;
         };
         Returns: {
-          created_at: string;
-          examples: string[] | null;
-          explanation: string | null;
-          expression: string;
-          expression_key: string;
           id: string;
-          idiomatic_meaning: string;
+          expression: string;
           language_code: string;
+          idiomatic_meaning: string;
           likes_count: number;
+          explanation: string | null;
+          examples: string[] | null;
           source: string;
           status: string;
-          updated_at: string;
+          tags: Json;
+          translations: Json;
+          equivalents: Json;
+          created_at: string;
         }[];
       };
     };
