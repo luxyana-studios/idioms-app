@@ -2,16 +2,16 @@ import type { ConfigContext, ExpoConfig } from "expo/config";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: "IdiomDeck",
-  slug: "idiom-deck",
+  name: "Idioms",
+  slug: "idioms",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
-  scheme: "idiomdeck",
+  scheme: "idioms",
   userInterfaceStyle: "automatic",
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "com.luxyana.idiomdeck",
+    bundleIdentifier: "com.luxyana.idioms",
   },
   android: {
     adaptiveIcon: {
@@ -20,7 +20,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       backgroundImage: "./assets/android-icon-background.png",
       monochromeImage: "./assets/android-icon-monochrome.png",
     },
-    package: "com.luxyana.idiomdeck",
+    package: "com.luxyana.idioms",
   },
   web: {
     favicon: "./assets/favicon.png",

@@ -1,5 +1,5 @@
 {
-  "name": "luxyana_template",
+  "name": "idioms",
   "version": "1.0.0",
   "main": "./src/entry.ts",
   "scripts": {

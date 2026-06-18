@@ -25,9 +25,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({
         initialized: true,
         session: {
-          user: { id: "demo", email: "demo@idiomdeck.app" },
+          user: { id: "demo", email: "demo@idioms.app" },
         } as Session,
-        user: { id: "demo", email: "demo@idiomdeck.app" } as User,
+        user: { id: "demo", email: "demo@idioms.app" } as User,
       });
       return;
     }
