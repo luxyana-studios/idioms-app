@@ -46,7 +46,8 @@
     "react-native-svg": "15.15.5",
     "react-native-unistyles": "^3.2.5",
     "react-native-web": "^0.21.0",
-    "zustand": "^5.0.14"
+    "zustand": "^5.0.14",
+    "react-native-purchases": "^10.3.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
