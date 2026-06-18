@@ -88,5 +88,8 @@
   "home.surpriseMe": "मुझे चौंकाओ",
   "home.rollAgain": "फिर से रोल करें",
   "languages.lastLanguageTitle": "एक भाषा रखें",
-  "languages.lastLanguageGuard": "आपको कम से कम एक भाषा चाहिए। इसे हटाने से पहले कोई और जोड़ें।"
+  "languages.lastLanguageGuard": "आपको कम से कम एक भाषा चाहिए। इसे हटाने से पहले कोई और जोड़ें।",
+  "auth.fullName": "पूरा नाम",
+  "auth.fullNamePlaceholder": "आपका नाम",
+  "auth.signIn": "साइन इन करें"
 }
