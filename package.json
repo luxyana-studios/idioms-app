@@ -38,7 +38,7 @@
     "react-dom": "19.2.7",
     "react-i18next": "^17.0.8",
     "react-native": "0.86.0",
-    "react-native-gesture-handler": "~2.31.2",
+    "react-native-gesture-handler": "~3.0.1",
     "react-native-mmkv": "^4.3.1",
     "react-native-reanimated": "4.4.1",
     "react-native-safe-area-context": "~5.8.0",
@@ -52,7 +52,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
     "@react-native/jest-preset": "^0.86.0",
-    "@testing-library/react-native": "^13.3.3",
+    "@testing-library/react-native": "^14.0.0",
     "@types/jest": "^30.0.0",
     "@types/react": "~19.2.17",
     "jest": "^30.4.2",
@@ -60,7 +60,7 @@
     "lefthook": "^2.1.9",
     "react-test-renderer": "19.2.7",
     "supabase": "^2.101.0",
-    "typescript": "~5.9.2"
+    "typescript": "~6.0.3"
   },
   "private": true,
   "overrides": {
