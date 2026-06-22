@@ -31,12 +31,12 @@ const makeIdiom = (overrides: Partial<Idiom> = {}): Idiom => ({
 });
 
 describe("useVariantCarousel", () => {
-  it("derives variants from idiom.equivalents with the base idiom first", () => {
+  it("derives variants from idiom.equivalents with the base idiom first", async () => {
     const idiom = makeIdiom({
       equivalents: [makeEquivalent("eq-1"), makeEquivalent("eq-2")],
     });
 
-    const { result } = renderHook(() => useVariantCarousel(idiom));
+    const { result } = await renderHook(() => useVariantCarousel(idiom));
 
     expect(result.current.variants).toHaveLength(3);
     expect(result.current.variants[0]).toMatchObject({
@@ -48,47 +48,46 @@ describe("useVariantCarousel", () => {
       "eq-1",
       "eq-2",
     ]);
-    // Equivalent variants carry no tags (not surfaced by the feed RPC).
     expect(result.current.variants[1].tags).toEqual([]);
   });
 
-  it("returns only the base variant when there are no equivalents", () => {
-    const { result } = renderHook(() => useVariantCarousel(makeIdiom()));
+  it("returns only the base variant when there are no equivalents", async () => {
+    const { result } = await renderHook(() => useVariantCarousel(makeIdiom()));
 
     expect(result.current.variants).toHaveLength(1);
     expect(result.current.currentVariant.id).toBe("base");
   });
 
-  it("clamps navigation within bounds", () => {
+  it("clamps navigation within bounds", async () => {
     const idiom = makeIdiom({ equivalents: [makeEquivalent("eq-1")] });
-    const { result } = renderHook(() => useVariantCarousel(idiom));
+    const { result } = await renderHook(() => useVariantCarousel(idiom));
 
-    act(() => result.current.handlePrev());
-    expect(result.current.variantIndex).toBe(0); // can't go below 0
+    await act(() => result.current.handlePrev());
+    expect(result.current.variantIndex).toBe(0);
 
-    act(() => result.current.handleNext());
+    await act(() => result.current.handleNext());
     expect(result.current.variantIndex).toBe(1);
 
-    act(() => result.current.handleNext());
-    expect(result.current.variantIndex).toBe(1); // can't exceed last index
+    await act(() => result.current.handleNext());
+    expect(result.current.variantIndex).toBe(1);
   });
 
-  it("resets to the base variant when the idiom id changes", () => {
+  it("resets to the base variant when the idiom id changes", async () => {
     const first = makeIdiom({ id: "a", equivalents: [makeEquivalent("eq-1")] });
     const second = makeIdiom({
       id: "b",
       equivalents: [makeEquivalent("eq-2")],
     });
 
-    const { result, rerender } = renderHook(
+    const { result, rerender } = await renderHook(
       ({ idiom }: { idiom: Idiom }) => useVariantCarousel(idiom),
       { initialProps: { idiom: first } },
     );
 
-    act(() => result.current.handleNext());
+    await act(() => result.current.handleNext());
     expect(result.current.variantIndex).toBe(1);
 
-    rerender({ idiom: second });
+    await rerender({ idiom: second });
     expect(result.current.variantIndex).toBe(0);
   });
 });

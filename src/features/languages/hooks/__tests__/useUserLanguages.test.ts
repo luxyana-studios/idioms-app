@@ -49,11 +49,9 @@ const makeSelectChain = (result: { data: unknown; error: unknown }) => {
   const promise = Promise.resolve(result) as Promise<typeof result> & {
     select: jest.Mock;
     order: jest.Mock;
-    eq: jest.Mock;
   };
   promise.select = jest.fn(() => promise);
   promise.order = jest.fn(() => promise);
-  promise.eq = jest.fn(() => promise);
   return promise;
 };
 
@@ -76,10 +74,10 @@ describe("useUserLanguages", () => {
     mockUseAuth.mockReturnValue({ user: { id: "u-1" }, initialized: true });
   });
 
-  it("is disabled until auth is initialized", () => {
+  it("is disabled until auth is initialized", async () => {
     mockUseAuth.mockReturnValue({ user: null, initialized: false });
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -88,27 +86,15 @@ describe("useUserLanguages", () => {
     expect(mockFrom).not.toHaveBeenCalled();
   });
 
-  it("fetches the global catalog when there is no signed-in user", async () => {
+  it("is disabled when there is no signed-in user", async () => {
     mockUseAuth.mockReturnValue({ user: null, initialized: true });
-    const globalRows = [
-      { language_code: "en", color: "#3B5BA5", flag: "🇬🇧", position: 0 },
-      { language_code: "es", color: "#C96F4A", flag: "🇪🇸", position: 1 },
-    ];
-    mockFrom.mockReturnValueOnce(
-      makeSelectChain({ data: globalRows, error: null }),
-    );
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-    expect(mockFrom).toHaveBeenCalledWith("global_language_config");
-    expect(result.current.configuredLanguages).toEqual([]);
-    expect(
-      result.current.availableLanguages.map((l) => l.languageCode),
-    ).toEqual(["en", "es"]);
+    expect(result.current.fetchStatus).toBe("idle");
+    expect(mockFrom).not.toHaveBeenCalled();
   });
 
   it("uses configured rows as the effective scope", async () => {
@@ -130,7 +116,7 @@ describe("useUserLanguages", () => {
     ];
     mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -190,7 +176,7 @@ describe("useUserLanguages", () => {
     ];
     mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -224,7 +210,7 @@ describe("useUserLanguages", () => {
     ];
     mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -254,7 +240,7 @@ describe("useUserLanguages", () => {
     ];
     mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -273,7 +259,7 @@ describe("useUserLanguages", () => {
       makeSelectChain({ data: null, error: dbError }),
     );
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 

@@ -38,34 +38,8 @@ export const useUserLanguages = () => {
 
   const query = useQuery({
     queryKey: userLanguagesKey(user?.id),
-    enabled: initialized,
+    enabled: initialized && !!user,
     queryFn: async (): Promise<CatalogRow[]> => {
-      // Unauthenticated (onboarding): read the public global catalog directly.
-      if (!user) {
-        const { data, error } = await supabase
-          .from("global_language_config")
-          .select("language_code, color, flag, position")
-          .eq("enabled", true)
-          .order("position", { ascending: true });
-
-        if (error) throw error;
-
-        return (data ?? []).flatMap((row) => {
-          if (row.language_code == null) return [];
-          return [
-            {
-              languageCode: row.language_code,
-              color: row.color ?? "",
-              flag: row.flag ?? "",
-              position: row.position ?? 0,
-              isConfigured: false,
-              inGlobal: true,
-              isActive: true,
-            },
-          ];
-        });
-      }
-
       const { data, error } = await supabase
         .from("user_language_catalog")
         .select(

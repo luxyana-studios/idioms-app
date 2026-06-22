@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 import { IconButton } from "../IconButton";
 
 jest.mock("react-native-unistyles", () => ({
@@ -21,46 +21,46 @@ jest.mock("react-native-unistyles", () => ({
 jest.mock("@expo/vector-icons/Ionicons", () => "Ionicons");
 
 describe("IconButton", () => {
-  it("renders with the given accessibility label", () => {
-    render(
+  it("renders with the given accessibility label", async () => {
+    const { getByLabelText } = await render(
       <IconButton
         icon="menu"
         onPress={jest.fn()}
         accessibilityLabel="Open menu"
       />,
     );
-    expect(screen.getByLabelText("Open menu")).toBeTruthy();
+    expect(getByLabelText("Open menu")).toBeTruthy();
   });
 
-  it("has role button", () => {
-    render(
+  it("has role button", async () => {
+    const { getByRole } = await render(
       <IconButton
         icon="search"
         onPress={jest.fn()}
         accessibilityLabel="Search"
       />,
     );
-    expect(screen.getByRole("button")).toBeTruthy();
+    expect(getByRole("button")).toBeTruthy();
   });
 
-  it("calls onPress when tapped", () => {
+  it("calls onPress when tapped", async () => {
     const onPress = jest.fn();
-    render(
+    const { getByRole } = await render(
       <IconButton icon="menu" onPress={onPress} accessibilityLabel="Menu" />,
     );
-    fireEvent.press(screen.getByRole("button"));
+    fireEvent.press(getByRole("button"));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it("renders glass variant by default", () => {
-    render(
+  it("renders glass variant by default", async () => {
+    const { getByRole } = await render(
       <IconButton icon="heart" onPress={jest.fn()} accessibilityLabel="Save" />,
     );
-    expect(screen.getByRole("button")).toBeTruthy();
+    expect(getByRole("button")).toBeTruthy();
   });
 
-  it("renders primary variant", () => {
-    render(
+  it("renders primary variant", async () => {
+    const { getByRole } = await render(
       <IconButton
         icon="heart"
         onPress={jest.fn()}
@@ -68,6 +68,6 @@ describe("IconButton", () => {
         accessibilityLabel="Save"
       />,
     );
-    expect(screen.getByRole("button")).toBeTruthy();
+    expect(getByRole("button")).toBeTruthy();
   });
 });
