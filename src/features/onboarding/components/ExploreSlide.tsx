@@ -5,8 +5,6 @@ import { View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -33,57 +31,19 @@ export function ExploreSlide({ width, height, isActive, onNext }: Props) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
 
-  const titleOpacity = useSharedValue(0);
-  const titleY = useSharedValue(14);
-  const exploreOpacity = useSharedValue(0);
-  const exploreY = useSharedValue(18);
-  const surpriseOpacity = useSharedValue(0);
-  const surpriseY = useSharedValue(12);
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
-    if (isActive) {
-      titleOpacity.value = withDelay(60, withTiming(1, { duration: 300 }));
-      titleY.value = withDelay(60, withSpring(0, { damping: 18 }));
-      exploreOpacity.value = withDelay(280, withTiming(1, { duration: 360 }));
-      exploreY.value = withDelay(280, withSpring(0, { damping: 16 }));
-      surpriseOpacity.value = withDelay(560, withTiming(1, { duration: 340 }));
-      surpriseY.value = withDelay(560, withSpring(0, { damping: 18 }));
-    } else {
-      titleOpacity.value = 0;
-      titleY.value = 14;
-      exploreOpacity.value = 0;
-      exploreY.value = 18;
-      surpriseOpacity.value = 0;
-      surpriseY.value = 12;
-    }
-  }, [
-    isActive,
-    titleOpacity,
-    titleY,
-    exploreOpacity,
-    exploreY,
-    surpriseOpacity,
-    surpriseY,
-  ]);
+    opacity.value = isActive ? withTiming(1, { duration: 350 }) : 0;
+  }, [isActive, opacity]);
 
-  const titleAnim = useAnimatedStyle(() => ({
-    opacity: titleOpacity.value,
-    transform: [{ translateY: titleY.value }],
-  }));
-  const exploreAnim = useAnimatedStyle(() => ({
-    opacity: exploreOpacity.value,
-    transform: [{ translateY: exploreY.value }],
-  }));
-  const surpriseAnim = useAnimatedStyle(() => ({
-    opacity: surpriseOpacity.value,
-    transform: [{ translateY: surpriseY.value }],
-  }));
+  const fadeAnim = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
   return (
     <View style={[styles.slide, { width, height }]}>
-      <View style={styles.inner}>
+      <Animated.View style={[styles.inner, fadeAnim]}>
         {/* Title */}
-        <Animated.View style={[styles.titleBlock, titleAnim]}>
+        <View style={styles.titleBlock}>
           <Typography variant="heading" weight="bold" style={styles.centered}>
             {t("onboarding.exploreTitle")}
           </Typography>
@@ -94,10 +54,10 @@ export function ExploreSlide({ width, height, isActive, onNext }: Props) {
           >
             {t("onboarding.exploreSubtitle")}
           </Typography>
-        </Animated.View>
+        </View>
 
         {/* Explore section mock */}
-        <Animated.View style={[styles.exploreSection, exploreAnim]}>
+        <View style={styles.exploreSection}>
           {/* Search bar mock */}
           <View
             style={[
@@ -221,10 +181,10 @@ export function ExploreSlide({ width, height, isActive, onNext }: Props) {
               </View>
             ))}
           </View>
-        </Animated.View>
+        </View>
 
         {/* Surprise Me section */}
-        <Animated.View style={[styles.surpriseSection, surpriseAnim]}>
+        <View style={styles.surpriseSection}>
           <View
             style={[
               styles.surpriseDivider,
@@ -256,7 +216,7 @@ export function ExploreSlide({ width, height, isActive, onNext }: Props) {
               </Typography>
             </View>
           </View>
-        </Animated.View>
+        </View>
 
         <View style={styles.spacer} />
 
@@ -265,7 +225,7 @@ export function ExploreSlide({ width, height, isActive, onNext }: Props) {
           onPress={onNext}
           style={styles.cta}
         />
-      </View>
+      </Animated.View>
     </View>
   );
 }

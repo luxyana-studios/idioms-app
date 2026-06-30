@@ -1,23 +1,19 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { LinearGradient } from "expo-linear-gradient";
 import type { ComponentProps } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
-import Animated, {
+import {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Button } from "@/shared/components/Button";
-import { CategoryChip } from "@/shared/components/CategoryChip";
-import { GlowBackground } from "@/shared/components/GlowBackground";
-import { IconButton } from "@/shared/components/IconButton";
 import { Typography } from "@/shared/components/Typography";
+import { MockFeedCard } from "./MockFeedCard";
 
 type IoniconsName = ComponentProps<typeof Ionicons>["name"];
 
@@ -83,43 +79,17 @@ export function CardSwipeSlide({ width, height, isActive, onNext }: Props) {
   const { theme } = useUnistyles();
   const [variantIdx, setVariantIdx] = useState(0);
 
-  // Entry animation for the whole card block
-  const wrapOpacity = useSharedValue(0);
-  const wrapY = useSharedValue(20);
   // Content cycling animation (fade + subtle slide)
   const contentFade = useSharedValue(1);
   const contentX = useSharedValue(0);
-  // Gesture list entry
-  const gesturesOpacity = useSharedValue(0);
-  const gesturesY = useSharedValue(12);
 
   useEffect(() => {
-    if (isActive) {
-      wrapOpacity.value = withDelay(80, withTiming(1, { duration: 380 }));
-      wrapY.value = withDelay(
-        80,
-        withSpring(0, { damping: 16, stiffness: 120 }),
-      );
-      gesturesOpacity.value = withDelay(520, withTiming(1, { duration: 360 }));
-      gesturesY.value = withDelay(520, withSpring(0, { damping: 18 }));
-    } else {
-      wrapOpacity.value = 0;
-      wrapY.value = 20;
+    if (!isActive) {
       contentFade.value = 1;
       contentX.value = 0;
-      gesturesOpacity.value = 0;
-      gesturesY.value = 12;
       setVariantIdx(0);
     }
-  }, [
-    isActive,
-    wrapOpacity,
-    wrapY,
-    contentFade,
-    contentX,
-    gesturesOpacity,
-    gesturesY,
-  ]);
+  }, [isActive, contentFade, contentX]);
 
   const nextVariant = useCallback(() => {
     setVariantIdx((i) => (i + 1) % VARIANTS.length);
@@ -129,11 +99,9 @@ export function CardSwipeSlide({ width, height, isActive, onNext }: Props) {
   useEffect(() => {
     if (!isActive) return;
     const id = setInterval(() => {
-      // Slide out to the left + fade
       contentX.value = withTiming(-36, { duration: 230 });
       contentFade.value = withTiming(0, { duration: 210 }, () => {
         runOnJS(nextVariant)();
-        // Snap to right, animate in from the right
         contentX.value = 36;
         contentX.value = withSpring(0, { damping: 16, stiffness: 110 });
         contentFade.value = withTiming(1, { duration: 270 });
@@ -142,17 +110,9 @@ export function CardSwipeSlide({ width, height, isActive, onNext }: Props) {
     return () => clearInterval(id);
   }, [isActive, contentX, contentFade, nextVariant]);
 
-  const wrapAnim = useAnimatedStyle(() => ({
-    opacity: wrapOpacity.value,
-    transform: [{ translateY: wrapY.value }],
-  }));
   const contentAnim = useAnimatedStyle(() => ({
     opacity: contentFade.value,
     transform: [{ translateX: contentX.value }],
-  }));
-  const gesturesAnim = useAnimatedStyle(() => ({
-    opacity: gesturesOpacity.value,
-    transform: [{ translateY: gesturesY.value }],
   }));
 
   const current = VARIANTS[variantIdx];
@@ -173,102 +133,15 @@ export function CardSwipeSlide({ width, height, isActive, onNext }: Props) {
           </Typography>
         </View>
 
-        {/* Mock FeedCard — content cycles through language variants */}
-        <Animated.View style={[styles.cardWrap, wrapAnim]}>
-          <View
-            style={[
-              styles.mockCard,
-              { backgroundColor: theme.colors.background },
-            ]}
-          >
-            <GlowBackground subtle />
-            <Animated.View style={[styles.heroArea, contentAnim]}>
-              <Typography
-                variant="display"
-                weight="extraBold"
-                style={[styles.expression, { color: theme.colors.primary }]}
-              >
-                {current.expression}
-              </Typography>
-            </Animated.View>
-            <LinearGradient
-              colors={[
-                theme.colors.feedCardScrimStart,
-                theme.colors.feedCardScrimEnd,
-              ]}
-              style={styles.scrim}
-              pointerEvents="none"
-            />
-            <View
-              style={[
-                styles.tray,
-                { backgroundColor: theme.colors.feedTrayBg },
-              ]}
-            >
-              <Animated.View style={contentAnim}>
-                <Typography
-                  variant="body"
-                  weight="medium"
-                  style={[
-                    styles.meaning,
-                    { color: theme.colors.textSecondary },
-                  ]}
-                  numberOfLines={1}
-                >
-                  {current.meaning}
-                </Typography>
-              </Animated.View>
-              <View style={styles.tagsActions}>
-                <Animated.View style={[styles.tagsRow, contentAnim]}>
-                  <CategoryChip label={current.lang} />
-                  <CategoryChip label="INFORMAL" />
-                </Animated.View>
-                <View style={styles.actions}>
-                  <IconButton
-                    icon="chevron-forward"
-                    onPress={() => {}}
-                    variant="bare"
-                    iconSize={20}
-                    containerSize={36}
-                    borderRadius={theme.radius.full}
-                    accessibilityLabel={t("home.expandIdiom")}
-                  />
-                  <IconButton
-                    icon="heart-outline"
-                    onPress={() => {}}
-                    variant="primary"
-                    iconSize={20}
-                    containerSize={40}
-                    borderRadius={theme.radius.full}
-                    accessibilityLabel={t("home.saveIdiom")}
-                  />
-                </View>
-              </View>
-            </View>
-          </View>
-
-          {/* Language dots — show which variant is active */}
-          <View style={styles.variantDots}>
-            {VARIANTS.map((v, i) => (
-              <View
-                key={v.lang}
-                style={[
-                  styles.variantDot,
-                  {
-                    backgroundColor:
-                      i === variantIdx
-                        ? theme.colors.primary
-                        : theme.colors.progressTrack,
-                    width: i === variantIdx ? 16 : 5,
-                  },
-                ]}
-              />
-            ))}
-          </View>
-        </Animated.View>
+        <MockFeedCard
+          current={current}
+          variantIdx={variantIdx}
+          totalVariants={VARIANTS.length}
+          contentAnim={contentAnim}
+        />
 
         {/* Gesture guide — 3 real interactions */}
-        <Animated.View style={[styles.gestureList, gesturesAnim]}>
+        <View style={styles.gestureList}>
           {GESTURES.map(({ icon, labelKey, descKey, usePrimary }) => (
             <View key={labelKey} style={styles.gestureRow}>
               <View
@@ -302,7 +175,7 @@ export function CardSwipeSlide({ width, height, isActive, onNext }: Props) {
               </View>
             </View>
           ))}
-        </Animated.View>
+        </View>
 
         <View style={styles.spacer} />
 
@@ -334,71 +207,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   centered: {
     textAlign: "center",
-  },
-  cardWrap: {
-    width: "100%",
-    gap: theme.spacing.sm,
-  },
-  mockCard: {
-    width: "100%",
-    borderRadius: theme.radius["2xl"],
-    overflow: "hidden",
-    height: 178,
-  },
-  heroArea: {
-    flex: 1,
-    justifyContent: "flex-end",
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.xs,
-  },
-  expression: {
-    fontSize: 30,
-    lineHeight: 36,
-    letterSpacing: -1.5,
-  },
-  scrim: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 110,
-  },
-  tray: {
-    borderTopLeftRadius: theme.radius["2xl"],
-    borderTopRightRadius: theme.radius["2xl"],
-    paddingTop: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.sm,
-    gap: theme.spacing.xs,
-    zIndex: 2,
-  },
-  meaning: {
-    letterSpacing: 0.1,
-  },
-  tagsActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.sm,
-  },
-  tagsRow: {
-    flex: 1,
-    flexDirection: "row",
-    gap: theme.spacing.xs,
-  },
-  actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.xs,
-  },
-  variantDots: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: theme.spacing.xs,
-  },
-  variantDot: {
-    height: 5,
-    borderRadius: theme.radius.full,
   },
   gestureList: {
     width: "100%",

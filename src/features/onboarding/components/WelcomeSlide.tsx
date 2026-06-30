@@ -4,6 +4,8 @@ import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Typography } from "@/shared/components/Typography";
 
+const APP_NAME = "Idioms";
+
 const FEATURES = [
   { icon: "earth-outline", key: "onboarding.pillLanguages" },
   { icon: "chatbubble-ellipses-outline", key: "onboarding.pillContexts" },
@@ -49,7 +51,7 @@ export function WelcomeSlide({ width, height, onNext }: Props) {
             weight="bold"
             style={[styles.appName, { color: theme.colors.text }]}
           >
-            IdiomDeck
+            {APP_NAME}
           </Typography>
           <Typography
             variant="body"

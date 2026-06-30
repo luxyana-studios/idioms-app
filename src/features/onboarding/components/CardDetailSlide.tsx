@@ -5,8 +5,6 @@ import { View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -33,74 +31,34 @@ export function CardDetailSlide({ width, height, isActive, onNext }: Props) {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
 
-  const headerOpacity = useSharedValue(0);
-  const headerY = useSharedValue(16);
-  const contentOpacity = useSharedValue(0);
-  const contentY = useSharedValue(20);
-  const equivOpacity = useSharedValue(0);
-  const equivY = useSharedValue(12);
+  const opacity = useSharedValue(0);
 
   useEffect(() => {
-    if (isActive) {
-      headerOpacity.value = withDelay(60, withTiming(1, { duration: 320 }));
-      headerY.value = withDelay(60, withSpring(0, { damping: 18 }));
-      contentOpacity.value = withDelay(280, withTiming(1, { duration: 360 }));
-      contentY.value = withDelay(280, withSpring(0, { damping: 16 }));
-      equivOpacity.value = withDelay(540, withTiming(1, { duration: 320 }));
-      equivY.value = withDelay(540, withSpring(0, { damping: 18 }));
-    } else {
-      headerOpacity.value = 0;
-      headerY.value = 16;
-      contentOpacity.value = 0;
-      contentY.value = 20;
-      equivOpacity.value = 0;
-      equivY.value = 12;
-    }
-  }, [
-    isActive,
-    headerOpacity,
-    headerY,
-    contentOpacity,
-    contentY,
-    equivOpacity,
-    equivY,
-  ]);
+    opacity.value = isActive ? withTiming(1, { duration: 350 }) : 0;
+  }, [isActive, opacity]);
 
-  const headerAnim = useAnimatedStyle(() => ({
-    opacity: headerOpacity.value,
-    transform: [{ translateY: headerY.value }],
-  }));
-  const contentAnim = useAnimatedStyle(() => ({
-    opacity: contentOpacity.value,
-    transform: [{ translateY: contentY.value }],
-  }));
-  const equivAnim = useAnimatedStyle(() => ({
-    opacity: equivOpacity.value,
-    transform: [{ translateY: equivY.value }],
-  }));
+  const fadeAnim = useAnimatedStyle(() => ({ opacity: opacity.value }));
 
   return (
     <View style={[styles.slide, { width, height }]}>
       <GlowBackground subtle />
-      <View style={styles.inner}>
-        <Animated.View style={[styles.titleBlock, headerAnim]}>
+      <Animated.View style={[styles.inner, fadeAnim]}>
+        <View style={styles.titleBlock}>
           <Typography variant="heading" weight="bold" style={styles.centered}>
             {t("onboarding.cardDetailTitle")}
           </Typography>
-        </Animated.View>
+        </View>
 
         {/* Detail view mock — mirrors the actual [id].tsx detail screen */}
-        <Animated.View
+        <View
           style={[
             styles.detailCard,
-            contentAnim,
             {
               backgroundColor: theme.colors.surfaceContainerLow,
               borderColor: theme.colors.border,
             },
           ]}
         >
-          {/* Expression + meaning */}
           <Typography
             variant="title"
             weight="extraBold"
@@ -116,13 +74,11 @@ export function CardDetailSlide({ width, height, isActive, onNext }: Props) {
             {t("onboarding.idiomMeaning")}
           </Typography>
 
-          {/* Tags */}
           <View style={styles.tagsRow}>
             <CategoryChip label="EN" />
             <CategoryChip label="INFORMAL" />
           </View>
 
-          {/* Origin section — uses real IdiomInfoCard */}
           <IdiomInfoCard label={t("onboarding.originLabel")}>
             <Typography
               variant="body"
@@ -133,10 +89,10 @@ export function CardDetailSlide({ width, height, isActive, onNext }: Props) {
               {t("onboarding.idiomOriginText")}
             </Typography>
           </IdiomInfoCard>
-        </Animated.View>
+        </View>
 
         {/* Equivalents section */}
-        <Animated.View style={[styles.equivSection, equivAnim]}>
+        <View style={styles.equivSection}>
           <View style={styles.equivHeader}>
             <Ionicons
               name="earth-outline"
@@ -174,7 +130,7 @@ export function CardDetailSlide({ width, height, isActive, onNext }: Props) {
               />
             </View>
           ))}
-        </Animated.View>
+        </View>
 
         <View style={styles.spacer} />
 
@@ -183,7 +139,7 @@ export function CardDetailSlide({ width, height, isActive, onNext }: Props) {
           onPress={onNext}
           style={styles.cta}
         />
-      </View>
+      </Animated.View>
     </View>
   );
 }
