@@ -62,7 +62,7 @@ describe("useSurpriseIdiom", () => {
       makeRpcResolve([makeIdiomRow("id-1"), makeIdiomRow("id-2")]),
     );
 
-    const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
+    const { result } = await renderHook(() => useSurpriseIdiom(), { wrapper });
 
     await waitFor(() => expect(result.current.idiom?.id).toBe("id-1"));
 
@@ -84,7 +84,7 @@ describe("useSurpriseIdiom", () => {
       ]),
     );
 
-    const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
+    const { result } = await renderHook(() => useSurpriseIdiom(), { wrapper });
     await waitFor(() => expect(result.current.idiom?.id).toBe("id-1"));
 
     const callsBefore = mockRpc.mock.calls.length;
@@ -102,7 +102,7 @@ describe("useSurpriseIdiom", () => {
       .mockReturnValueOnce(makeRpcResolve([makeIdiomRow("id-1")]))
       .mockReturnValueOnce(makeRpcResolve([makeIdiomRow("id-2")]));
 
-    const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
+    const { result } = await renderHook(() => useSurpriseIdiom(), { wrapper });
     await waitFor(() => expect(result.current.idiom?.id).toBe("id-1"));
 
     await act(async () => {
@@ -124,7 +124,7 @@ describe("useSurpriseIdiom", () => {
       .mockReturnValueOnce(makeRpcResolve([]))
       .mockReturnValueOnce(makeRpcResolve([makeIdiomRow("id-fresh")]));
 
-    const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
+    const { result } = await renderHook(() => useSurpriseIdiom(), { wrapper });
     await waitFor(() => expect(result.current.idiom?.id).toBe("id-fresh"));
 
     expect(mockRpc).toHaveBeenCalledTimes(2);
@@ -140,7 +140,7 @@ describe("useSurpriseIdiom", () => {
       .mockReturnValueOnce(makeRpcResolve([]))
       .mockReturnValueOnce(makeRpcReject({ message: "db error" }));
 
-    const { result } = renderHook(() => useSurpriseIdiom(), { wrapper });
+    const { result } = await renderHook(() => useSurpriseIdiom(), { wrapper });
     await waitFor(() => expect(result.current.isError).toBe(true));
 
     expect(result.current.idiom).toBeNull();

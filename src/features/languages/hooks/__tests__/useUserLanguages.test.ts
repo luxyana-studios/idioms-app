@@ -74,10 +74,10 @@ describe("useUserLanguages", () => {
     mockUseAuth.mockReturnValue({ user: { id: "u-1" }, initialized: true });
   });
 
-  it("is disabled until auth is initialized", () => {
+  it("is disabled until auth is initialized", async () => {
     mockUseAuth.mockReturnValue({ user: null, initialized: false });
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -86,10 +86,10 @@ describe("useUserLanguages", () => {
     expect(mockFrom).not.toHaveBeenCalled();
   });
 
-  it("is disabled when there is no signed-in user", () => {
+  it("is disabled when there is no signed-in user", async () => {
     mockUseAuth.mockReturnValue({ user: null, initialized: true });
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -116,7 +116,7 @@ describe("useUserLanguages", () => {
     ];
     mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -176,7 +176,7 @@ describe("useUserLanguages", () => {
     ];
     mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -210,7 +210,7 @@ describe("useUserLanguages", () => {
     ];
     mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -240,7 +240,7 @@ describe("useUserLanguages", () => {
     ];
     mockFrom.mockReturnValueOnce(makeSelectChain({ data: rows, error: null }));
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -259,7 +259,7 @@ describe("useUserLanguages", () => {
       makeSelectChain({ data: null, error: dbError }),
     );
 
-    const { result } = renderHook(() => useUserLanguages(), {
+    const { result } = await renderHook(() => useUserLanguages(), {
       wrapper: makeWrapper(),
     });
 

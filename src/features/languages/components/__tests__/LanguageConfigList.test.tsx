@@ -114,14 +114,14 @@ beforeEach(() => {
 });
 
 describe("LanguageConfigList", () => {
-  it("renders selected languages first, then remaining available ones", () => {
-    const { getAllByTestId } = render(<LanguageConfigList />);
+  it("renders selected languages first, then remaining available ones", async () => {
+    const { getAllByTestId } = await render(<LanguageConfigList />);
     const order = getAllByTestId(/^row-/).map((node) => node.props.testID);
     expect(order).toEqual(["row-es", "row-fr", "row-en"]);
   });
 
-  it("adds an unselected language with its suggested defaults", () => {
-    const { getByTestId } = render(<LanguageConfigList />);
+  it("adds an unselected language with its suggested defaults", async () => {
+    const { getByTestId } = await render(<LanguageConfigList />);
     fireEvent.press(getByTestId("toggle-fr"));
     expect(mockAddMutate).toHaveBeenCalledWith({
       languageCode: "fr",
@@ -131,7 +131,7 @@ describe("LanguageConfigList", () => {
     });
   });
 
-  it("removes an already-selected language when more than one is configured", () => {
+  it("removes an already-selected language when more than one is configured", async () => {
     mockUseUserLanguages.mockReturnValue(
       languageState({
         configured: [
@@ -141,15 +141,15 @@ describe("LanguageConfigList", () => {
         available: [],
       }),
     );
-    const { getByTestId } = render(<LanguageConfigList />);
+    const { getByTestId } = await render(<LanguageConfigList />);
     fireEvent.press(getByTestId("toggle-es"));
     expect(mockRemoveMutate).toHaveBeenCalledWith("es");
   });
 
-  it("blocks removing the last configured language", () => {
+  it("blocks removing the last configured language", async () => {
     const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
     // Default state has a single configured language (es).
-    const { getByTestId } = render(<LanguageConfigList />);
+    const { getByTestId } = await render(<LanguageConfigList />);
     fireEvent.press(getByTestId("toggle-es"));
     expect(mockRemoveMutate).not.toHaveBeenCalled();
     expect(alertSpy).toHaveBeenCalledWith(
@@ -159,8 +159,8 @@ describe("LanguageConfigList", () => {
     alertSpy.mockRestore();
   });
 
-  it("updates color via the update mutation", () => {
-    const { getByTestId } = render(<LanguageConfigList />);
+  it("updates color via the update mutation", async () => {
+    const { getByTestId } = await render(<LanguageConfigList />);
     fireEvent.press(getByTestId("color-es"));
     expect(mockUpdateMutate).toHaveBeenCalledWith({
       languageCode: "es",
@@ -168,7 +168,7 @@ describe("LanguageConfigList", () => {
     });
   });
 
-  it("reorders by swapping adjacent selected languages", () => {
+  it("reorders by swapping adjacent selected languages", async () => {
     mockUseUserLanguages.mockReturnValue(
       languageState({
         configured: [
@@ -178,16 +178,16 @@ describe("LanguageConfigList", () => {
         available: [],
       }),
     );
-    const { getByTestId } = render(<LanguageConfigList />);
+    const { getByTestId } = await render(<LanguageConfigList />);
     fireEvent.press(getByTestId("dragdown-es"));
     expect(mockReorderMutate).toHaveBeenCalledWith(["fr", "es"]);
   });
 
-  it("shows the empty state when nothing is available", () => {
+  it("shows the empty state when nothing is available", async () => {
     mockUseUserLanguages.mockReturnValue(
       languageState({ configured: [], available: [] }),
     );
-    const { getByText } = render(<LanguageConfigList />);
+    const { getByText } = await render(<LanguageConfigList />);
     expect(getByText("languages.empty")).toBeTruthy();
   });
 });

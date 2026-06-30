@@ -60,6 +60,7 @@
     "lefthook": "^2.1.9",
     "react-test-renderer": "19.2.7",
     "supabase": "^2.108.0",
+    "test-renderer": "^1.2.0",
     "typescript": "~6.0.3"
   },
   "private": true,
