@@ -2,7 +2,7 @@ import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
 import { StepProgress } from "@/features/onboarding/components/StepProgress";
 import { Button } from "@/shared/components/Button";
@@ -14,7 +14,6 @@ const IS_DEMO = !process.env.EXPO_PUBLIC_SUPABASE_URL;
 
 export default function AccountScreen() {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
   const router = useRouter();
   const { signUp, loading } = useAuthStore();
 
@@ -26,7 +25,7 @@ export default function AccountScreen() {
   const handleCreate = async () => {
     setError(null);
     if (!name.trim()) {
-      setError(`${t("auth.fullName")} is required`);
+      setError(t("auth.fieldRequired", { field: t("auth.fullName") }));
       return;
     }
     if (password.length < 6) {
@@ -54,20 +53,14 @@ export default function AccountScreen() {
           <Typography variant="title" weight="bold">
             {t("onboarding.accountTitle")}
           </Typography>
-          <Typography
-            variant="body"
-            style={{ color: theme.colors.textSecondary }}
-          >
+          <Typography variant="body" style={styles.subtitle}>
             {t("onboarding.accountSubtitle")}
           </Typography>
         </View>
 
         {IS_DEMO ? (
           <View style={styles.devBox}>
-            <Typography
-              variant="caption"
-              style={{ color: theme.colors.textMuted, textAlign: "center" }}
-            >
+            <Typography variant="caption" style={styles.devNote}>
               {t("onboarding.accountDevMode")}
             </Typography>
             <Button
@@ -123,10 +116,7 @@ export default function AccountScreen() {
             />
 
             <Link href="/(auth)/login" style={styles.link}>
-              <Typography
-                variant="caption"
-                style={{ color: theme.colors.primary, textAlign: "center" }}
-              >
+              <Typography variant="caption" style={styles.loginLink}>
                 {t("auth.hasAccount")} {t("auth.signIn")}
               </Typography>
             </Link>
@@ -146,7 +136,18 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.lg,
   },
   header: {
-    gap: 6,
+    gap: theme.spacing["2xs"],
+  },
+  subtitle: {
+    color: theme.colors.textSecondary,
+  },
+  devNote: {
+    color: theme.colors.textMuted,
+    textAlign: "center",
+  },
+  loginLink: {
+    color: theme.colors.primary,
+    textAlign: "center",
   },
   form: {
     flex: 1,

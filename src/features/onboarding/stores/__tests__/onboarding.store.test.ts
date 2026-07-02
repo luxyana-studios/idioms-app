@@ -25,19 +25,6 @@ describe("useOnboardingStore", () => {
     expect(selectedLanguageCodes).toEqual([]);
   });
 
-  it("setGoals updates goals", () => {
-    useOnboardingStore.getState().setGoals(["fun", "travel"]);
-    expect(useOnboardingStore.getState().goals).toEqual(["fun", "travel"]);
-  });
-
-  it("setSelectedLanguageCodes updates codes", () => {
-    useOnboardingStore.getState().setSelectedLanguageCodes(["en", "es"]);
-    expect(useOnboardingStore.getState().selectedLanguageCodes).toEqual([
-      "en",
-      "es",
-    ]);
-  });
-
   it("complete marks completed as true", () => {
     useOnboardingStore.getState().complete();
     expect(useOnboardingStore.getState().completed).toBe(true);

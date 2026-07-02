@@ -40,7 +40,7 @@ export default function CompleteScreen() {
       );
     } finally {
       complete();
-      router.replace("/(main)/(tabs)/(home)");
+      router.replace("/");
     }
   };
 

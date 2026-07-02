@@ -6,6 +6,11 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProviders } from "@/core/providers/AppProviders";
 import { useLoadFonts } from "@/core/theme/fonts";
 import { useAuthStore } from "@/features/auth/stores/auth.store";
+import {
+  DEV_ALWAYS_SHOW_ONBOARDING,
+  DEV_SKIP_ONBOARDING,
+  useOnboardingStore,
+} from "@/features/onboarding/stores/onboarding.store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -13,18 +18,30 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const segments = useSegments();
   const { session, initialized } = useAuthStore();
+  const { completed, reset } = useOnboardingStore();
+
+  // In dev, reset onboarding on each launch so the flow is always testable
+  useEffect(() => {
+    if (DEV_ALWAYS_SHOW_ONBOARDING) reset();
+  }, [reset]);
 
   useEffect(() => {
     if (!initialized) return;
 
+    const inOnboarding = segments[0] === "(onboarding)";
     const inAuth = segments[0] === "(auth)";
 
-    if (!session && !inAuth) {
+    if (!DEV_SKIP_ONBOARDING && !completed && !inOnboarding) {
+      router.replace("/(onboarding)");
+      return;
+    }
+
+    if (!session && !inAuth && !inOnboarding) {
       router.replace("/(auth)/login");
     } else if (session && inAuth) {
       router.replace("/(main)/(tabs)/(home)");
     }
-  }, [session, initialized, segments, router.replace]);
+  }, [session, initialized, segments, completed, router.replace]);
 
   return <>{children}</>;
 }

@@ -15,8 +15,6 @@ interface OnboardingState {
   completed: boolean;
   goals: string[];
   selectedLanguageCodes: string[];
-  setGoals: (goals: string[]) => void;
-  setSelectedLanguageCodes: (codes: string[]) => void;
   toggleGoal: (id: string) => void;
   toggleLanguage: (code: string) => void;
   complete: () => void;
@@ -30,9 +28,6 @@ export const useOnboardingStore = create<OnboardingState>()(
       goals: [],
       selectedLanguageCodes: [],
 
-      setGoals: (goals) => set({ goals }),
-      setSelectedLanguageCodes: (codes) =>
-        set({ selectedLanguageCodes: codes }),
       toggleGoal: (id) =>
         set((state) => ({
           goals: state.goals.includes(id)

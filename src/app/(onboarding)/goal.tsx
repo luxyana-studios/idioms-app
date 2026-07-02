@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { GoalCard } from "@/features/onboarding/components/GoalCard";
 import { StepProgress } from "@/features/onboarding/components/StepProgress";
 import { useOnboardingStore } from "@/features/onboarding/stores/onboarding.store";
@@ -19,7 +19,6 @@ const GOALS = [
 
 export default function GoalScreen() {
   const { t } = useTranslation();
-  const { theme } = useUnistyles();
   const router = useRouter();
   const { goals, toggleGoal } = useOnboardingStore();
 
@@ -32,10 +31,7 @@ export default function GoalScreen() {
           <Typography variant="title" weight="bold">
             {t("onboarding.goalTitle")}
           </Typography>
-          <Typography
-            variant="body"
-            style={{ color: theme.colors.textSecondary }}
-          >
+          <Typography variant="body" style={styles.subtitle}>
             {t("onboarding.goalSubtitle")}
           </Typography>
         </View>
@@ -70,7 +66,10 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.lg,
   },
   header: {
-    gap: 6,
+    gap: theme.spacing["2xs"],
+  },
+  subtitle: {
+    color: theme.colors.textSecondary,
   },
   goals: {
     flex: 1,

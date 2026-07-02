@@ -40,14 +40,14 @@
     "react-native": "0.86.0",
     "react-native-gesture-handler": "~3.0.2",
     "react-native-mmkv": "^4.3.2",
+    "react-native-purchases": "^10.4.0",
     "react-native-reanimated": "4.5.0",
     "react-native-safe-area-context": "~5.8.0",
     "react-native-screens": "~4.25.2",
     "react-native-svg": "15.15.5",
     "react-native-unistyles": "^3.2.5",
     "react-native-web": "^0.21.0",
-    "zustand": "^5.0.14",
-    "react-native-purchases": "^10.4.0"
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
@@ -60,7 +60,6 @@
     "lefthook": "^2.1.9",
     "react-test-renderer": "19.2.7",
     "supabase": "^2.108.0",
-    "test-renderer": "^1.2.0",
     "typescript": "~6.0.3"
   },
   "private": true,

@@ -138,7 +138,7 @@ export default function PaywallScreen() {
         {isPaymentConfigured && !packages && (
           <ActivityIndicator
             color={theme.colors.primary}
-            style={{ marginVertical: 24 }}
+            style={styles.loadingIndicator}
           />
         )}
 
@@ -176,11 +176,7 @@ export default function PaywallScreen() {
         )}
 
         {error ? (
-          <Typography
-            variant="caption"
-            color="error"
-            style={{ textAlign: "center", marginBottom: 8 }}
-          >
+          <Typography variant="caption" color="error" style={styles.errorText}>
             {error}
           </Typography>
         ) : null}
@@ -210,10 +206,7 @@ export default function PaywallScreen() {
             accessibilityRole="button"
             style={styles.restoreBtn}
           >
-            <Typography
-              variant="caption"
-              style={{ color: theme.colors.primary }}
-            >
+            <Typography variant="caption" style={styles.restoreText}>
               {t("onboarding.restorePurchases")}
             </Typography>
           </Pressable>
@@ -276,5 +269,15 @@ const styles = StyleSheet.create((theme) => ({
   },
   legalNote: {
     marginTop: theme.spacing.sm,
+  },
+  loadingIndicator: {
+    marginVertical: theme.spacing.xl,
+  },
+  errorText: {
+    textAlign: "center",
+    marginBottom: theme.spacing.sm,
+  },
+  restoreText: {
+    color: theme.colors.primary,
   },
 }));
