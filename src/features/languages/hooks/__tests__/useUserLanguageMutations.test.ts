@@ -86,7 +86,7 @@ describe("user language mutations", () => {
     const upsert = jest.fn(() => Promise.resolve({ error: null }));
     mockFrom.mockReturnValue({ upsert });
 
-    const { result } = renderHook(() => useAddUserLanguage(), {
+    const { result } = await renderHook(() => useAddUserLanguage(), {
       wrapper: makeWrapper(),
     });
 
@@ -112,7 +112,7 @@ describe("user language mutations", () => {
     const update = jest.fn(() => ({ eq: eq1 }));
     mockFrom.mockReturnValue({ update });
 
-    const { result } = renderHook(() => useUpdateUserLanguage(), {
+    const { result } = await renderHook(() => useUpdateUserLanguage(), {
       wrapper: makeWrapper(),
     });
 
@@ -130,7 +130,7 @@ describe("user language mutations", () => {
     const del = jest.fn(() => ({ eq: eq1 }));
     mockFrom.mockReturnValue({ delete: del });
 
-    const { result } = renderHook(() => useRemoveUserLanguage(), {
+    const { result } = await renderHook(() => useRemoveUserLanguage(), {
       wrapper: makeWrapper(),
     });
 
@@ -145,7 +145,7 @@ describe("user language mutations", () => {
     mockUseAuth.mockReturnValue({ user: null, initialized: true });
     mockFrom.mockReturnValue({ upsert: jest.fn() });
 
-    const { result } = renderHook(() => useAddUserLanguage(), {
+    const { result } = await renderHook(() => useAddUserLanguage(), {
       wrapper: makeWrapper(),
     });
 
@@ -167,7 +167,7 @@ describe("useReorderUserLanguages", () => {
     const positions: Array<Record<string, unknown>> = [];
     mockFrom.mockReturnValue(makeUpdateChain(positions));
 
-    const { result } = renderHook(() => useReorderUserLanguages(), {
+    const { result } = await renderHook(() => useReorderUserLanguages(), {
       wrapper: makeWrapper(),
     });
 
@@ -190,7 +190,9 @@ describe("useReorderUserLanguages", () => {
       row({ languageCode: "fr", position: 1 }),
     ]);
 
-    const { result } = renderHook(() => useReorderUserLanguages(), { wrapper });
+    const { result } = await renderHook(() => useReorderUserLanguages(), {
+      wrapper,
+    });
 
     result.current.mutate(["fr", "es"]);
 
@@ -228,7 +230,9 @@ describe("optimistic add / update / remove", () => {
       row({ languageCode: "fr", isConfigured: false, isActive: false }),
     ]);
 
-    const { result } = renderHook(() => useAddUserLanguage(), { wrapper });
+    const { result } = await renderHook(() => useAddUserLanguage(), {
+      wrapper,
+    });
     result.current.mutate({
       languageCode: "fr",
       color: "#3B5BA5",
@@ -255,7 +259,9 @@ describe("optimistic add / update / remove", () => {
       row({ languageCode: "fr" }),
     ]);
 
-    const { result } = renderHook(() => useRemoveUserLanguage(), { wrapper });
+    const { result } = await renderHook(() => useRemoveUserLanguage(), {
+      wrapper,
+    });
     result.current.mutate("es");
 
     // "es" stays in the catalog (it's a global default) but drops out of the
@@ -275,7 +281,9 @@ describe("optimistic add / update / remove", () => {
       row({ languageCode: "es", color: "#C96F4A" }),
     ]);
 
-    const { result } = renderHook(() => useUpdateUserLanguage(), { wrapper });
+    const { result } = await renderHook(() => useUpdateUserLanguage(), {
+      wrapper,
+    });
     result.current.mutate({ languageCode: "es", patch: { color: "#3B5BA5" } });
 
     await waitFor(() => expect(rows()?.[0]?.color).toBe("#3B5BA5"));
@@ -292,7 +300,9 @@ describe("optimistic add / update / remove", () => {
       row({ languageCode: "fr" }),
     ]);
 
-    const { result } = renderHook(() => useRemoveUserLanguage(), { wrapper });
+    const { result } = await renderHook(() => useRemoveUserLanguage(), {
+      wrapper,
+    });
     result.current.mutate("es");
 
     await waitFor(() => expect(result.current.isError).toBe(true));

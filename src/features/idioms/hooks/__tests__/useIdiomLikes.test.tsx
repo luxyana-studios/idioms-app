@@ -89,7 +89,7 @@ describe("useLikedIdiomIds", () => {
     );
 
     const queryClient = makeQueryClient();
-    const { result } = renderHook(() => useLikedIdiomIds(), {
+    const { result } = await renderHook(() => useLikedIdiomIds(), {
       wrapper: makeWrapper(queryClient),
     });
 
@@ -100,11 +100,11 @@ describe("useLikedIdiomIds", () => {
     expect(result.current.data?.size).toBe(2);
   });
 
-  it("is disabled when there is no user", () => {
+  it("is disabled when there is no user", async () => {
     mockUseAuth.mockReturnValue({ user: null, initialized: true });
 
     const queryClient = makeQueryClient();
-    const { result } = renderHook(() => useLikedIdiomIds(), {
+    const { result } = await renderHook(() => useLikedIdiomIds(), {
       wrapper: makeWrapper(queryClient),
     });
 
@@ -129,7 +129,7 @@ describe("useToggleIdiomLike", () => {
 
     mockFrom.mockImplementation(() => makeUpsertChain({ error: null }));
 
-    const { result } = renderHook(() => useToggleIdiomLike(), {
+    const { result } = await renderHook(() => useToggleIdiomLike(), {
       wrapper: makeWrapper(queryClient),
     });
 
@@ -160,7 +160,7 @@ describe("useToggleIdiomLike", () => {
 
     mockFrom.mockImplementation(() => makeDeleteChain({ error: null }));
 
-    const { result } = renderHook(() => useToggleIdiomLike(), {
+    const { result } = await renderHook(() => useToggleIdiomLike(), {
       wrapper: makeWrapper(queryClient),
     });
 
@@ -192,7 +192,7 @@ describe("useToggleIdiomLike", () => {
       makeUpsertChain({ error: { message: "boom" } }),
     );
 
-    const { result } = renderHook(() => useToggleIdiomLike(), {
+    const { result } = await renderHook(() => useToggleIdiomLike(), {
       wrapper: makeWrapper(queryClient),
     });
 
@@ -221,7 +221,7 @@ describe("useToggleIdiomLike", () => {
     mockUseAuth.mockReturnValue({ user: null, initialized: true });
 
     const queryClient = makeQueryClient();
-    const { result } = renderHook(() => useToggleIdiomLike(), {
+    const { result } = await renderHook(() => useToggleIdiomLike(), {
       wrapper: makeWrapper(queryClient),
     });
 

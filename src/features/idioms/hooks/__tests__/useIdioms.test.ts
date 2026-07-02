@@ -47,7 +47,7 @@ describe("useIdioms", () => {
   });
 
   it("calls get_idiom_feed with the ordered language scope and UI language", async () => {
-    const { result } = renderHook(() => useIdioms(), {
+    const { result } = await renderHook(() => useIdioms(), {
       wrapper: makeWrapper(),
     });
 
@@ -66,7 +66,7 @@ describe("useIdioms", () => {
       isError: false,
     });
 
-    const { result } = renderHook(() => useIdioms(), {
+    const { result } = await renderHook(() => useIdioms(), {
       wrapper: makeWrapper(),
     });
 
@@ -78,14 +78,14 @@ describe("useIdioms", () => {
     });
   });
 
-  it("waits while language state is loading", () => {
+  it("waits while language state is loading", async () => {
     mockUseUserLanguages.mockReturnValue({
       languages: [language("es")],
       isLoading: true,
       isError: false,
     });
 
-    const { result } = renderHook(() => useIdioms(), {
+    const { result } = await renderHook(() => useIdioms(), {
       wrapper: makeWrapper(),
     });
 
@@ -135,7 +135,7 @@ describe("useIdioms", () => {
       error: null,
     });
 
-    const { result } = renderHook(() => useIdioms(), {
+    const { result } = await renderHook(() => useIdioms(), {
       wrapper: makeWrapper(),
     });
 
@@ -214,7 +214,7 @@ describe("useIdioms", () => {
       error: null,
     });
 
-    const { result } = renderHook(() => useIdioms(), {
+    const { result } = await renderHook(() => useIdioms(), {
       wrapper: makeWrapper(),
     });
 

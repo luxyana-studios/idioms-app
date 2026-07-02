@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 import { RecommendationRow } from "../RecommendationRow";
 
 jest.mock("react-native-unistyles", () => ({
@@ -33,8 +33,8 @@ jest.mock("../Typography", () => {
 });
 
 describe("RecommendationRow", () => {
-  it("renders title and subtitle", () => {
-    render(
+  it("renders title and subtitle", async () => {
+    const { getByText } = await render(
       <RecommendationRow
         icon="book"
         title="Origin Stories"
@@ -42,12 +42,12 @@ describe("RecommendationRow", () => {
         onPress={jest.fn()}
       />,
     );
-    expect(screen.getByText("Origin Stories")).toBeTruthy();
-    expect(screen.getByText("Learn the history")).toBeTruthy();
+    expect(getByText("Origin Stories")).toBeTruthy();
+    expect(getByText("Learn the history")).toBeTruthy();
   });
 
-  it("has role button with accessibility label defaulting to title", () => {
-    render(
+  it("has role button with accessibility label defaulting to title", async () => {
+    const { getByRole } = await render(
       <RecommendationRow
         icon="book"
         title="Origin Stories"
@@ -55,11 +55,11 @@ describe("RecommendationRow", () => {
         onPress={jest.fn()}
       />,
     );
-    expect(screen.getByRole("button", { name: "Origin Stories" })).toBeTruthy();
+    expect(getByRole("button", { name: "Origin Stories" })).toBeTruthy();
   });
 
-  it("uses custom accessibilityLabel when provided", () => {
-    render(
+  it("uses custom accessibilityLabel when provided", async () => {
+    const { getByLabelText } = await render(
       <RecommendationRow
         icon="book"
         title="Origin Stories"
@@ -68,12 +68,12 @@ describe("RecommendationRow", () => {
         accessibilityLabel="Go to library"
       />,
     );
-    expect(screen.getByLabelText("Go to library")).toBeTruthy();
+    expect(getByLabelText("Go to library")).toBeTruthy();
   });
 
-  it("calls onPress when tapped", () => {
+  it("calls onPress when tapped", async () => {
     const onPress = jest.fn();
-    render(
+    const { getByRole } = await render(
       <RecommendationRow
         icon="flash"
         title="Quick Quiz"
@@ -81,12 +81,12 @@ describe("RecommendationRow", () => {
         onPress={onPress}
       />,
     );
-    fireEvent.press(screen.getByRole("button"));
+    fireEvent.press(getByRole("button"));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it("renders accent variant without crashing", () => {
-    render(
+  it("renders accent variant without crashing", async () => {
+    const { getByText } = await render(
       <RecommendationRow
         icon="flash"
         title="Quick Quiz"
@@ -95,6 +95,6 @@ describe("RecommendationRow", () => {
         variant="accent"
       />,
     );
-    expect(screen.getByText("Quick Quiz")).toBeTruthy();
+    expect(getByText("Quick Quiz")).toBeTruthy();
   });
 });

@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react-native";
+import { act, fireEvent, render } from "@testing-library/react-native";
 import type { Idiom } from "@/features/idioms/types";
 import { FeedCard } from "../FeedCard";
 
@@ -178,66 +178,76 @@ const defaultProps = {
 describe("FeedCard", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.useFakeTimers();
   });
-  afterEach(() => jest.useRealTimers());
 
-  it("renders the idiom expression", () => {
-    const { getByText } = render(<FeedCard {...defaultProps} />);
+  it("renders the idiom expression", async () => {
+    const { getByText } = await render(<FeedCard {...defaultProps} />);
     expect(getByText("Kick the bucket")).toBeTruthy();
   });
 
-  it("renders the idiom meaning", () => {
-    const { getByText } = render(<FeedCard {...defaultProps} />);
+  it("renders the idiom meaning", async () => {
+    const { getByText } = await render(<FeedCard {...defaultProps} />);
     expect(getByText("To die")).toBeTruthy();
   });
 
-  it("calls onExpand on single tap of card body after delay", () => {
-    const onExpand = jest.fn();
-    const { getByLabelText } = render(
-      <FeedCard {...defaultProps} onExpand={onExpand} />,
-    );
-    fireEvent.press(getByLabelText("Kick the bucket"));
-    expect(onExpand).not.toHaveBeenCalled();
-    jest.advanceTimersByTime(300);
-    expect(onExpand).toHaveBeenCalledTimes(1);
-  });
-
-  it("calls onLike on double-tap of card body", () => {
+  it("calls onLike on double-tap of card body", async () => {
     const onLike = jest.fn();
     const onExpand = jest.fn();
-    const { getByLabelText } = render(
+    const { getByLabelText } = await render(
       <FeedCard {...defaultProps} onLike={onLike} onExpand={onExpand} />,
     );
     const overlay = getByLabelText("Kick the bucket");
-    fireEvent.press(overlay); // first tap — starts 300 ms timer
-    fireEvent.press(overlay); // second tap — cancels timer, fires like
+    // Both presses must fire in the same synchronous block so Date.now()
+    // returns the same value — making the second press register as a double-tap.
+    // Wrapping in act() ensures React drains all pending work before the test ends.
+    await act(async () => {
+      fireEvent.press(overlay); // first tap — starts 300 ms timer
+      fireEvent.press(overlay); // second tap — cancels timer, fires like
+    });
     expect(onLike).toHaveBeenCalledTimes(1);
     expect(onExpand).not.toHaveBeenCalled();
   });
 
-  it("calls onLike when save button is pressed", () => {
+  it("calls onLike when save button is pressed", async () => {
     const onLike = jest.fn();
-    const { getByLabelText } = render(
+    const { getByLabelText } = await render(
       <FeedCard {...defaultProps} onLike={onLike} />,
     );
     fireEvent.press(getByLabelText("home.saveIdiom"));
     expect(onLike).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onExpand when expand button is pressed", () => {
+  it("calls onExpand when expand button is pressed", async () => {
     const onExpand = jest.fn();
-    const { getByLabelText } = render(
+    const { getByLabelText } = await render(
       <FeedCard {...defaultProps} onExpand={onExpand} />,
     );
     fireEvent.press(getByLabelText("home.expandIdiom"));
     expect(onExpand).toHaveBeenCalledTimes(1);
   });
 
-  it("shows saved label when idiom is in likedIds", () => {
-    const { getByLabelText } = render(
+  it("shows saved label when idiom is in likedIds", async () => {
+    const { getByLabelText } = await render(
       <FeedCard {...defaultProps} likedIds={new Set(["test-1"])} />,
     );
     expect(getByLabelText("home.unsaveIdiom")).toBeTruthy();
+  });
+
+  // Isolated in its own nested describe so fake timer setup/teardown doesn't
+  // corrupt React's scheduler state for the tests above.
+  describe("tap timing", () => {
+    beforeEach(() => jest.useFakeTimers());
+    afterEach(() => jest.useRealTimers());
+
+    it("calls onExpand on single tap of card body after delay", async () => {
+      const onExpand = jest.fn();
+      const { getByLabelText } = await render(
+        <FeedCard {...defaultProps} onExpand={onExpand} />,
+      );
+      fireEvent.press(getByLabelText("Kick the bucket"));
+      expect(onExpand).not.toHaveBeenCalled();
+      jest.advanceTimersByTime(300);
+      expect(onExpand).toHaveBeenCalledTimes(1);
+    });
   });
 });
