@@ -1,6 +1,6 @@
-# IdiomDeck
+# MyIdioms
 
-Learn the art of language through beautifully crafted idiom cards. IdiomDeck is a mobile app for discovering, learning, and mastering idiomatic expressions through a swipe-based card deck experience.
+Learn the art of language through beautifully crafted idiom cards. MyIdioms is a mobile app for discovering, learning, and mastering idiomatic expressions through a swipe-based card deck experience.
 
 ## Features
 
@@ -29,7 +29,7 @@ Learn the art of language through beautifully crafted idiom cards. IdiomDeck is 
 
 ## Design System
 
-IdiomDeck uses two Material Design 3-based color palettes:
+MyIdioms uses two Material Design 3-based color palettes:
 
 - **Terra Ethos** (dark) — deep earthy tones, `#16130e` background, `#ecbe8e` primary (warm tan), `#bfcab1` secondary (sage)
 - **Futurist Serenity** (light) — cream base, `#fcf9f4` background, `#914731` primary (terracotta), `#596244` secondary (sage)

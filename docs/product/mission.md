@@ -2,15 +2,15 @@
 
 ## Core Idea
 
-Idioms is an app for discovering, understanding, and comparing idiomatic expressions across languages.
+MyIdioms is an app for discovering, understanding, and comparing idiomatic expressions across languages.
 
-Most apps treat idioms as vocabulary to memorize. Idioms treats them as **cultural puzzles to understand** — by making the gap between what an expression literally says and what it actually means visible, explorable, and connected across languages.
+Most apps treat idioms as vocabulary to memorize. MyIdioms treats them as **cultural puzzles to understand** — by making the gap between what an expression literally says and what it actually means visible, explorable, and connected across languages.
 
 ---
 
 ## USP
 
-> "Idioms doesn't just tell you what an expression means — it shows you how that same idea is expressed across cultures, in their own words."
+> "MyIdioms doesn't just tell you what an expression means — it shows you how that same idea is expressed across cultures, in their own words."
 
 ---
 
@@ -39,7 +39,7 @@ Someone learning a language, or curious about language and culture, who wants to
 
 ## Competitive Differentiation
 
-| Other apps | Idioms |
+| Other apps | MyIdioms |
 |---|---|
 | Treat idioms as vocab | Treats them as cultural puzzles |
 | Memorize the meaning | Understand *why* meaning differs from wording |

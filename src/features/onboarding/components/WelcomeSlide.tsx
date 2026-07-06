@@ -4,7 +4,7 @@ import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Typography } from "@/shared/components/Typography";
 
-const APP_NAME = "Idioms";
+const APP_NAME = "MyIdioms";
 
 const FEATURES = [
   { icon: "earth-outline", key: "onboarding.pillLanguages" },

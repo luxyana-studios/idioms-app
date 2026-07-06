@@ -54,7 +54,7 @@ export function LoginForm() {
         weight="extraBold"
         style={[styles.appName, { color: theme.colors.text }]}
       >
-        Idioms
+        MyIdioms
       </Typography>
       <Typography
         variant="body"

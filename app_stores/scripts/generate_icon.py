@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-IdiomDeck — Premium App Icon 512x512
+MyIdioms — Premium App Icon 512x512
 Design: Luxury monogram seal. Deep warm dark background, gold circular
 ornamental ring, bold "ID" monogram, fine typographic details.
 Aesthetic: editorial / literary-luxury. Timeless, premium, distinctive.
