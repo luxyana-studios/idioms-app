@@ -2,9 +2,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { APP_NAME } from "@/core/constants";
 import { Typography } from "@/shared/components/Typography";
-
-const APP_NAME = "Idioms";
 
 const FEATURES = [
   { icon: "earth-outline", key: "onboarding.pillLanguages" },

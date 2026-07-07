@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Play Store assets for IdiomDeck."""
+"""Generate Play Store assets for MyIdioms."""
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import os
@@ -160,7 +160,7 @@ def make_feature_graphic(out_path):
               fill=(150, 130, 100), anchor="mm")
 
     title_f = font(110)
-    draw.text((cx, 245), "IdiomDeck", font=title_f,
+    draw.text((cx, 245), "MyIdioms", font=title_f,
               fill=TEXT_WHITE, anchor="mm")
 
     tagline_f = font(38)

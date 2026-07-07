@@ -10,6 +10,7 @@ import {
   UnistylesRuntime,
   useUnistyles,
 } from "react-native-unistyles";
+import { APP_NAME } from "@/core/constants";
 import { TextInput } from "@/shared/components/TextInput";
 import { Typography } from "@/shared/components/Typography";
 import { useAuth } from "../hooks/useAuth";
@@ -54,7 +55,7 @@ export function LoginForm() {
         weight="extraBold"
         style={[styles.appName, { color: theme.colors.text }]}
       >
-        Idioms
+        {APP_NAME}
       </Typography>
       <Typography
         variant="body"
