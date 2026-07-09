@@ -95,6 +95,39 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 The app runs without these in placeholder mode (auth and database features disabled).
 
+## Deployment
+
+Builds are shipped to the App Store (TestFlight internal) and Play Store (internal testing) via
+**EAS**. A manually-triggered GitHub Actions workflow (`.github/workflows/eas-build.yml`) runs
+`eas build --profile production --auto-submit` on Expo's cloud servers.
+
+**To ship a build:** GitHub → Actions → **EAS Build** → *Run workflow* → pick a platform
+(`all` / `android` / `ios`). Builds are then monitored on [expo.dev](https://expo.dev) → Builds.
+Promoting a tested build to the public store is always a separate manual step.
+
+Full reference — architecture, secrets, credentials, and version numbering — is in
+[`docs/eas-deployment.md`](docs/eas-deployment.md).
+
+### Testing the deployment setup locally
+
+Before relying on CI, validate the setup from your machine (cheapest checks first). The CLI is
+run on demand with `npx eas-cli@latest`, so nothing needs to be installed globally:
+
+```bash
+npx eas-cli@latest whoami                                              # 1. logged in, correct org (luxyana-studios)
+npx eas-cli@latest config --platform android --profile production      # 2. app.config.ts + eas.json resolve correctly
+npx eas-cli@latest secret:list                                         # 3. EAS submit secrets exist
+
+# 4. Compile the production profile locally — no cloud, no store (needs JDK 17 + Android SDK)
+npx eas-cli@latest build --platform android --profile production --local
+
+# 5. Full cloud build WITHOUT submitting — the safest end-to-end rehearsal of CI
+npx eas-cli@latest build --platform android --profile production --non-interactive
+```
+
+See [`docs/eas-deployment.md` §11](docs/eas-deployment.md#11-testing-the-setup-locally) for the
+full layered walkthrough (including verifying `EXPO_TOKEN` and running the workflow with `act`).
+
 ## Project Structure
 
 ```

@@ -4,6 +4,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "MyIdioms",
   slug: "idioms",
+  owner: "luxyana-studios",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
