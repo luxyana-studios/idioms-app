@@ -1,9 +1,17 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useIdiomsStore } from "../stores/idioms.store";
-import { useIdioms } from "./useIdioms";
+import { useIdiomsFeed } from "./useIdiomsFeed";
 
 export function useFeedList() {
-  const { data: idioms = [], isLoading, isError, refetch } = useIdioms();
+  const {
+    idioms = [],
+    isLoading,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useIdiomsFeed();
   const currentIndex = useIdiomsStore((s) => s.currentIndex);
   const setCurrentIndex = useIdiomsStore((s) => s.setCurrentIndex);
   const isShuffled = useIdiomsStore((s) => s.isShuffled);
@@ -22,12 +30,23 @@ export function useFeedList() {
 
   const allIdiomIds = useMemo(() => idioms.map((i) => i.id), [idioms]);
 
+  // Pull the next page as the user nears the end of the loaded feed. Shuffle
+  // freezes the deck to what's already loaded, so only page ahead while the feed
+  // is in natural order. Guard on the fetching flag so we don't queue duplicates.
+  const loadMore = useCallback(() => {
+    if (!isShuffled && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [isShuffled, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   return {
     idioms: feedIdioms,
     allIdiomIds,
     isLoading,
     isError,
     refetch,
+    loadMore,
+    isFetchingNextPage,
     currentIndex,
     setCurrentIndex,
     isShuffled,

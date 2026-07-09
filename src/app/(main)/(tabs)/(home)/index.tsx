@@ -37,6 +37,8 @@ export default function HomeScreen() {
     isLoading,
     isError,
     refetch,
+    loadMore,
+    isFetchingNextPage,
     currentIndex,
     setCurrentIndex,
     shuffleKey,
@@ -169,6 +171,15 @@ export default function HomeScreen() {
         getItemLayout={getItemLayout}
         initialScrollIndex={currentIndex > 0 ? currentIndex : undefined}
         windowSize={3}
+        onEndReached={loadMore}
+        onEndReachedThreshold={3}
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View style={styles.footer}>
+              <ActivityIndicator color={theme.colors.primary} />
+            </View>
+          ) : null
+        }
       />
 
       {/* Floating header — touch passes through to FlatList except on buttons */}
@@ -194,6 +205,10 @@ const styles = StyleSheet.create((theme) => ({
   },
   centered: {
     justifyContent: "center",
+    alignItems: "center",
+  },
+  footer: {
+    paddingVertical: theme.spacing.lg,
     alignItems: "center",
   },
   floatingHeader: {

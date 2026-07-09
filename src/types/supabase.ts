@@ -391,7 +391,12 @@ export type Database = {
     };
     Functions: {
       get_idiom_feed: {
-        Args: { p_language_codes: string[]; p_ui_language?: string };
+        Args: {
+          p_language_codes: string[];
+          p_ui_language?: string;
+          p_limit?: number;
+          p_offset?: number;
+        };
         Returns: {
           created_at: string;
           equivalents: Json;

@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  type InfiniteData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { supabase } from "@/core/supabase/client";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import type { Idiom } from "../types";
@@ -8,9 +13,12 @@ interface ToggleIdiomLikeInput {
   isLiked: boolean;
 }
 
+type IdiomFeed = InfiniteData<Idiom[]>;
+
 interface ToggleIdiomLikeContext {
   previousLikedIds?: Set<string>;
   previousIdioms?: Array<[readonly unknown[], Idiom[] | undefined]>;
+  previousFeeds?: Array<[readonly unknown[], IdiomFeed | undefined]>;
 }
 
 const adjustLikesCount = (
@@ -23,6 +31,20 @@ const adjustLikesCount = (
       ? { ...idiom, likesCount: Math.max(idiom.likesCount + delta, 0) }
       : idiom,
   );
+
+// The paginated home feed (["idioms-feed"]) caches idioms as InfiniteData pages,
+// so patch each page rather than a flat array to keep the optimistic count live.
+const adjustFeedLikesCount = (
+  feed: IdiomFeed | undefined,
+  idiomId: string,
+  delta: number,
+): IdiomFeed | undefined =>
+  feed && {
+    ...feed,
+    pages: feed.pages.map(
+      (page) => adjustLikesCount(page, idiomId, delta) ?? page,
+    ),
+  };
 
 const toggleInSet = (
   current: Set<string>,
@@ -89,6 +111,7 @@ export const useToggleIdiomLike = () => {
         await Promise.all([
           queryClient.cancelQueries({ queryKey: ["idiom-likes", user?.id] }),
           queryClient.cancelQueries({ queryKey: ["idioms"] }),
+          queryClient.cancelQueries({ queryKey: ["idioms-feed"] }),
         ]);
 
         const previousLikedIds = queryClient.getQueryData<Set<string>>([
@@ -97,6 +120,9 @@ export const useToggleIdiomLike = () => {
         ]);
         const previousIdioms = queryClient.getQueriesData<Idiom[]>({
           queryKey: ["idioms"],
+        });
+        const previousFeeds = queryClient.getQueriesData<IdiomFeed>({
+          queryKey: ["idioms-feed"],
         });
 
         queryClient.setQueryData<Set<string>>(
@@ -109,7 +135,12 @@ export const useToggleIdiomLike = () => {
           (current) => adjustLikesCount(current, idiomId, isLiked ? -1 : 1),
         );
 
-        return { previousLikedIds, previousIdioms };
+        queryClient.setQueriesData<IdiomFeed>(
+          { queryKey: ["idioms-feed"] },
+          (current) => adjustFeedLikesCount(current, idiomId, isLiked ? -1 : 1),
+        );
+
+        return { previousLikedIds, previousIdioms, previousFeeds };
       },
       onError: (_error, _variables, context) => {
         queryClient.setQueryData(
@@ -119,6 +150,10 @@ export const useToggleIdiomLike = () => {
 
         for (const [queryKey, idioms] of context?.previousIdioms ?? []) {
           queryClient.setQueryData(queryKey, idioms);
+        }
+
+        for (const [queryKey, feed] of context?.previousFeeds ?? []) {
+          queryClient.setQueryData(queryKey, feed);
         }
       },
       onSettled: async () => {
