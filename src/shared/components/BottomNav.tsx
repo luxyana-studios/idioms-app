@@ -146,20 +146,19 @@ export function BottomNav() {
   const activeTab = segments[2];
   const isOnHome = activeTab === "(home)";
 
-  const { enableShuffle, allIdiomIds, currentIdiomId, isShuffled } =
-    useFeedList();
+  const { shuffle, isShuffled } = useFeedList();
 
   const handlePress = useCallback(
     (item: NavItemDef) => {
       if (item.segment === "(home)" && isOnHome) {
-        enableShuffle(allIdiomIds, currentIdiomId);
+        shuffle();
       } else {
         router.navigate(
           item.navigateTo as Parameters<typeof router.navigate>[0],
         );
       }
     },
-    [isOnHome, enableShuffle, allIdiomIds, currentIdiomId, router],
+    [isOnHome, shuffle, router],
   );
 
   const GlassLayer =

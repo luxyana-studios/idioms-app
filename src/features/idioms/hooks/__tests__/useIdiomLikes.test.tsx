@@ -181,6 +181,69 @@ describe("useToggleIdiomLike", () => {
     expect(idioms?.[0].likesCount).toBe(4);
   });
 
+  it("optimistically patches the paginated feed cache (InfiniteData)", async () => {
+    const queryClient = makeQueryClient();
+    queryClient.setQueryData(["idiom-likes", "user-1"], new Set<string>());
+    queryClient.setQueryData(["idioms-feed", "en", "es"], {
+      pageParams: [0],
+      pages: [[makeIdiom("idiom-1", 3), makeIdiom("idiom-2", 1)]],
+    });
+
+    mockFrom.mockImplementation(() => makeUpsertChain({ error: null }));
+
+    const { result } = await renderHook(() => useToggleIdiomLike(), {
+      wrapper: makeWrapper(queryClient),
+    });
+
+    await act(async () => {
+      await result.current.mutateAsync({ idiomId: "idiom-1", isLiked: false });
+    });
+
+    const feed = queryClient.getQueryData<{ pages: Idiom[][] }>([
+      "idioms-feed",
+      "en",
+      "es",
+    ]);
+    expect(feed?.pages[0][0].likesCount).toBe(4);
+    // Unrelated idiom in the same page is untouched.
+    expect(feed?.pages[0][1].likesCount).toBe(1);
+  });
+
+  it("rolls back the feed cache when the mutation fails", async () => {
+    const queryClient = makeQueryClient();
+    queryClient.setQueryData(["idiom-likes", "user-1"], new Set<string>());
+    queryClient.setQueryData(["idioms-feed", "en", "es"], {
+      pageParams: [0],
+      pages: [[makeIdiom("idiom-1", 3)]],
+    });
+
+    mockFrom.mockImplementation(() =>
+      makeUpsertChain({ error: { message: "boom" } }),
+    );
+
+    const { result } = await renderHook(() => useToggleIdiomLike(), {
+      wrapper: makeWrapper(queryClient),
+    });
+
+    await act(async () => {
+      try {
+        await result.current.mutateAsync({
+          idiomId: "idiom-1",
+          isLiked: false,
+        });
+      } catch {
+        // expected
+      }
+    });
+
+    const feed = queryClient.getQueryData<{ pages: Idiom[][] }>([
+      "idioms-feed",
+      "en",
+      "es",
+    ]);
+    expect(feed?.pages[0][0].likesCount).toBe(3);
+  });
+
   it("rolls back optimistic state when the mutation fails", async () => {
     const queryClient = makeQueryClient();
     const initialLikes = new Set<string>();

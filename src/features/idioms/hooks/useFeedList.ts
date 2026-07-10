@@ -1,38 +1,45 @@
-import { useMemo } from "react";
+import { useCallback } from "react";
 import { useIdiomsStore } from "../stores/idioms.store";
-import { useIdioms } from "./useIdioms";
+import { useIdiomsFeed } from "./useIdiomsFeed";
 
 export function useFeedList() {
-  const { data: idioms = [], isLoading, isError, refetch } = useIdioms();
+  const shuffleSeed = useIdiomsStore((s) => s.shuffleSeed);
+  const shuffleKey = useIdiomsStore((s) => s.shuffleKey);
+  const shuffle = useIdiomsStore((s) => s.shuffle);
   const currentIndex = useIdiomsStore((s) => s.currentIndex);
   const setCurrentIndex = useIdiomsStore((s) => s.setCurrentIndex);
-  const isShuffled = useIdiomsStore((s) => s.isShuffled);
-  const shuffledIds = useIdiomsStore((s) => s.shuffledIds);
-  const shuffleKey = useIdiomsStore((s) => s.shuffleKey);
-  const enableShuffle = useIdiomsStore((s) => s.enableShuffle);
 
-  const feedIdioms = useMemo(() => {
-    if (!isShuffled || shuffledIds.length === 0) return idioms;
-    const map = new Map(idioms.map((i) => [i.id, i]));
-    return shuffledIds.flatMap((id) => {
-      const idiom = map.get(id);
-      return idiom ? [idiom] : [];
-    });
-  }, [idioms, isShuffled, shuffledIds]);
-
-  const allIdiomIds = useMemo(() => idioms.map((i) => i.id), [idioms]);
-
-  return {
-    idioms: feedIdioms,
-    allIdiomIds,
+  // Ordering (natural or shuffled) is resolved server-side via the seed, so the
+  // feed arrives already in display order — no client-side reshuffle needed.
+  const {
+    idioms = [],
     isLoading,
     isError,
     refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useIdiomsFeed(shuffleSeed);
+
+  // Pull the next page as the user nears the end of the loaded feed. Paging works
+  // in both natural and shuffled order, since the seed just fixes the ordering.
+  const loadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  return {
+    idioms,
+    isLoading,
+    isError,
+    refetch,
+    loadMore,
+    isFetchingNextPage,
     currentIndex,
     setCurrentIndex,
-    isShuffled,
-    enableShuffle,
-    currentIdiomId: feedIdioms[currentIndex]?.id,
+    isShuffled: shuffleSeed !== null,
+    shuffle,
     shuffleKey,
   };
 }

@@ -193,7 +193,7 @@ export default function ExploreScreen() {
                 <Pressable
                   key={idiom.id}
                   onPress={() => {
-                    router.push(`/(main)/(tabs)/(home)?scrollToId=${idiom.id}`);
+                    router.push(`/(main)/(tabs)/(home)/${idiom.id}`);
                   }}
                   style={({ pressed }) => [
                     styles.idiomCard,
