@@ -396,6 +396,7 @@ export type Database = {
           p_ui_language?: string;
           p_limit?: number;
           p_offset?: number;
+          p_seed?: string;
         };
         Returns: {
           created_at: string;

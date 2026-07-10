@@ -14,25 +14,29 @@ const fetchIdiomsPage = async (
   uiLanguage: string,
   languageCodes: string[],
   offset: number,
+  seed: string | null,
 ): Promise<Idiom[]> => {
   const { data, error } = await supabase.rpc("get_idiom_feed", {
     p_language_codes: languageCodes,
     p_ui_language: uiLanguage,
     p_limit: FEED_PAGE_SIZE,
     p_offset: offset,
+    // null seed → natural order; a seed switches the RPC to md5(id || seed).
+    p_seed: seed ?? undefined,
   });
 
   if (error) throw error;
 
-  // The RPC already orders rows by configured language, then created_at, then id,
-  // so a stable offset yields non-overlapping pages.
+  // The RPC orders rows deterministically (by language+created_at, or by the seed),
+  // so a stable offset yields non-overlapping pages in either order.
   return (data ?? []).map(mapIdiomRow);
 };
 
 // Paginated variant of useIdioms for the home feed. Loads the catalog one page
 // at a time via useInfiniteQuery instead of the whole set up front. Kept separate
 // from useIdioms (whole-catalog) because explore/saved/counts need every idiom.
-export const useIdiomsFeed = () => {
+// A non-null `seed` shuffles the whole feed server-side (see get_idiom_feed).
+export const useIdiomsFeed = (seed: string | null = null) => {
   const { i18n } = useTranslation();
   const {
     languages,
@@ -46,9 +50,11 @@ export const useIdiomsFeed = () => {
   const languageScopeKey = languageCodes.join(",");
 
   const query = useInfiniteQuery({
-    queryKey: ["idioms-feed", i18n.language, languageScopeKey],
+    // Seed is part of the key: each shuffle is a distinct feed, and clearing it
+    // returns to the cached natural-order feed instantly.
+    queryKey: ["idioms-feed", i18n.language, languageScopeKey, seed],
     queryFn: ({ pageParam }) =>
-      fetchIdiomsPage(i18n.language, languageCodes, pageParam),
+      fetchIdiomsPage(i18n.language, languageCodes, pageParam, seed),
     initialPageParam: 0,
     // A short final page (fewer than a full page) means the catalog is exhausted.
     // Otherwise every prior page was full, so the next offset is a clean multiple.

@@ -1,42 +1,32 @@
 import { create } from "zustand";
 
-function fisherYatesShuffle(ids: string[]): string[] {
-  const arr = [...ids];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+// A short random token used as the RPC shuffle seed. The value only needs to be
+// unique enough that consecutive shuffles produce a different order.
+function makeSeed(): string {
+  return Math.random().toString(36).slice(2, 10);
 }
 
 interface IdiomsState {
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
-  isShuffled: boolean;
-  shuffledIds: string[];
+  // null = natural order. A non-null seed drives the RPC's md5(id || seed)
+  // ordering, so shuffle is resolved server-side and spans the whole catalog.
+  shuffleSeed: string | null;
+  // Bumped on every shuffle so the feed screen can scroll back to the top.
   shuffleKey: number;
-  enableShuffle: (idiomIds: string[], currentId?: string) => void;
+  // Re-rolls the seed, so each press produces a fresh whole-catalog order.
+  shuffle: () => void;
 }
 
 export const useIdiomsStore = create<IdiomsState>()((set, get) => ({
   currentIndex: 0,
   setCurrentIndex: (index) => set({ currentIndex: index }),
-  isShuffled: false,
-  shuffledIds: [],
+  shuffleSeed: null,
   shuffleKey: 0,
-  enableShuffle: (idiomIds, currentId) => {
-    const shuffled = fisherYatesShuffle(idiomIds);
-    // Ensure the currently visible card is never at position 0 so the user
-    // always sees a different card after pressing shuffle.
-    if (currentId && shuffled[0] === currentId && shuffled.length > 1) {
-      const swapIdx = 1 + Math.floor(Math.random() * (shuffled.length - 1));
-      [shuffled[0], shuffled[swapIdx]] = [shuffled[swapIdx], shuffled[0]];
-    }
+  shuffle: () =>
     set({
-      isShuffled: true,
-      shuffledIds: shuffled,
+      shuffleSeed: makeSeed(),
       currentIndex: 0,
       shuffleKey: get().shuffleKey + 1,
-    });
-  },
+    }),
 }));

@@ -115,6 +115,24 @@ describe("useIdiomsFeed", () => {
     expect(result.current.hasNextPage).toBe(false);
   });
 
+  it("passes the shuffle seed to the RPC and keys the query by it", async () => {
+    mockRpc.mockResolvedValue({ data: [makeRow("a")], error: null });
+
+    const { result } = await renderHook(() => useIdiomsFeed("seed-xyz"), {
+      wrapper: makeWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(mockRpc).toHaveBeenCalledWith("get_idiom_feed", {
+      p_language_codes: ["es", "fr"],
+      p_ui_language: "en",
+      p_limit: FEED_PAGE_SIZE,
+      p_offset: 0,
+      p_seed: "seed-xyz",
+    });
+  });
+
   it("waits while language state is loading", async () => {
     mockUseUserLanguages.mockReturnValue({
       languages: [language("es")],

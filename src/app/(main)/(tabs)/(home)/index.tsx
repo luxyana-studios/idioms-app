@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import { DrawerActions } from "expo-router/react-navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -30,7 +30,6 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { height: screenHeight } = useWindowDimensions();
-  const { scrollToId } = useLocalSearchParams<{ scrollToId?: string }>();
 
   const {
     idioms,
@@ -62,19 +61,6 @@ export default function HomeScreen() {
       flatListRef.current?.scrollToOffset({ offset: 0, animated: false });
     }
   }, [shuffleKey]);
-
-  useEffect(() => {
-    if (!scrollToId || idioms.length === 0) {
-      return;
-    }
-    const idx = idioms.findIndex((i) => i.id === scrollToId);
-    if (idx >= 0) {
-      flatListRef.current?.scrollToIndex({ index: idx, animated: false });
-      setCurrentIndex(idx);
-    }
-    // Clear the param so re-tapping the same idiom from Explore re-triggers this effect.
-    router.setParams({ scrollToId: undefined });
-  }, [scrollToId, idioms, setCurrentIndex, router]);
 
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {

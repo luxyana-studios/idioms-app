@@ -1,10 +1,14 @@
--- Paginate the idiom feed: add optional p_limit / p_offset to get_idiom_feed so
--- the home feed can load one page at a time instead of the whole catalog. Other
--- callers (explore, saved, language counts) omit both args and still receive the
--- full ordered payload — p_limit null means "no limit".
+-- Paginate + shuffle the idiom feed. Adds to get_idiom_feed:
+--   * p_limit / p_offset  — the home feed loads one page at a time instead of the
+--     whole catalog. Other callers (explore, saved, language counts) omit both and
+--     still receive the full ordered payload — p_limit null means "no limit".
+--   * p_seed              — when set, the feed is ordered by md5(id || seed) instead
+--     of the natural (language, created_at) order. A fixed seed gives a stable total
+--     order (id is the final tiebreak), so paging a shuffled feed yields the same
+--     non-overlapping, dup-free pages as the natural feed. The p_language_codes
+--     filter is unchanged, so shuffle stays scoped to the configured languages.
 --
--- The feed ordering is deterministic (configured language order, then created_at,
--- then id), so offset paging over a stable catalog yields non-overlapping pages.
+-- Offset paging over a stable catalog yields non-overlapping pages in both orders.
 
 -- Adding parameters changes the function signature, so drop the old 2-arg form
 -- first (CREATE OR REPLACE only replaces a matching signature).
@@ -14,7 +18,8 @@ create function public.get_idiom_feed(
   p_language_codes text[],
   p_ui_language text default 'en',
   p_limit integer default null,
-  p_offset integer default 0
+  p_offset integer default 0,
+  p_seed text default null
 )
 returns table (
   id uuid,
@@ -119,12 +124,17 @@ as $$
       or i.language_code = any(p_language_codes)
     )
   order by
-    array_position(p_language_codes, i.language_code) nulls last,
-    i.created_at,
+    -- Natural order (p_seed null): configured language, then created_at.
+    -- Shuffled order (p_seed set): deterministic md5(id || seed).
+    -- The inactive branch is null for every row, so it has no effect; i.id is the
+    -- final tiebreak in both, making the order a strict total order.
+    case when p_seed is null then array_position(p_language_codes, i.language_code) end nulls last,
+    case when p_seed is null then i.created_at end,
+    case when p_seed is not null then md5(i.id::text || p_seed) end,
     i.id
   limit p_limit
   offset greatest(p_offset, 0);
 $$;
 
-grant execute on function public.get_idiom_feed(text[], text, integer, integer)
+grant execute on function public.get_idiom_feed(text[], text, integer, integer, text)
   to anon, authenticated;
