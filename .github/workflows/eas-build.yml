@@ -1,0 +1,48 @@
+name: EAS Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform'
+        required: true
+        default: 'all'
+        type: choice
+        options: [all, android, ios]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eas-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: EAS Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - run: npm ci
+
+      - name: Build and submit
+        run: |
+          eas build \
+            --platform ${{ inputs.platform }} \
+            --profile production \
+            --non-interactive \
+            --no-wait \
+            --auto-submit
